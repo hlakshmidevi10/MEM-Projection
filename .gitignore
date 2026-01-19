@@ -1,0 +1,21 @@
+# Ignore everything
+*
+
+# But keep the README
+!Readme.md
+
+# Keep the scripts folder
+!scripts/
+!scripts/**
+
+# Keep the yeast-8 visualization folder
+!yeast-8/
+!yeast-8/s28cc_flo1_chr1_186000_214000/
+!yeast-8/s28cc_flo1_chr1_186000_214000/**
+
+# Keep the .gitignore itself
+!.gitignore
+
+# Never track .DS_Store files
+.DS_Store
+**/.DS_Store

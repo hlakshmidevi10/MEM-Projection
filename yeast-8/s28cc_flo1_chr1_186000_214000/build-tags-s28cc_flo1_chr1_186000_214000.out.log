@@ -1,0 +1,53 @@
+6927
+5
+6928
+endmarker runs size 24
+12
+Loading the graph file
+Computing the unique kmers in the graph
+The number of unique kmers in the index is: 130748
+Indexing unique kmers took 0.0321175 seconds
+Adding the kmers to the BPlusTree
+running each part 30133 using threads 12
+Adding kmers to bptree took 0.282899 seconds
+The number of unique kmers in the index is: 130748
+The number of items in the BPlusTree is: 96608
+The size of the BWT is: 361602
+calculating the fraction of the tag arrays covered
+The fraction of the tag arrays covered by unique kmers is: 341667 / 361602 = 0.94487
+Extending the kmers on the graph
+Extending kmers took 0.0215496 seconds
+calculating the fraction of the tag arrays covered after one extension
+The fraction of the tag arrays covered after extending the kmers is: 342205 / 361602 = 0.946358
+Filling the gaps on the bptree
+Total no. of sequences: 24
+The end of the sequence at BWT index 20
+The end of the sequence at BWT index 18
+The end of the sequence at BWT index 9
+The end of the sequence at BWT index 17
+The end of the sequence at BWT index 11
+The end of the sequence at BWT index 15
+The end of the sequence at BWT index 12
+The end of the sequence at BWT index 4
+The end of the sequence at BWT index 3
+The end of the sequence at BWT index 22
+The end of the sequence at BWT index 16
+The end of the sequence at BWT index 5
+The end of the sequence at BWT index 2
+The end of the sequence at BWT index 13
+The end of the sequence at BWT index 0
+The end of the sequence at BWT index 21
+The end of the sequence at BWT index 10
+The end of the sequence at BWT index 23
+The end of the sequence at BWT index 6
+The end of the sequence at BWT index 8
+The end of the sequence at BWT index 1
+The end of the sequence at BWT index 14
+The end of the sequence at BWT index 19
+The end of the sequence at BWT index 7
+The traverse completed
+Adding runs with size 1 to the BPlusTree
+Sorted the tmp1 with size 19373
+Total RunsProcessed (len): 107764
+Total Run positions processed : 361578/361602
+Traversing all paths and fill all the gaps took 0.0277228 seconds

@@ -1,0 +1,60 @@
+general:
+  input-fasta:        s28cc_flo1_chr1_186000_214000.fa
+  output-dir:         pggb.s28cc_flo1_chr1_186000_214000
+  temp-dir:           pggb.s28cc_flo1_chr1_186000_214000
+  resume:             false
+  compress:           false
+  threads:            12
+  poa_threads:        12
+pggb:
+  version:            v0.7.4-26-g498c5d7
+wfmash:
+  version:            v0.23.0-41-gb5f0ff1c
+  segment-length:     1000
+  block-length:       3000
+  map-pct-id:         90
+  n-mappings:         1
+  no-splits:          false
+  sparse-map:         false
+  mash-kmer:          15
+  mash-kmer-thres:    0.0002
+  hg-filter-ani-diff: 0
+  exclude-delim:      #
+  no-merge-segments:  false
+  batch-size:         4G
+seqwish:
+  version:            8622291
+  min-match-len:      23
+  sparse-factor:      0
+  transclose-batch:   10M
+smoothxg:
+  version:            50efe82
+  skip-normalization: false
+  n-haplotypes:              8
+  path-jump-max:      0
+  edge-jump-max:      0
+  poa-length-target:  700,1100
+  poa-params:         1,4,6,2,26,1
+  poa_padding:        0.001
+  run_abpoa:          false
+  run_global_poa:     false
+  pad-max-depth:      100
+  write-maf:          false
+  consensus-spec:     false
+  consensus-prefix:   Consensus_
+  block-id-min:       .9000
+  block-ratio-min:    0
+odgi:
+  version:            3e79c91
+  viz:                true
+  layout:             true
+  stats:              false
+gfaffix:
+  version:            v0.2.1
+  reduce-redundancy:  true
+vg:
+  version:            v1.67.0-45-gc462d7fce
+  deconstruct:        false
+reporting:
+  version:            v
+  multiqc:            false
