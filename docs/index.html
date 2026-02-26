@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MEM Projection - BWT-based Pangenome Read Mapping</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-brand">MEM Projection</div>
+            <div class="nav-links">
+                <a href="#home">Home</a>
+                <a href="#motivation">Motivation</a>
+                <a href="#approach">Approach</a>
+                <a href="#features">Features</a>
+                <a href="#technical">Technical</a>
+                <a href="#results">Results</a>
+                <a href="#quickstart">Quick Start</a>
+                <a href="https://github.com/hlakshmidevi10/mem-projection" target="_blank">GitHub</a>
+            </div>
+        </div>
+    </nav>
+
+    <header id="home" class="hero">
+        <div class="container">
+            <div class="hero-content">
+                <h1>MEM Projection</h1>
+                <p class="subtitle">Lossless Pangenome Mapper</p>
+                <p class="tagline">Fast and efficient method to map sequencing reads to lossless pangenome graphs via BWT-based projection</p>
+                <div class="hero-buttons">
+                    <a href="https://github.com/hlakshmidevi10/mem-projection" class="btn btn-primary" target="_blank">View on GitHub</a>
+                    <a href="#quickstart" class="btn btn-secondary">Get Started</a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="motivation" class="section">
+        <div class="container">
+            <h2>Motivation</h2>
+            <div class="content-grid">
+                <div class="motivation-card">
+                    <div class="icon">🧬</div>
+                    <h3>The Pangenomics Era</h3>
+                    <p>With increasing high-quality assemblies across species, we're moving from single references to comprehensive pangenome representations that capture genetic diversity and improve downstream analyses.</p>
+                </div>
+                <div class="motivation-card">
+                    <div class="icon">⚠️</div>
+                    <h3>The Graph Complexity Problem</h3>
+                    <p>Complex regions (alpha satellites, centromeres) create high computational burden in direct graph alignment. This leads to graph pruning and loss of biologically relevant regions. We need lossless approaches.</p>
+                </div>
+                <div class="motivation-card">
+                    <div class="icon">⚡</div>
+                    <h3>Fast Lossless Mapping</h3>
+                    <p>By leveraging BWT-based full-text indexes and tag-array projection, we achieve fast read mapping to lossless pangenome graphs without pruning complex regions.</p>
+                </div>
+                <div class="motivation-card">
+                    <div class="icon">🎯</div>
+                    <h3>Haplotype Resolution</h3>
+                    <p>Path-specific coverage enables deconvolving haplotypes from short reads, supporting accurate genotyping and variant calling in complex genomic regions.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="approach" class="section section-alt">
+        <div class="container">
+            <h2>The MEM-Projection Approach</h2>
+            <p class="section-intro">
+                MEM Projection bridges the efficiency of linear sequence indexes with the representational power of pangenome graphs through a novel projection strategy using tag-array indexing.
+            </p>
+            <div class="approach-content">
+                <div class="approach-step">
+                    <div class="step-number">1</div>
+                    <h3>MEM Finding via r-index</h3>
+                    <p>Query sequencing reads against the <strong>r-index</strong> (FM-index on RLBWT) to find <strong>Maximal Exact Matches (MEMs)</strong>. Each BWT interval [i, j] represents suffixes with the MEM as prefix, stored in O(r) space where r is the number of runs.</p>
+                </div>
+                <div class="approach-step">
+                    <div class="step-number">2</div>
+                    <h3>Tag-Array Projection</h3>
+                    <p>Use the <strong>tag-index</strong> to project BWT positions to graph coordinates. Tag[i] stores (node_id, offset, strand) for suffix T[SA[i]..], providing positional annotation over the BWT. Query tag.query(i, j) returns all graph positions for the MEM.</p>
+                </div>
+                <div class="approach-step">
+                    <div class="step-number">3</div>
+                    <h3>Haplotype-Aware Coverage</h3>
+                    <p>For each MEM's BWT interval, extract unique sequence/haplotype IDs via SA (document array query). The <strong>path-walker</strong> performs guided traversal using only paths supported by these haplotypes, computing path coverage for genotyping.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="features" class="section">
+        <div class="container">
+            <h2>Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <h3>🔒 Lossless Representation</h3>
+                    <p>No graph pruning required. Maintains full complexity including complex regions (centromeres, alpha satellites) that other tools must simplify.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ Fast MEM Queries</h3>
+                    <p>RLBWT-based r-index enables O(r) space complexity and efficient MEM finding for arbitrary-length queries on large pangenomes.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🎯 Tag-Array Indexing</h3>
+                    <p>Innovative positional annotation over BWT enables direct projection from linear BWT coordinates to graph node/path positions.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🧬 Haplotype Deconvolution</h3>
+                    <p>Document array queries identify unique haplotypes for each MEM, enabling path-specific coverage and haplotype resolution from short reads.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Genotyping-Ready Output</h3>
+                    <p>Produces GAF alignments and path/node coverage (coverage.tsv) compatible with genotyping tools like cosigt.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🚀 ROI Efficiency</h3>
+                    <p>Dynamic local graph construction for regions of interest. Fast coverage-vector computation without storing full CRAM files.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔧 Modular Design</h3>
+                    <p>Clean separation: PGGB for graphs, grlBWT for RLBWT, pangenome-index for r-index/tags, gafpack for path-walking.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📈 Visualization Support</h3>
+                    <p>Coverage outputs work with Bandage. Brighter nodes indicate higher coverage, revealing path-specific mapping patterns.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="workflow" class="section section-alt">
+        <div class="container">
+            <h2>Pipeline Workflow</h2>
+            <div class="workflow-diagram">
+                <div class="workflow-step">
+                    <div class="workflow-box">
+                        <div class="workflow-title">Graph Construction</div>
+                        <div class="workflow-desc">PGGB builds pangenome graph from multi-sample assemblies</div>
+                        <div class="workflow-tool">pggb, gfa2gbwt</div>
+                    </div>
+                    <div class="workflow-arrow">↓</div>
+                </div>
+                
+                <div class="workflow-step">
+                    <div class="workflow-box">
+                        <div class="workflow-title">Index Building</div>
+                        <div class="workflow-desc">Create RLBWT and r-index from lossless sequence space</div>
+                        <div class="workflow-tool">grlbwt-cli, build_rindex</div>
+                    </div>
+                    <div class="workflow-arrow">↓</div>
+                </div>
+                
+                <div class="workflow-step">
+                    <div class="workflow-box">
+                        <div class="workflow-title">Tag Mapping</div>
+                        <div class="workflow-desc">Construct auxiliary structure linking BWT to graph coordinates</div>
+                        <div class="workflow-tool">build_tags, compress_tags</div>
+                    </div>
+                    <div class="workflow-arrow">↓</div>
+                </div>
+                
+                <div class="workflow-step">
+                    <div class="workflow-box">
+                        <div class="workflow-title">MEM Finding</div>
+                        <div class="workflow-desc">Query reads against r-index for maximal exact matches</div>
+                        <div class="workflow-tool">find_mems</div>
+                    </div>
+                    <div class="workflow-arrow">↓</div>
+                </div>
+                
+                <div class="workflow-step">
+                    <div class="workflow-box">
+                        <div class="workflow-title">Graph Projection</div>
+                        <div class="workflow-desc">Map MEMs to graph coordinates using tag index</div>
+                        <div class="workflow-tool">Tag-based projection</div>
+                    </div>
+                    <div class="workflow-arrow">↓</div>
+                </div>
+                
+                <div class="workflow-step">
+                    <div class="workflow-box">
+                        <div class="workflow-title">Coverage Computation</div>
+                        <div class="workflow-desc">Calculate path-specific and node-level coverage</div>
+                        <div class="workflow-tool">gafpack</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="technical" class="section">
+        <div class="container">
+            <h2>Technical Details</h2>
+            <div class="technical-content">
+                <div class="technical-section">
+                    <h3>FM-Index & RLBWT</h3>
+                    <p>The FM-index is a full-text index based on the Burrows-Wheeler Transform (BWT) that enables fast pattern matching. Each index i in BWT corresponds to a unique suffix T[SA[i]...], where SA is the suffix array.</p>
+                    <p><strong>Run-length encoding</strong> compresses the BWT to O(r) space where r is the number of runs, dramatically reducing memory for repetitive pangenomes.</p>
+                    <div class="query-types">
+                        <div class="query"><strong>Find(P):</strong> Total occurrences of pattern P in text T</div>
+                        <div class="query"><strong>Locate(P):</strong> Positions where P occurs in T</div>
+                    </div>
+                </div>
+                
+                <div class="technical-section">
+                    <h3>Tag-Array Indexing</h3>
+                    <p>Tag[i] stores the label <code>(node_id, offset, strand)</code> for the graph position from which suffix T[SA[i]...] originates. This provides <strong>positional annotation over the BWT</strong>.</p>
+                    <p>When we find a MEM with BWT interval [i, j], we query <code>tag.query(i, j)</code> to retrieve all corresponding graph positions: {(s₁, o₁, strand₁), ..., (sⱼ, oⱼ, strandⱼ)}.</p>
+                    <p class="reference">Reference: Eskandar P, Paten B, Sirén J. <em>Lossless Pangenome Indexing Using Tag Arrays</em></p>
+                </div>
+                
+                <div class="technical-section">
+                    <h3>Haplotype-Guided Path Walking</h3>
+                    <p>For each MEM with BWT interval [i, j], we use the document array (DA) to extract unique sequence/haplotype IDs. This tells us which paths in the pangenome actually contain the MEM.</p>
+                    <p>The path-walker performs <strong>guided traversal</strong> with complexity proportional to the number of unique paths, visiting only paths supported by the identified haplotypes. This produces accurate path coverage for genotyping.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="results" class="section section-alt">
+        <div class="container">
+            <h2>Validation & Results</h2>
+            <div class="results-content">
+                <div class="result-card">
+                    <h3>✅ Whole-Genome Analysis</h3>
+                    <p>End-to-end workflow verified on <strong>8 yeast genomes</strong> (whole-genome scale), producing coverage.tsv and mappings.gaf outputs.</p>
+                </div>
+                <div class="result-card">
+                    <h3>✅ High-Diversity ROI</h3>
+                    <p>Tested on 30Kbp region of interest from <strong>235 yeast genomes</strong>, demonstrating scalability to high sample counts.</p>
+                </div>
+                <div class="result-card">
+                    <h3>🔬 Coverage Validation</h3>
+                    <p>Read coverage visualized on Bandage shows expected patterns: paths diverging from reference have lower coverage, confirming accurate haplotype-specific mapping.</p>
+                </div>
+                <div class="result-card">
+                    <h3>🚧 Ongoing Work</h3>
+                    <p>Currently testing whole-genome analysis with 235 yeast genomes. Profiling runtime and memory performance across larger contexts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section id="components" class="section">
+        <div class="container">
+            <h2>Core Components</h2>
+            <div class="components-grid">
+                <div class="component-card">
+                    <h3>r-index</h3>
+                    <p>Full-text index based on run-length encoded BWT (RLBWT) optimized for fast MEM queries with O(r) space complexity</p>
+                </div>
+                <div class="component-card">
+                    <h3>Tag-index</h3>
+                    <p>Positional annotation layer over BWT mapping suffix array positions to graph coordinates (node_id, offset, strand)</p>
+                </div>
+                <div class="component-card">
+                    <h3>gafpack Path-walker</h3>
+                    <p>Parallel haplotype-guided path traversal computing path-specific and node-level coverage from projected MEMs</p>
+                </div>
+                <div class="component-card">
+                    <h3>PGGB Pipeline</h3>
+                    <p>Pangenome Graph Builder (wfmash + seqwish + smoothxg + odgi) for constructing high-quality variation graphs</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="quickstart" class="section section-alt">
+        <div class="container">
+            <h2>Quick Start</h2>
+            <div class="quickstart-content">
+                <div class="quickstart-step">
+                    <h3>1. Build Pangenome Graph</h3>
+                    <pre><code>pggb -i reference.fa.gz -t 16 -o pggb.output
+gfa2gbwt -c pggb.output/graph.smooth -p --pan-sn</code></pre>
+                </div>
+                
+                <div class="quickstart-step">
+                    <h3>2. Create Indexes</h3>
+                    <pre><code>gbz_extract -b -p graph.gbz > graph.seq
+grlbwt-cli graph.seq
+build_rindex graph.rl_bwt > graph.ri</code></pre>
+                </div>
+                
+                <div class="quickstart-step">
+                    <h3>3. Build Tag Index</h3>
+                    <pre><code>build_tags graph.gbz graph.rl_bwt graph.tags 31
+compress_tags graph.ri graph.tags graph</code></pre>
+                </div>
+                
+                <div class="quickstart-step">
+                    <h3>4. Find MEMs and Compute Coverage</h3>
+                    <pre><code>find_mems graph.ri graph_compressed.tags reads.txt 30 1 output
+gafpack --gfa graph.gfa --path-pos output_path_pos.tsv \
+        --seq-id-starts output_seq_id_starts.out \
+        --path-names graph.paths --gaf-file-prefix output --len-scale</code></pre>
+                </div>
+            </div>
+            
+            <div class="quickstart-links">
+                <a href="https://github.com/hlakshmidevi10/mem-projection#readme" class="btn btn-primary" target="_blank">Full Documentation</a>
+                <a href="https://github.com/hlakshmidevi10/mem-projection/issues" class="btn btn-secondary" target="_blank">Report Issues</a>
+            </div>
+        </div>
+    </section>
+
+    <section id="dependencies" class="section">
+        <div class="container">
+            <h2>Dependencies</h2>
+            <div class="dependencies-grid">
+                <a href="https://github.com/pangenome/pggb" class="dependency-card" target="_blank">
+                    <h3>PGGB</h3>
+                    <p>Pangenome Graph Builder</p>
+                </a>
+                <a href="https://github.com/hlakshmidevi10/pangenome-index-pvt" class="dependency-card" target="_blank">
+                    <h3>pangenome-index</h3>
+                    <p>r-index & tag building tools</p>
+                </a>
+                <a href="https://github.com/hlakshmidevi10/gafpack-pvt" class="dependency-card" target="_blank">
+                    <h3>gafpack</h3>
+                    <p>Path-walker & coverage computation</p>
+                </a>
+                <div class="dependency-card">
+                    <h3>impg</h3>
+                    <p>Pangenome query tool</p>
+                </div>
+                <div class="dependency-card">
+                    <h3>wgsim</h3>
+                    <p>Read simulation</p>
+                </div>
+                <div class="dependency-card">
+                    <h3>vg</h3>
+                    <p>Variation graph toolkit</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 MEM Projection. Garrison Lab. Licensed under MIT License.</p>
+            <p>
+                <a href="https://github.com/hlakshmidevi10/mem-projection" target="_blank">GitHub</a> |
+                <a href="https://github.com/hlakshmidevi10/mem-projection/issues" target="_blank">Issues</a> |
+                <a href="https://github.com/hlakshmidevi10/mem-projection#readme" target="_blank">Documentation</a>
+            </p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
