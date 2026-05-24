@@ -1,0 +1,7 @@
+Run:       2026-05-03
+Config:    /Users/hlakshmidevi/personal/mem-projection/pangenome-pipeline/configs/yeast235-chrII-normalized.env
+Started:   Mon May  4 21:41:24 PDT 2026
+Host:      M-Q7Q6XPVH36
+PI_BIN:    /Users/hlakshmidevi/personal/pangenome-index-latest/bin
+PI commit: 6073141 2026-05-03 10:14:58 -0700 Gate per-read [find_all_mems] debug output behind DEBUG_FIND_MEMS
+Finished: Mon May  4 21:41:45 PDT 2026

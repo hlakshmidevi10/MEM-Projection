@@ -1,0 +1,3505 @@
+Processing gfa file: /Users/hlakshmidevi/personal/mem-projection/yeast-235/yeast-235-chrI/final_output2/yeast235_chrII_100kb_laced_sorted_normalized_new.gfa
+Args: S288C_chrII_N100K_R1_200_normalized_path_pos.bin, S288C_chrII_N100K_R1_200_normalized_seq_id_starts.out
+Path names file: yeast235_chrII_100kb_normalized.paths
+Size of cumulative starts: 635; Total no. of entries: 4954591
+Path indices map:
+  AAR#0#chrII#0: 5
+  CR85#0#chrII#0: 314
+  CIC#2#chrII_4#0: 313
+  CENPK1137D#0#chrII#0: 176
+  AAC#0#chrII#0: 2
+  AIE#0#chrII#0: 49
+  ABH#0#chrII#0: 7
+  CEQ_1a#0#chrII_chrX#0: 177
+  CFF#2#chrII_10#0: 191
+  CIC#1#chrII_2#0: 312
+  BAD#0#chrII#0: 97
+  CIC#2#chrII_3#0: 218
+  ADM#2#chrII_5#0: 26
+  ADM#1#chrII_5#0: 17
+  CBM#1#chrII_9#0: 154
+  CCT_1a#0#chrII#0: 170
+  AEL#2#chrII_5#0: 41
+  Y55#0#chrII#0: 296
+  CBM#2#chrII_13#0: 307
+  AEL#1#chrII#0: 36
+  S288C#0#chrII#0: 283
+  CBM#1#chrII_1#0: 144
+  CBM#2#chrII_10#0: 306
+  CLL#1#chrII_8#0: 242
+  ASN#0#chrII#0: 85
+  CFF#2#chrII_15#0: 196
+  CFF#1#chrII_5#0: 185
+  CGH_1#0#chrII#0: 206
+  SK1#0#chrII#0: 285
+  CPS#0#chrII#0: 259
+  CBM#2#chrII_12#0: 156
+  ALH_1c#0#chrII#0: 68
+  ADM#0#chrII#0: 12
+  BAF#0#chrII#0: 98
+  CCC_1a#0#chrII#0: 167
+  ASB#0#chrII#0: 81
+  AKR#2#chrII_5#0: 66
+  FM1318#0#chrII#0: 304
+  ADM#2#chrII_11#0: 21
+  AKR#1#chrII_2#0: 60
+  CIC#0#chrII#0: 209
+  DG1768#0#chrII#0: 267
+  CMF#1#chrII#0: 249
+  CFF#1#chrII_1#0: 181
+  AEL#2#chrII_3#0: 39
+  CBM#1#chrII_7#0: 152
+  AIF#2#chrII#0: 52
+  CIC#1#chrII_4#0: 212
+  CLL#1#chrII_4#0: 238
+  CIC#2#chrII_5#0: 219
+  ASG#0#chrII#0: 84
+  AGA_1a#0#chrII#0: 44
+  AIS#0#chrII#0: 54
+  AEH#0#chrII#0: 34
+  ACH#0#chrII#0: 9
+  CKB#2#chrII#0: 233
+  CBM#2#chrII_5#0: 162
+  MSH604#0#chrII#0: 277
+  CLL#1#chrII_1#0: 235
+  IFO1802#0#chrII#0: 315
+  BBT#0#chrII#0: 114
+  CFF#2#chrII_6#0: 201
+  NCYC3947#0#chrII#0: 279
+  CIC#1#chrII_3#0: 211
+  BBF#0#chrII#0: 109
+  CCN#0#chrII#0: 168
+  NCYC3962#0#chrII#0: 280
+  AHG#0#chrII#0: 46
+  UFRJ50816#0#chrII#0: 287
+  CIC#2#chrII_9#0: 223
+  ASN#2#chrII_4#0: 90
+  CIH#2#chrII_3#0: 229
+  ANM#0#chrII#0: 78
+  CBS7001#0#chrII#0: 301
+  CNT#2#chrII#0: 255
+  BFP_1a#0#chrII#0: 126
+  CBM#1#chrII_3#0: 149
+  YPS128#0#chrII#0: 298
+  CLL#1#chrII_5#0: 239
+  BDM_1a#0#chrII#0: 120
+  ASN#2#chrII_2#0: 88
+  CRE#0#chrII#0: 263
+  AEL#2#chrII_1#0: 37
+  ANL#0#chrII#0: 77
+  IFO1815#0#chrII#0: 271
+  BAP_1a#0#chrII#0: 107
+  CL450#0#chrII#0: 303
+  ADM#2#chrII_1#0: 19
+  AIF#1#chrII#0: 51
+  AAC#1#chrII#0: 3
+  ADM#1#chrII_3#0: 15
+  CLL#0#chrII#0: 234
+  LL2011_012#0#chrII#0: 274
+  CFF#2#chrII_16#0: 197
+  UWOPS837873#0#chrII#0: 290
+  BAF#2#chrII#0: 100
+  CGH_3#0#chrII#0: 207
+  AIS#2#chrII#0: 56
+  CBM#1#chrII_8#0: 153
+  BAH#0#chrII#0: 102
+  AAA#0#chrII#0: 0
+  BDC_1c#0#chrII#0: 117
+  CLL#1#chrII_6#0: 240
+  CLN#0#chrII#0: 247
+  WX20#0#chrII#0: 293
+  AKR#1#chrII_1#0: 59
+  AIS#1#chrII#0: 55
+  BFH#0#chrII#0: 123
+  CEL_1a#0#chrII#0: 175
+  CFF#2#chrII_13#0: 194
+  CPA_1a#0#chrII#0: 256
+  AFI#0#chrII#0: 43
+  CFC#0#chrII#0: 179
+  ADQ#0#chrII#0: 31
+  BPK#2#chrII_2#0: 138
+  BTE#0#chrII#0: 139
+  BPG#0#chrII#0: 134
+  CIH#1#chrII_2#0: 226
+  CRB_1a#0#chrII#0: 262
+  LL2012_001#0#chrII#0: 275
+  CIH#1#chrII_1#0: 225
+  CQI_4a#0#chrII#0: 260
+  W303#0#chrII#0: 292
+  AGK#0#chrII#0: 45
+  CFS#0#chrII#0: 205
+  ZP591#0#chrII#0: 316
+  AEL#0#chrII#0: 35
+  CFF#1#chrII_4#0: 184
+  CBM#2#chrII_16#0: 158
+  CQS_1a#0#chrII#0: 261
+  CKB#1#chrII#0: 232
+  ADM#1#chrII_4#0: 16
+  ADM#2#chrII_9#0: 30
+  CMF#0#chrII#0: 248
+  CIH#0#chrII#0: 224
+  AVN#0#chrII#0: 96
+  ADS#0#chrII#0: 32
+  AEL#2#chrII_4#0: 40
+  AVB#0#chrII#0: 94
+  BAG_1a#0#chrII#0: 101
+  CL216#0#chrII#0: 302
+  AKR#1#chrII_3#0: 61
+  CBM#2#chrII_1#0: 155
+  CFF#2#chrII_11#0: 192
+  CLL#2#chrII_3#0: 245
+  CBS432#0#chrII#0: 166
+  RM11#0#chrII#0: 282
+  BDN_1c#0#chrII#0: 121
+  BBL#0#chrII#0: 112
+  BMB#0#chrII#0: 132
+  CIH#2#chrII_2#0: 228
+  CFF#2#chrII_7#0: 202
+  CBM#2#chrII_2#0: 159
+  ASN#2#chrII_3#0: 89
+  CBM#2#chrII_8#0: 309
+  AIC#0#chrII#0: 48
+  BDH_1b#0#chrII#0: 119
+  CHS_3a#0#chrII#0: 208
+  AHL#0#chrII#0: 47
+  CFF#1#chrII_8#0: 188
+  AMP_1a#0#chrII#0: 75
+  BPK#2#chrII_1#0: 137
+  BAK_1a#0#chrII#0: 104
+  BEM#0#chrII#0: 122
+  SX2#0#chrII#0: 286
+  CFF#1#chrII_6#0: 186
+  BAM#0#chrII#0: 106
+  CBM#1#chrII_6#0: 151
+  AKR#2#chrII_2#0: 63
+  LL2012_016#0#chrII#0: 276
+  CBM#1#chrII_11#0: 146
+  CIC#1#chrII_1#0: 210
+  L1374#0#chrII#0: 273
+  CIC#1#chrII_6#0: 214
+  BFH#1#chrII#0: 124
+  AKR#2#chrII_1#0: 62
+  CIC#1#chrII_5#0: 213
+  APG#0#chrII#0: 79
+  CFF#2#chrII_9#0: 204
+  CIC#2#chrII_6#0: 220
+  ALI#1#chrII#0: 70
+  HN1#0#chrII#0: 270
+  AQG_2a#0#chrII#0: 80
+  BBM_1a#0#chrII#0: 113
+  CFF#2#chrII_1#0: 190
+  CIC#2#chrII_8#0: 222
+  ALH_1b#0#chrII#0: 67
+  CDN_1a#0#chrII#0: 173
+  CIH#2#chrII_4#0: 230
+  BAI_1a#0#chrII#0: 103
+  BLD_1a#0#chrII#0: 131
+  AKR#0#chrII#0: 58
+  AAB#0#chrII#0: 1
+  BFH#2#chrII#0: 125
+  CFF#2#chrII_3#0: 198
+  ALI#2#chrII#0: 71
+  SGDref#0#chrII#0: 284
+  ADM#2#chrII_4#0: 25
+  CDG_1a#0#chrII#0: 172
+  CIC#2#chrII_2#0: 217
+  ASN#1#chrII#0: 86
+  AKR#2#chrII_3#0: 64
+  CFF#1#chrII_10#0: 182
+  ADM#2#chrII_10#0: 20
+  ALS_1a#0#chrII#0: 72
+  ADI#0#chrII#0: 11
+  CBM#2#chrII_3#0: 160
+  ADM#2#chrII_7#0: 28
+  BPK#1#chrII#0: 136
+  CBM#1#chrII_10#0: 145
+  AEL#2#chrII_2#0: 38
+  ATV#0#chrII#0: 93
+  CFF#0#chrII#0: 180
+  CNT#0#chrII#0: 252
+  BJ4#0#chrII#0: 130
+  BY4742#0#chrII#0: 140
+  CBM#1#chrII_12#0: 147
+  CBM#2#chrII_6#0: 163
+  CBM#1#chrII_5#0: 305
+  CPG_1a#0#chrII#0: 257
+  CNT#1#chrII_2#0: 254
+  ASB#1#chrII#0: 82
+  CFF#2#chrII_8#0: 203
+  CFF#2#chrII_14#0: 195
+  CIC#2#chrII_7#0: 221
+  CFF#1#chrII_2#0: 183
+  CNB_1a#0#chrII#0: 251
+  ADE#0#chrII#0: 10
+  XXYS14#0#chrII#0: 294
+  ADM#1#chrII_6#0: 18
+  ALI#0#chrII#0: 69
+  AMH_1a#0#chrII#0: 73
+  BCN#0#chrII#0: 116
+  BMC_2a#0#chrII#0: 133
+  CBK#0#chrII#0: 142
+  ADM#2#chrII_2#0: 23
+  CBM#1#chrII_4#0: 150
+  BBF#2#chrII#0: 111
+  CFF#2#chrII_12#0: 193
+  AKH_1a#0#chrII#0: 57
+  CNT#1#chrII_1#0: 253
+  BPK#0#chrII#0: 135
+  CLL#1#chrII_3#0: 237
+  BAL_1a#0#chrII#0: 105
+  UWOPS034614#0#chrII#0: 288
+  CFF#1#chrII_7#0: 187
+  YGL3210#0#chrII#0: 297
+  Y12#0#chrII#0: 295
+  AFH#0#chrII#0: 42
+  R23#0#chrII#0: 281
+  CBM#2#chrII_15#0: 308
+  ASB#2#chrII#0: 83
+  CDA#0#chrII#0: 171
+  CRL#0#chrII#0: 264
+  CFF#1#chrII_3#0: 310
+  CFF#2#chrII_2#0: 311
+  ABA#0#chrII#0: 6
+  AEG#0#chrII#0: 33
+  CCQ_1a#0#chrII#0: 169
+  ASN#2#chrII_5#0: 91
+  CBM#2#chrII_14#0: 157
+  ADM#2#chrII_12#0: 22
+  UWOPS052272#0#chrII#0: 289
+  AVI_1a#0#chrII#0: 95
+  BGP_1a#0#chrII#0: 128
+  CLL#1#chrII_2#0: 236
+  ADM#1#chrII_1#0: 13
+  BBF#1#chrII#0: 110
+  CEI_1a#0#chrII#0: 174
+  ACA#0#chrII#0: 8
+  AMM_1a#0#chrII#0: 74
+  BDF_1d#0#chrII#0: 118
+  CBM#0#chrII_chrVII#0: 143
+  CLL#2#chrII_4#0: 246
+  JXXY161#0#chrII#0: 272
+  DBVPG6765#0#chrII#0: 266
+  CBM#1#chrII_2#0: 148
+  ANE#0#chrII#0: 76
+  CFF#2#chrII_5#0: 200
+  CLL#1#chrII_7#0: 241
+  CLL#2#chrII_2#0: 244
+  ADM#2#chrII_6#0: 27
+  BCE_3a#0#chrII#0: 115
+  CAS_1a#0#chrII#0: 141
+  HLJ1#0#chrII#0: 269
+  N44#0#chrII#0: 278
+  CKB#0#chrII#0: 231
+  ATM_1a#0#chrII#0: 92
+  CBM#2#chrII_7#0: 164
+  DBVPG6044#0#chrII#0: 265
+  CIC#1#chrII_7#0: 215
+  AIF#0#chrII#0: 50
+  BAQ_1a#0#chrII#0: 108
+  BHH#0#chrII#0: 129
+  ADM#1#chrII_2#0: 14
+  CIH#2#chrII_1#0: 227
+  ADM#2#chrII_3#0: 24
+  CIC#2#chrII_1#0: 216
+  BGN_3a#0#chrII#0: 127
+  CFA#0#chrII#0: 178
+  AIG#0#chrII#0: 53
+  CLL#2#chrII_1#0: 243
+  BAF#1#chrII#0: 99
+  CBM#2#chrII_4#0: 161
+  YPS138#0#chrII#0: 299
+  CBM#2#chrII_9#0: 165
+  EM14S013B#0#chrII#0: 268
+  ADM#2#chrII_8#0: 29
+  CFF#2#chrII_4#0: 199
+  YPS606#0#chrII#0: 300
+  CFF#1#chrII_9#0: 189
+  CPI_1c#0#chrII#0: 258
+  UWOPS919171#0#chrII#0: 291
+  CMF#2#chrII#0: 250
+  ASN#2#chrII_1#0: 87
+  AKR#2#chrII_4#0: 65
+  AAC#2#chrII#0: 4
+Total paths: 317
+Loaded 4954591 path_pos records (118910184 bytes)
+--------
+Processing path: AAA#0#chrII#0   seq_id: 0   st: 0   num_matches: 3783
+Processing node: 574 offset: 1, al_len: 200, read_id: 75275, read_st: 0
+Processed all 3783 matches for path: AAA#0#chrII#0
+
+--------
+Processing path: AAA#0#chrII#0_reverse   seq_id: 1   st: 3783   num_matches: 6677
+Processing node: 574 offset: 382, al_len: 60, read_id: 92591, read_st: 71
+Processed all 6677 matches for path: AAA#0#chrII#0_reverse
+
+--------
+Processing path: AAB#0#chrII#0   seq_id: 2   st: 10460   num_matches: 16563
+Processing node: 961 offset: 6, al_len: 123, read_id: 85377, read_st: 77
+Processed all 16563 matches for path: AAB#0#chrII#0
+
+--------
+Processing path: AAB#0#chrII#0_reverse   seq_id: 3   st: 27023   num_matches: 16551
+Processing node: 10226 offset: 794, al_len: 200, read_id: 29582, read_st: 0
+Processed all 16551 matches for path: AAB#0#chrII#0_reverse
+
+--------
+Processing path: AAC#0#chrII#0   seq_id: 4   st: 43574   num_matches: 14508
+Processing node: 1836 offset: 3, al_len: 200, read_id: 14073, read_st: 0
+Processed all 14508 matches for path: AAC#0#chrII#0
+
+--------
+Processing path: AAC#0#chrII#0_reverse   seq_id: 5   st: 58082   num_matches: 14555
+Processing node: 4130 offset: 24, al_len: 200, read_id: 47475, read_st: 0
+Processed all 14555 matches for path: AAC#0#chrII#0_reverse
+
+--------
+Processing path: AAC#1#chrII#0   seq_id: 6   st: 72637   num_matches: 13367
+Processing node: 1906 offset: 0, al_len: 97, read_id: 94207, read_st: 103
+Processed all 13367 matches for path: AAC#1#chrII#0
+
+--------
+Processing path: AAC#1#chrII#0_reverse   seq_id: 7   st: 86004   num_matches: 12258
+Processing node: 1271 offset: 2, al_len: 200, read_id: 5883, read_st: 0
+Processed all 12258 matches for path: AAC#1#chrII#0_reverse
+
+--------
+Processing path: AAC#2#chrII#0   seq_id: 8   st: 98262   num_matches: 12701
+Processing node: 2344 offset: 3, al_len: 200, read_id: 37509, read_st: 0
+Processed all 12701 matches for path: AAC#2#chrII#0
+
+--------
+Processing path: AAC#2#chrII#0_reverse   seq_id: 9   st: 110963   num_matches: 13734
+Processing node: 8120 offset: 7, al_len: 200, read_id: 58099, read_st: 0
+Processed all 13734 matches for path: AAC#2#chrII#0_reverse
+
+--------
+Processing path: AAR#0#chrII#0   seq_id: 10   st: 124697   num_matches: 17681
+Processing node: 1771 offset: 431, al_len: 192, read_id: 12103, read_st: 0
+Processed all 17681 matches for path: AAR#0#chrII#0
+
+--------
+Processing path: AAR#0#chrII#0_reverse   seq_id: 11   st: 142378   num_matches: 16415
+Processing node: 7157 offset: 138, al_len: 127, read_id: 25619, read_st: 0
+Processed all 16415 matches for path: AAR#0#chrII#0_reverse
+
+--------
+Processing path: ABA#0#chrII#0   seq_id: 12   st: 158793   num_matches: 17978
+Processing node: 985 offset: 0, al_len: 200, read_id: 57312, read_st: 0
+Processed all 17978 matches for path: ABA#0#chrII#0
+
+--------
+Processing path: ABA#0#chrII#0_reverse   seq_id: 13   st: 176771   num_matches: 15178
+Processing node: 5222 offset: 13, al_len: 200, read_id: 74154, read_st: 0
+Processed all 15178 matches for path: ABA#0#chrII#0_reverse
+
+--------
+Processing path: ABH#0#chrII#0   seq_id: 14   st: 191949   num_matches: 15093
+Processing node: 3003 offset: 773, al_len: 200, read_id: 39904, read_st: 0
+Processed all 15093 matches for path: ABH#0#chrII#0
+
+--------
+Processing path: ABH#0#chrII#0_reverse   seq_id: 15   st: 207042   num_matches: 15594
+Processing node: 3003 offset: 512, al_len: 200, read_id: 12895, read_st: 0
+Processed all 15594 matches for path: ABH#0#chrII#0_reverse
+
+--------
+Processing path: ACA#0#chrII#0   seq_id: 16   st: 222636   num_matches: 9576
+Processing node: 12 offset: 16, al_len: 200, read_id: 78884, read_st: 0
+Processed all 9576 matches for path: ACA#0#chrII#0
+
+--------
+Processing path: ACA#0#chrII#0_reverse   seq_id: 17   st: 232212   num_matches: 13534
+Processing node: 269 offset: 27, al_len: 200, read_id: 94585, read_st: 0
+Processed all 13534 matches for path: ACA#0#chrII#0_reverse
+
+--------
+Processing path: ACH#0#chrII#0   seq_id: 18   st: 245746   num_matches: 17343
+Processing node: 2975 offset: 161, al_len: 44, read_id: 76432, read_st: 156
+Processed all 17343 matches for path: ACH#0#chrII#0
+
+--------
+Processing path: ACH#0#chrII#0_reverse   seq_id: 19   st: 263089   num_matches: 17991
+Processing node: 2975 offset: 133, al_len: 116, read_id: 4594, read_st: 84
+Processed all 17991 matches for path: ACH#0#chrII#0_reverse
+
+--------
+Processing path: ADE#0#chrII#0   seq_id: 20   st: 281080   num_matches: 14900
+Processing node: 57 offset: 548, al_len: 200, read_id: 81668, read_st: 0
+Processed all 14900 matches for path: ADE#0#chrII#0
+
+--------
+Processing path: ADE#0#chrII#0_reverse   seq_id: 21   st: 295980   num_matches: 14998
+Processing node: 2013 offset: 102, al_len: 165, read_id: 7763, read_st: 0
+Processed all 14998 matches for path: ADE#0#chrII#0_reverse
+
+--------
+Processing path: ADI#0#chrII#0   seq_id: 22   st: 310978   num_matches: 20067
+Processing node: 3008 offset: 750, al_len: 200, read_id: 82755, read_st: 0
+Processed all 20067 matches for path: ADI#0#chrII#0
+
+--------
+Processing path: ADI#0#chrII#0_reverse   seq_id: 23   st: 331045   num_matches: 20464
+Processing node: 3008 offset: 866, al_len: 49, read_id: 42218, read_st: 0
+Processed all 20464 matches for path: ADI#0#chrII#0_reverse
+
+--------
+Processing path: ADM#0#chrII#0   seq_id: 24   st: 351509   num_matches: 17338
+Processing node: 654 offset: 1, al_len: 75, read_id: 56220, read_st: 69
+Processed all 17338 matches for path: ADM#0#chrII#0
+
+--------
+Processing path: ADM#0#chrII#0_reverse   seq_id: 25   st: 368847   num_matches: 17201
+Processing node: 681 offset: 0, al_len: 37, read_id: 43649, read_st: 0
+Processed all 17201 matches for path: ADM#0#chrII#0_reverse
+
+--------
+Processing path: ADM#1#chrII_1#0   seq_id: 26   st: 386048   num_matches: 3487
+Processing node: 30984 offset: 221, al_len: 200, read_id: 60971, read_st: 0
+Processed all 3487 matches for path: ADM#1#chrII_1#0
+
+--------
+Processing path: ADM#1#chrII_1#0_reverse   seq_id: 27   st: 389535   num_matches: 3583
+Processing node: 22282 offset: 33, al_len: 31, read_id: 94110, read_st: 169
+Processed all 3583 matches for path: ADM#1#chrII_1#0_reverse
+
+--------
+Processing path: ADM#1#chrII_2#0   seq_id: 28   st: 393118   num_matches: 3652
+Processing node: 9098 offset: 561, al_len: 200, read_id: 46095, read_st: 0
+Processed all 3652 matches for path: ADM#1#chrII_2#0
+
+--------
+Processing path: ADM#1#chrII_2#0_reverse   seq_id: 29   st: 396770   num_matches: 3518
+Processing node: 4898 offset: 0, al_len: 159, read_id: 73485, read_st: 41
+Processed all 3518 matches for path: ADM#1#chrII_2#0_reverse
+
+--------
+Processing path: ADM#1#chrII_3#0   seq_id: 30   st: 400288   num_matches: 464
+Processing node: 22968 offset: 56, al_len: 30, read_id: 736, read_st: 170
+Processed all 464 matches for path: ADM#1#chrII_3#0
+
+--------
+Processing path: ADM#1#chrII_3#0_reverse   seq_id: 31   st: 400752   num_matches: 549
+Processing node: 178985 offset: 43, al_len: 122, read_id: 53418, read_st: 0
+Processed all 549 matches for path: ADM#1#chrII_3#0_reverse
+
+--------
+Processing path: ADM#1#chrII_4#0   seq_id: 32   st: 401301   num_matches: 313
+Processing node: 4031 offset: 4, al_len: 200, read_id: 29839, read_st: 0
+Processed all 313 matches for path: ADM#1#chrII_4#0
+
+--------
+Processing path: ADM#1#chrII_4#0_reverse   seq_id: 33   st: 401614   num_matches: 574
+Processing node: 26795 offset: 0, al_len: 200, read_id: 90978, read_st: 0
+Processed all 574 matches for path: ADM#1#chrII_4#0_reverse
+
+--------
+Processing path: ADM#1#chrII_5#0   seq_id: 34   st: 402188   num_matches: 912
+Processing node: 64640 offset: 4, al_len: 200, read_id: 91501, read_st: 0
+Processed all 912 matches for path: ADM#1#chrII_5#0
+
+--------
+Processing path: ADM#1#chrII_5#0_reverse   seq_id: 35   st: 403100   num_matches: 222
+Processing node: 4274 offset: 0, al_len: 65, read_id: 97058, read_st: 135
+Processed all 222 matches for path: ADM#1#chrII_5#0_reverse
+
+--------
+Processing path: ADM#1#chrII_6#0   seq_id: 36   st: 403322   num_matches: 3004
+Processing node: 2724 offset: 322, al_len: 200, read_id: 18129, read_st: 0
+Processed all 3004 matches for path: ADM#1#chrII_6#0
+
+--------
+Processing path: ADM#1#chrII_6#0_reverse   seq_id: 37   st: 406326   num_matches: 1883
+Processing node: 3432 offset: 648, al_len: 200, read_id: 68551, read_st: 0
+Processed all 1883 matches for path: ADM#1#chrII_6#0_reverse
+
+--------
+Processing path: ADM#2#chrII_1#0   seq_id: 38   st: 408209   num_matches: 1528
+Processing node: 2053 offset: 145, al_len: 45, read_id: 7346, read_st: 155
+Processed all 1528 matches for path: ADM#2#chrII_1#0
+
+--------
+Processing path: ADM#2#chrII_1#0_reverse   seq_id: 39   st: 409737   num_matches: 2112
+Processing node: 9199 offset: 1, al_len: 200, read_id: 2127, read_st: 0
+Processed all 2112 matches for path: ADM#2#chrII_1#0_reverse
+
+--------
+Processing path: ADM#2#chrII_10#0   seq_id: 40   st: 411849   num_matches: 105
+Processing node: 83715 offset: 7, al_len: 200, read_id: 91365, read_st: 0
+Processed all 105 matches for path: ADM#2#chrII_10#0
+
+--------
+Processing path: ADM#2#chrII_10#0_reverse   seq_id: 41   st: 411954   num_matches: 147
+Processing node: 15976 offset: 9, al_len: 99, read_id: 75898, read_st: 0
+Processed all 147 matches for path: ADM#2#chrII_10#0_reverse
+
+--------
+Processing path: ADM#2#chrII_11#0   seq_id: 42   st: 412101   num_matches: 1228
+Processing node: 27934 offset: 24, al_len: 69, read_id: 97010, read_st: 0
+Processed all 1228 matches for path: ADM#2#chrII_11#0
+
+--------
+Processing path: ADM#2#chrII_11#0_reverse   seq_id: 43   st: 413329   num_matches: 1039
+Processing node: 71637 offset: 843, al_len: 200, read_id: 56998, read_st: 0
+Processed all 1039 matches for path: ADM#2#chrII_11#0_reverse
+
+--------
+Processing path: ADM#2#chrII_12#0   seq_id: 44   st: 414368   num_matches: 531
+Processing node: 136162 offset: 618, al_len: 200, read_id: 13342, read_st: 0
+Processed all 531 matches for path: ADM#2#chrII_12#0
+
+--------
+Processing path: ADM#2#chrII_12#0_reverse   seq_id: 45   st: 414899   num_matches: 1383
+Processing node: 2724 offset: 27, al_len: 85, read_id: 72053, read_st: 0
+Processed all 1383 matches for path: ADM#2#chrII_12#0_reverse
+
+--------
+Processing path: ADM#2#chrII_2#0   seq_id: 46   st: 416282   num_matches: 3817
+Processing node: 5730 offset: 2, al_len: 200, read_id: 45190, read_st: 0
+Processed all 3817 matches for path: ADM#2#chrII_2#0
+
+--------
+Processing path: ADM#2#chrII_2#0_reverse   seq_id: 47   st: 420099   num_matches: 3688
+Processing node: 7179 offset: 0, al_len: 200, read_id: 9598, read_st: 0
+Processed all 3688 matches for path: ADM#2#chrII_2#0_reverse
+
+--------
+Processing path: ADM#2#chrII_3#0   seq_id: 48   st: 423787   num_matches: 386
+Processing node: 16536 offset: 243, al_len: 33, read_id: 33596, read_st: 0
+Processed all 386 matches for path: ADM#2#chrII_3#0
+
+--------
+Processing path: ADM#2#chrII_3#0_reverse   seq_id: 49   st: 424173   num_matches: 391
+Processing node: 16536 offset: 291, al_len: 49, read_id: 29241, read_st: 151
+Processed all 391 matches for path: ADM#2#chrII_3#0_reverse
+
+--------
+Processing path: ADM#2#chrII_4#0   seq_id: 50   st: 424564   num_matches: 171
+Processing node: 70413 offset: 925, al_len: 200, read_id: 39784, read_st: 0
+Processed all 171 matches for path: ADM#2#chrII_4#0
+
+--------
+Processing path: ADM#2#chrII_4#0_reverse   seq_id: 51   st: 424735   num_matches: 127
+Processing node: 70413 offset: 186, al_len: 200, read_id: 20791, read_st: 0
+Processed all 127 matches for path: ADM#2#chrII_4#0_reverse
+
+--------
+Processing path: ADM#2#chrII_5#0   seq_id: 52   st: 424862   num_matches: 76
+Processing node: 52885 offset: 0, al_len: 33, read_id: 32430, read_st: 0
+Processed all 76 matches for path: ADM#2#chrII_5#0
+
+--------
+Processing path: ADM#2#chrII_5#0_reverse   seq_id: 53   st: 424938   num_matches: 22
+Processing node: 306923 offset: 0, al_len: 143, read_id: 28156, read_st: 57
+Processed all 22 matches for path: ADM#2#chrII_5#0_reverse
+
+--------
+Processing path: ADM#2#chrII_6#0   seq_id: 54   st: 424960   num_matches: 189
+Processing node: 13678 offset: 0, al_len: 200, read_id: 10478, read_st: 0
+Processed all 189 matches for path: ADM#2#chrII_6#0
+
+--------
+Processing path: ADM#2#chrII_6#0_reverse   seq_id: 55   st: 425149   num_matches: 18
+Processing node: 28722 offset: 0, al_len: 178, read_id: 28284, read_st: 22
+Processed all 18 matches for path: ADM#2#chrII_6#0_reverse
+
+--------
+Processing path: ADM#2#chrII_7#0   seq_id: 56   st: 425167   num_matches: 1747
+Processing node: 4662 offset: 526, al_len: 200, read_id: 11044, read_st: 0
+Processed all 1747 matches for path: ADM#2#chrII_7#0
+
+--------
+Processing path: ADM#2#chrII_7#0_reverse   seq_id: 57   st: 426914   num_matches: 1814
+Processing node: 4662 offset: 239, al_len: 200, read_id: 13740, read_st: 0
+Processed all 1814 matches for path: ADM#2#chrII_7#0_reverse
+
+--------
+Processing path: ADM#2#chrII_8#0   seq_id: 58   st: 428728   num_matches: 151
+Processing node: 81542 offset: 4, al_len: 200, read_id: 88717, read_st: 0
+Processed all 151 matches for path: ADM#2#chrII_8#0
+
+--------
+Processing path: ADM#2#chrII_8#0_reverse   seq_id: 59   st: 428879   num_matches: 58
+Processing node: 77603 offset: 154, al_len: 92, read_id: 6693, read_st: 108
+Processed all 58 matches for path: ADM#2#chrII_8#0_reverse
+
+--------
+Processing path: ADM#2#chrII_9#0   seq_id: 60   st: 428937   num_matches: 127
+Processing node: 42579 offset: 0, al_len: 77, read_id: 13683, read_st: 0
+Processed all 127 matches for path: ADM#2#chrII_9#0
+
+--------
+Processing path: ADM#2#chrII_9#0_reverse   seq_id: 61   st: 429064   num_matches: 784
+Processing node: 24182 offset: 2, al_len: 142, read_id: 39704, read_st: 58
+Processed all 784 matches for path: ADM#2#chrII_9#0_reverse
+
+--------
+Processing path: ADQ#0#chrII#0   seq_id: 62   st: 429848   num_matches: 11666
+Processing node: 1530 offset: 168, al_len: 45, read_id: 14843, read_st: 0
+Processed all 11666 matches for path: ADQ#0#chrII#0
+
+--------
+Processing path: ADQ#0#chrII#0_reverse   seq_id: 63   st: 441514   num_matches: 12021
+Processing node: 1530 offset: 255, al_len: 200, read_id: 40966, read_st: 0
+Processed all 12021 matches for path: ADQ#0#chrII#0_reverse
+
+--------
+Processing path: ADS#0#chrII#0   seq_id: 64   st: 453535   num_matches: 19691
+Processing node: 3669 offset: 49, al_len: 33, read_id: 8750, read_st: 167
+Processed all 19691 matches for path: ADS#0#chrII#0
+
+--------
+Processing path: ADS#0#chrII#0_reverse   seq_id: 65   st: 473226   num_matches: 19876
+Processing node: 6243 offset: 309, al_len: 35, read_id: 10948, read_st: 0
+Processed all 19876 matches for path: ADS#0#chrII#0_reverse
+
+--------
+Processing path: AEG#0#chrII#0   seq_id: 66   st: 493102   num_matches: 12763
+Processing node: 8836 offset: 62, al_len: 68, read_id: 47222, read_st: 132
+Processed all 12763 matches for path: AEG#0#chrII#0
+
+--------
+Processing path: AEG#0#chrII#0_reverse   seq_id: 67   st: 505865   num_matches: 14441
+Processing node: 5936 offset: 8, al_len: 200, read_id: 41031, read_st: 0
+Processed all 14441 matches for path: AEG#0#chrII#0_reverse
+
+--------
+Processing path: AEH#0#chrII#0   seq_id: 68   st: 520306   num_matches: 20362
+Processing node: 5785 offset: 15, al_len: 200, read_id: 96829, read_st: 0
+Processed all 20362 matches for path: AEH#0#chrII#0
+
+--------
+Processing path: AEH#0#chrII#0_reverse   seq_id: 69   st: 540668   num_matches: 19529
+Processing node: 944 offset: 235, al_len: 200, read_id: 40543, read_st: 0
+Processed all 19529 matches for path: AEH#0#chrII#0_reverse
+
+--------
+Processing path: AEL#0#chrII#0   seq_id: 70   st: 560197   num_matches: 7026
+Processing node: 100 offset: 179, al_len: 196, read_id: 73083, read_st: 4
+Processed all 7026 matches for path: AEL#0#chrII#0
+
+--------
+Processing path: AEL#0#chrII#0_reverse   seq_id: 71   st: 567223   num_matches: 13004
+Processing node: 100 offset: 216, al_len: 57, read_id: 6973, read_st: 143
+Processed all 13004 matches for path: AEL#0#chrII#0_reverse
+
+--------
+Processing path: AEL#1#chrII#0   seq_id: 72   st: 580227   num_matches: 7391
+Processing node: 5058 offset: 13, al_len: 82, read_id: 20426, read_st: 118
+Processed all 7391 matches for path: AEL#1#chrII#0
+
+--------
+Processing path: AEL#1#chrII#0_reverse   seq_id: 73   st: 587618   num_matches: 4376
+Processing node: 751 offset: 373, al_len: 200, read_id: 56974, read_st: 0
+Processed all 4376 matches for path: AEL#1#chrII#0_reverse
+
+--------
+Processing path: AEL#2#chrII_1#0   seq_id: 74   st: 591994   num_matches: 913
+Processing node: 10364 offset: 18, al_len: 200, read_id: 25355, read_st: 0
+Processed all 913 matches for path: AEL#2#chrII_1#0
+
+--------
+Processing path: AEL#2#chrII_1#0_reverse   seq_id: 75   st: 592907   num_matches: 964
+Processing node: 53427 offset: 0, al_len: 200, read_id: 12728, read_st: 0
+Processed all 964 matches for path: AEL#2#chrII_1#0_reverse
+
+--------
+Processing path: AEL#2#chrII_2#0   seq_id: 76   st: 593871   num_matches: 3902
+Processing node: 4751 offset: 21, al_len: 111, read_id: 76100, read_st: 10
+Processed all 3902 matches for path: AEL#2#chrII_2#0
+
+--------
+Processing path: AEL#2#chrII_2#0_reverse   seq_id: 77   st: 597773   num_matches: 3035
+Processing node: 821 offset: 5, al_len: 200, read_id: 17165, read_st: 0
+Processed all 3035 matches for path: AEL#2#chrII_2#0_reverse
+
+--------
+Processing path: AEL#2#chrII_3#0   seq_id: 78   st: 600808   num_matches: 1314
+Processing node: 17596 offset: 1, al_len: 122, read_id: 10107, read_st: 78
+Processed all 1314 matches for path: AEL#2#chrII_3#0
+
+--------
+Processing path: AEL#2#chrII_3#0_reverse   seq_id: 79   st: 602122   num_matches: 2315
+Processing node: 17654 offset: 6, al_len: 163, read_id: 67243, read_st: 37
+Processed all 2315 matches for path: AEL#2#chrII_3#0_reverse
+
+--------
+Processing path: AEL#2#chrII_4#0   seq_id: 80   st: 604437   num_matches: 3186
+Processing node: 1316 offset: 0, al_len: 200, read_id: 82784, read_st: 0
+Processed all 3186 matches for path: AEL#2#chrII_4#0
+
+--------
+Processing path: AEL#2#chrII_4#0_reverse   seq_id: 81   st: 607623   num_matches: 666
+Processing node: 11852 offset: 1, al_len: 200, read_id: 82925, read_st: 0
+Processed all 666 matches for path: AEL#2#chrII_4#0_reverse
+
+--------
+Processing path: AEL#2#chrII_5#0   seq_id: 82   st: 608289   num_matches: 269
+Processing node: 193729 offset: 978, al_len: 100, read_id: 37543, read_st: 100
+Processed all 269 matches for path: AEL#2#chrII_5#0
+
+--------
+Processing path: AEL#2#chrII_5#0_reverse   seq_id: 83   st: 608558   num_matches: 665
+Processing node: 335469 offset: 69, al_len: 200, read_id: 50364, read_st: 0
+Processed all 665 matches for path: AEL#2#chrII_5#0_reverse
+
+--------
+Processing path: AFH#0#chrII#0   seq_id: 84   st: 609223   num_matches: 16024
+Processing node: 15 offset: 7, al_len: 89, read_id: 84091, read_st: 0
+Processed all 16024 matches for path: AFH#0#chrII#0
+
+--------
+Processing path: AFH#0#chrII#0_reverse   seq_id: 85   st: 625247   num_matches: 15512
+Processing node: 1769 offset: 29, al_len: 200, read_id: 64101, read_st: 0
+Processed all 15512 matches for path: AFH#0#chrII#0_reverse
+
+--------
+Processing path: AFI#0#chrII#0   seq_id: 86   st: 640759   num_matches: 20388
+Processing node: 15184 offset: 6, al_len: 200, read_id: 4296, read_st: 0
+Processed all 20388 matches for path: AFI#0#chrII#0
+
+--------
+Processing path: AFI#0#chrII#0_reverse   seq_id: 87   st: 661147   num_matches: 19438
+Processing node: 21288 offset: 192, al_len: 200, read_id: 36859, read_st: 0
+Processed all 19438 matches for path: AFI#0#chrII#0_reverse
+
+--------
+Processing path: AGA_1a#0#chrII#0   seq_id: 88   st: 680585   num_matches: 17435
+Processing node: 9219 offset: 870, al_len: 82, read_id: 66546, read_st: 0
+Processed all 17435 matches for path: AGA_1a#0#chrII#0
+
+--------
+Processing path: AGA_1a#0#chrII#0_reverse   seq_id: 89   st: 698020   num_matches: 16890
+Processing node: 9219 offset: 298, al_len: 200, read_id: 87322, read_st: 0
+Processed all 16890 matches for path: AGA_1a#0#chrII#0_reverse
+
+--------
+Processing path: AGK#0#chrII#0   seq_id: 90   st: 714910   num_matches: 18314
+Processing node: 8426 offset: 622, al_len: 150, read_id: 39149, read_st: 0
+Processed all 18314 matches for path: AGK#0#chrII#0
+
+--------
+Processing path: AGK#0#chrII#0_reverse   seq_id: 91   st: 733224   num_matches: 16552
+Processing node: 8426 offset: 358, al_len: 200, read_id: 32978, read_st: 0
+Processed all 16552 matches for path: AGK#0#chrII#0_reverse
+
+--------
+Processing path: AHG#0#chrII#0   seq_id: 92   st: 749776   num_matches: 16571
+Processing node: 5221 offset: 9, al_len: 200, read_id: 54928, read_st: 0
+Processed all 16571 matches for path: AHG#0#chrII#0
+
+--------
+Processing path: AHG#0#chrII#0_reverse   seq_id: 93   st: 766347   num_matches: 17536
+Processing node: 21123 offset: 316, al_len: 44, read_id: 42730, read_st: 156
+Processed all 17536 matches for path: AHG#0#chrII#0_reverse
+
+--------
+Processing path: AHL#0#chrII#0   seq_id: 94   st: 783883   num_matches: 16991
+Processing node: 267 offset: 0, al_len: 46, read_id: 10357, read_st: 127
+Processed all 16991 matches for path: AHL#0#chrII#0
+
+--------
+Processing path: AHL#0#chrII#0_reverse   seq_id: 95   st: 800874   num_matches: 16492
+Processing node: 9834 offset: 1, al_len: 200, read_id: 92602, read_st: 0
+Processed all 16492 matches for path: AHL#0#chrII#0_reverse
+
+--------
+Processing path: AIC#0#chrII#0   seq_id: 96   st: 817366   num_matches: 22134
+Processing node: 3515 offset: 194, al_len: 200, read_id: 14148, read_st: 0
+Processed all 22134 matches for path: AIC#0#chrII#0
+
+--------
+Processing path: AIC#0#chrII#0_reverse   seq_id: 97   st: 839500   num_matches: 22336
+Processing node: 3515 offset: 64, al_len: 200, read_id: 2078, read_st: 0
+Processed all 22336 matches for path: AIC#0#chrII#0_reverse
+
+--------
+Processing path: AIE#0#chrII#0   seq_id: 98   st: 861836   num_matches: 17409
+Processing node: 325 offset: 588, al_len: 66, read_id: 14802, read_st: 0
+Processed all 17409 matches for path: AIE#0#chrII#0
+
+--------
+Processing path: AIE#0#chrII#0_reverse   seq_id: 99   st: 879245   num_matches: 16782
+Processing node: 325 offset: 449, al_len: 65, read_id: 68520, read_st: 135
+Processed all 16782 matches for path: AIE#0#chrII#0_reverse
+
+--------
+Processing path: AIF#0#chrII#0   seq_id: 100   st: 896027   num_matches: 12275
+Processing node: 15584 offset: 24, al_len: 200, read_id: 50995, read_st: 0
+Processed all 12275 matches for path: AIF#0#chrII#0
+
+--------
+Processing path: AIF#0#chrII#0_reverse   seq_id: 101   st: 908302   num_matches: 11531
+Processing node: 14207 offset: 58, al_len: 73, read_id: 68790, read_st: 0
+Processed all 11531 matches for path: AIF#0#chrII#0_reverse
+
+--------
+Processing path: AIF#1#chrII#0   seq_id: 102   st: 919833   num_matches: 11384
+Processing node: 3744 offset: 228, al_len: 32, read_id: 22403, read_st: 0
+Processed all 11384 matches for path: AIF#1#chrII#0
+
+--------
+Processing path: AIF#1#chrII#0_reverse   seq_id: 103   st: 931217   num_matches: 11766
+Processing node: 3594 offset: 152, al_len: 200, read_id: 58242, read_st: 0
+Processed all 11766 matches for path: AIF#1#chrII#0_reverse
+
+--------
+Processing path: AIF#2#chrII#0   seq_id: 104   st: 942983   num_matches: 9798
+Processing node: 7559 offset: 27, al_len: 106, read_id: 58904, read_st: 0
+Processed all 9798 matches for path: AIF#2#chrII#0
+
+--------
+Processing path: AIF#2#chrII#0_reverse   seq_id: 105   st: 952781   num_matches: 7900
+Processing node: 2420 offset: 4, al_len: 200, read_id: 26427, read_st: 0
+Processed all 7900 matches for path: AIF#2#chrII#0_reverse
+
+--------
+Processing path: AIG#0#chrII#0   seq_id: 106   st: 960681   num_matches: 14967
+Processing node: 11307 offset: 2, al_len: 200, read_id: 83515, read_st: 0
+Processed all 14967 matches for path: AIG#0#chrII#0
+
+--------
+Processing path: AIG#0#chrII#0_reverse   seq_id: 107   st: 975648   num_matches: 16735
+Processing node: 1771 offset: 757, al_len: 72, read_id: 84638, read_st: 128
+Processed all 16735 matches for path: AIG#0#chrII#0_reverse
+
+--------
+Processing path: AIS#0#chrII#0   seq_id: 108   st: 992383   num_matches: 18528
+Processing node: 3918 offset: 557, al_len: 200, read_id: 24458, read_st: 0
+Processed all 18528 matches for path: AIS#0#chrII#0
+
+--------
+Processing path: AIS#0#chrII#0_reverse   seq_id: 109   st: 1010911   num_matches: 19624
+Processing node: 3918 offset: 1014, al_len: 99, read_id: 67049, read_st: 0
+Processed all 19624 matches for path: AIS#0#chrII#0_reverse
+
+--------
+Processing path: AIS#1#chrII#0   seq_id: 110   st: 1030535   num_matches: 17863
+Processing node: 2017 offset: 35, al_len: 38, read_id: 9922, read_st: 0
+Processed all 17863 matches for path: AIS#1#chrII#0
+
+--------
+Processing path: AIS#1#chrII#0_reverse   seq_id: 111   st: 1048398   num_matches: 19028
+Processing node: 5270 offset: 1, al_len: 123, read_id: 16424, read_st: 77
+Processed all 19028 matches for path: AIS#1#chrII#0_reverse
+
+--------
+Processing path: AIS#2#chrII#0   seq_id: 112   st: 1067426   num_matches: 16454
+Processing node: 7844 offset: 30, al_len: 200, read_id: 6109, read_st: 0
+Processed all 16454 matches for path: AIS#2#chrII#0
+
+--------
+Processing path: AIS#2#chrII#0_reverse   seq_id: 113   st: 1083880   num_matches: 13697
+Processing node: 7844 offset: 487, al_len: 200, read_id: 59142, read_st: 0
+Processed all 13697 matches for path: AIS#2#chrII#0_reverse
+
+--------
+Processing path: AKH_1a#0#chrII#0   seq_id: 114   st: 1097577   num_matches: 17927
+Processing node: 5089 offset: 561, al_len: 200, read_id: 50534, read_st: 0
+Processed all 17927 matches for path: AKH_1a#0#chrII#0
+
+--------
+Processing path: AKH_1a#0#chrII#0_reverse   seq_id: 115   st: 1115504   num_matches: 17659
+Processing node: 4628 offset: 395, al_len: 70, read_id: 19558, read_st: 0
+Processed all 17659 matches for path: AKH_1a#0#chrII#0_reverse
+
+--------
+Processing path: AKR#0#chrII#0   seq_id: 116   st: 1133163   num_matches: 9082
+Processing node: 2955 offset: 0, al_len: 78, read_id: 18587, read_st: 0
+Processed all 9082 matches for path: AKR#0#chrII#0
+
+--------
+Processing path: AKR#0#chrII#0_reverse   seq_id: 117   st: 1142245   num_matches: 9865
+Processing node: 4830 offset: 2, al_len: 87, read_id: 31724, read_st: 0
+Processed all 9865 matches for path: AKR#0#chrII#0_reverse
+
+--------
+Processing path: AKR#1#chrII_1#0   seq_id: 118   st: 1152110   num_matches: 2607
+Processing node: 19823 offset: 282, al_len: 100, read_id: 84868, read_st: 81
+Processed all 2607 matches for path: AKR#1#chrII_1#0
+
+--------
+Processing path: AKR#1#chrII_1#0_reverse   seq_id: 119   st: 1154717   num_matches: 1491
+Processing node: 19823 offset: 124, al_len: 69, read_id: 34247, read_st: 88
+Processed all 1491 matches for path: AKR#1#chrII_1#0_reverse
+
+--------
+Processing path: AKR#1#chrII_2#0   seq_id: 120   st: 1156208   num_matches: 1105
+Processing node: 6263 offset: 9, al_len: 200, read_id: 66958, read_st: 0
+Processed all 1105 matches for path: AKR#1#chrII_2#0
+
+--------
+Processing path: AKR#1#chrII_2#0_reverse   seq_id: 121   st: 1157313   num_matches: 1634
+Processing node: 48746 offset: 68, al_len: 34, read_id: 24810, read_st: 166
+Processed all 1634 matches for path: AKR#1#chrII_2#0_reverse
+
+--------
+Processing path: AKR#1#chrII_3#0   seq_id: 122   st: 1158947   num_matches: 1872
+Processing node: 8468 offset: 1, al_len: 130, read_id: 55842, read_st: 70
+Processed all 1872 matches for path: AKR#1#chrII_3#0
+
+--------
+Processing path: AKR#1#chrII_3#0_reverse   seq_id: 123   st: 1160819   num_matches: 2289
+Processing node: 1267 offset: 1, al_len: 200, read_id: 64347, read_st: 0
+Processed all 2289 matches for path: AKR#1#chrII_3#0_reverse
+
+--------
+Processing path: AKR#2#chrII_1#0   seq_id: 124   st: 1163108   num_matches: 2586
+Processing node: 4830 offset: 105, al_len: 56, read_id: 46131, read_st: 144
+Processed all 2586 matches for path: AKR#2#chrII_1#0
+
+--------
+Processing path: AKR#2#chrII_1#0_reverse   seq_id: 125   st: 1165694   num_matches: 2835
+Processing node: 2443 offset: 12, al_len: 200, read_id: 15732, read_st: 0
+Processed all 2835 matches for path: AKR#2#chrII_1#0_reverse
+
+--------
+Processing path: AKR#2#chrII_2#0   seq_id: 126   st: 1168529   num_matches: 303
+Processing node: 923 offset: 1, al_len: 200, read_id: 28974, read_st: 0
+Processed all 303 matches for path: AKR#2#chrII_2#0
+
+--------
+Processing path: AKR#2#chrII_2#0_reverse   seq_id: 127   st: 1168832   num_matches: 43
+Processing node: 3170 offset: 0, al_len: 200, read_id: 33694, read_st: 0
+Processed all 43 matches for path: AKR#2#chrII_2#0_reverse
+
+--------
+Processing path: AKR#2#chrII_3#0   seq_id: 128   st: 1168875   num_matches: 960
+Processing node: 15798 offset: 347, al_len: 43, read_id: 64194, read_st: 157
+Processed all 960 matches for path: AKR#2#chrII_3#0
+
+--------
+Processing path: AKR#2#chrII_3#0_reverse   seq_id: 129   st: 1169835   num_matches: 1521
+Processing node: 23345 offset: 43, al_len: 137, read_id: 32893, read_st: 63
+Processed all 1521 matches for path: AKR#2#chrII_3#0_reverse
+
+--------
+Processing path: AKR#2#chrII_4#0   seq_id: 130   st: 1171356   num_matches: 299
+Processing node: 2532 offset: 2, al_len: 200, read_id: 32379, read_st: 0
+Processed all 299 matches for path: AKR#2#chrII_4#0
+
+--------
+Processing path: AKR#2#chrII_4#0_reverse   seq_id: 131   st: 1171655   num_matches: 325
+Processing node: 60669 offset: 13, al_len: 200, read_id: 61466, read_st: 0
+Processed all 325 matches for path: AKR#2#chrII_4#0_reverse
+
+--------
+Processing path: AKR#2#chrII_5#0   seq_id: 132   st: 1171980   num_matches: 659
+Processing node: 28050 offset: 0, al_len: 79, read_id: 23397, read_st: 121
+Processed all 659 matches for path: AKR#2#chrII_5#0
+
+--------
+Processing path: AKR#2#chrII_5#0_reverse   seq_id: 133   st: 1172639   num_matches: 291
+Processing node: 156379 offset: 430, al_len: 200, read_id: 36456, read_st: 0
+Processed all 291 matches for path: AKR#2#chrII_5#0_reverse
+
+--------
+Processing path: ALH_1b#0#chrII#0   seq_id: 134   st: 1172930   num_matches: 10639
+Processing node: 4830 offset: 133, al_len: 119, read_id: 39114, read_st: 0
+Processed all 10639 matches for path: ALH_1b#0#chrII#0
+
+--------
+Processing path: ALH_1b#0#chrII#0_reverse   seq_id: 135   st: 1183569   num_matches: 6630
+Processing node: 4562 offset: 0, al_len: 200, read_id: 22218, read_st: 0
+Processed all 6630 matches for path: ALH_1b#0#chrII#0_reverse
+
+--------
+Processing path: ALH_1c#0#chrII#0   seq_id: 136   st: 1190199   num_matches: 2743
+Processing node: 18034 offset: 160, al_len: 35, read_id: 3916, read_st: 165
+Processed all 2743 matches for path: ALH_1c#0#chrII#0
+
+--------
+Processing path: ALH_1c#0#chrII#0_reverse   seq_id: 137   st: 1192942   num_matches: 3982
+Processing node: 10342 offset: 4, al_len: 111, read_id: 48646, read_st: 0
+Processed all 3982 matches for path: ALH_1c#0#chrII#0_reverse
+
+--------
+Processing path: ALI#0#chrII#0   seq_id: 138   st: 1196924   num_matches: 16488
+Processing node: 121 offset: 0, al_len: 200, read_id: 87789, read_st: 0
+Processed all 16488 matches for path: ALI#0#chrII#0
+
+--------
+Processing path: ALI#0#chrII#0_reverse   seq_id: 139   st: 1213412   num_matches: 16015
+Processing node: 6560 offset: 10, al_len: 78, read_id: 48343, read_st: 122
+Processed all 16015 matches for path: ALI#0#chrII#0_reverse
+
+--------
+Processing path: ALI#1#chrII#0   seq_id: 140   st: 1229427   num_matches: 12204
+Processing node: 688 offset: 11, al_len: 200, read_id: 68689, read_st: 0
+Processed all 12204 matches for path: ALI#1#chrII#0
+
+--------
+Processing path: ALI#1#chrII#0_reverse   seq_id: 141   st: 1241631   num_matches: 11657
+Processing node: 1055 offset: 12, al_len: 56, read_id: 17935, read_st: 144
+Processed all 11657 matches for path: ALI#1#chrII#0_reverse
+
+--------
+Processing path: ALI#2#chrII#0   seq_id: 142   st: 1253288   num_matches: 13695
+Processing node: 2533 offset: 761, al_len: 36, read_id: 89887, read_st: 164
+Processed all 13695 matches for path: ALI#2#chrII#0
+
+--------
+Processing path: ALI#2#chrII#0_reverse   seq_id: 143   st: 1266983   num_matches: 13846
+Processing node: 83 offset: 0, al_len: 200, read_id: 44485, read_st: 0
+Processed all 13846 matches for path: ALI#2#chrII#0_reverse
+
+--------
+Processing path: ALS_1a#0#chrII#0   seq_id: 144   st: 1280829   num_matches: 16746
+Processing node: 315 offset: 19, al_len: 200, read_id: 12110, read_st: 0
+Processed all 16746 matches for path: ALS_1a#0#chrII#0
+
+--------
+Processing path: ALS_1a#0#chrII#0_reverse   seq_id: 145   st: 1297575   num_matches: 17268
+Processing node: 1789 offset: 0, al_len: 200, read_id: 67633, read_st: 0
+Processed all 17268 matches for path: ALS_1a#0#chrII#0_reverse
+
+--------
+Processing path: AMH_1a#0#chrII#0   seq_id: 146   st: 1314843   num_matches: 1962
+Processing node: 1329 offset: 22, al_len: 67, read_id: 60491, read_st: 133
+Processed all 1962 matches for path: AMH_1a#0#chrII#0
+
+--------
+Processing path: AMH_1a#0#chrII#0_reverse   seq_id: 147   st: 1316805   num_matches: 1982
+Processing node: 1431 offset: 96, al_len: 58, read_id: 9885, read_st: 0
+Processed all 1982 matches for path: AMH_1a#0#chrII#0_reverse
+
+--------
+Processing path: AMM_1a#0#chrII#0   seq_id: 148   st: 1318787   num_matches: 14371
+Processing node: 3813 offset: 2, al_len: 200, read_id: 33832, read_st: 0
+Processed all 14371 matches for path: AMM_1a#0#chrII#0
+
+--------
+Processing path: AMM_1a#0#chrII#0_reverse   seq_id: 149   st: 1333158   num_matches: 14017
+Processing node: 1163 offset: 3, al_len: 200, read_id: 73023, read_st: 0
+Processed all 14017 matches for path: AMM_1a#0#chrII#0_reverse
+
+--------
+Processing path: AMP_1a#0#chrII#0   seq_id: 150   st: 1347175   num_matches: 12167
+Processing node: 6134 offset: 1, al_len: 200, read_id: 78957, read_st: 0
+Processed all 12167 matches for path: AMP_1a#0#chrII#0
+
+--------
+Processing path: AMP_1a#0#chrII#0_reverse   seq_id: 151   st: 1359342   num_matches: 12513
+Processing node: 1977 offset: 0, al_len: 200, read_id: 52055, read_st: 0
+Processed all 12513 matches for path: AMP_1a#0#chrII#0_reverse
+
+--------
+Processing path: ANE#0#chrII#0   seq_id: 152   st: 1371855   num_matches: 9397
+Processing node: 890 offset: 4, al_len: 200, read_id: 78547, read_st: 0
+Processed all 9397 matches for path: ANE#0#chrII#0
+
+--------
+Processing path: ANE#0#chrII#0_reverse   seq_id: 153   st: 1381252   num_matches: 9194
+Processing node: 6865 offset: 409, al_len: 200, read_id: 46361, read_st: 0
+Processed all 9194 matches for path: ANE#0#chrII#0_reverse
+
+--------
+Processing path: ANL#0#chrII#0   seq_id: 154   st: 1390446   num_matches: 20445
+Processing node: 43 offset: 251, al_len: 200, read_id: 14200, read_st: 0
+Processed all 20445 matches for path: ANL#0#chrII#0
+
+--------
+Processing path: ANL#0#chrII#0_reverse   seq_id: 155   st: 1410891   num_matches: 19974
+Processing node: 43 offset: 83, al_len: 200, read_id: 54398, read_st: 0
+Processed all 19974 matches for path: ANL#0#chrII#0_reverse
+
+--------
+Processing path: ANM#0#chrII#0   seq_id: 156   st: 1430865   num_matches: 20418
+Processing node: 692 offset: 452, al_len: 80, read_id: 59196, read_st: 120
+Processed all 20418 matches for path: ANM#0#chrII#0
+
+--------
+Processing path: ANM#0#chrII#0_reverse   seq_id: 157   st: 1451283   num_matches: 20373
+Processing node: 692 offset: 371, al_len: 200, read_id: 47271, read_st: 0
+Processed all 20373 matches for path: ANM#0#chrII#0_reverse
+
+--------
+Processing path: APG#0#chrII#0   seq_id: 158   st: 1471656   num_matches: 20310
+Processing node: 4325 offset: 0, al_len: 142, read_id: 5299, read_st: 58
+Processed all 20310 matches for path: APG#0#chrII#0
+
+--------
+Processing path: APG#0#chrII#0_reverse   seq_id: 159   st: 1491966   num_matches: 20067
+Processing node: 895 offset: 2, al_len: 71, read_id: 74905, read_st: 129
+Processed all 20067 matches for path: APG#0#chrII#0_reverse
+
+--------
+Processing path: AQG_2a#0#chrII#0   seq_id: 160   st: 1512033   num_matches: 13247
+Processing node: 2055 offset: 265, al_len: 200, read_id: 88585, read_st: 0
+Processed all 13247 matches for path: AQG_2a#0#chrII#0
+
+--------
+Processing path: AQG_2a#0#chrII#0_reverse   seq_id: 161   st: 1525280   num_matches: 12844
+Processing node: 2055 offset: 53, al_len: 200, read_id: 18584, read_st: 0
+Processed all 12844 matches for path: AQG_2a#0#chrII#0_reverse
+
+--------
+Processing path: ASB#0#chrII#0   seq_id: 162   st: 1538124   num_matches: 17501
+Processing node: 3564 offset: 30, al_len: 68, read_id: 19332, read_st: 115
+Processed all 17501 matches for path: ASB#0#chrII#0
+
+--------
+Processing path: ASB#0#chrII#0_reverse   seq_id: 163   st: 1555625   num_matches: 17435
+Processing node: 3564 offset: 64, al_len: 41, read_id: 65864, read_st: 0
+Processed all 17435 matches for path: ASB#0#chrII#0_reverse
+
+--------
+Processing path: ASB#1#chrII#0   seq_id: 164   st: 1573060   num_matches: 16108
+Processing node: 1289 offset: 11, al_len: 200, read_id: 91437, read_st: 0
+Processed all 16108 matches for path: ASB#1#chrII#0
+
+--------
+Processing path: ASB#1#chrII#0_reverse   seq_id: 165   st: 1589168   num_matches: 14689
+Processing node: 1289 offset: 165, al_len: 200, read_id: 4834, read_st: 0
+Processed all 14689 matches for path: ASB#1#chrII#0_reverse
+
+--------
+Processing path: ASB#2#chrII#0   seq_id: 166   st: 1603857   num_matches: 14682
+Processing node: 3253 offset: 2, al_len: 121, read_id: 92763, read_st: 79
+Processed all 14682 matches for path: ASB#2#chrII#0
+
+--------
+Processing path: ASB#2#chrII#0_reverse   seq_id: 167   st: 1618539   num_matches: 16327
+Processing node: 905 offset: 3, al_len: 200, read_id: 73023, read_st: 0
+Processed all 16327 matches for path: ASB#2#chrII#0_reverse
+
+--------
+Processing path: ASG#0#chrII#0   seq_id: 168   st: 1634866   num_matches: 16880
+Processing node: 4748 offset: 960, al_len: 200, read_id: 77051, read_st: 0
+Processed all 16880 matches for path: ASG#0#chrII#0
+
+--------
+Processing path: ASG#0#chrII#0_reverse   seq_id: 169   st: 1651746   num_matches: 15446
+Processing node: 13189 offset: 1, al_len: 200, read_id: 68367, read_st: 0
+Processed all 15446 matches for path: ASG#0#chrII#0_reverse
+
+--------
+Processing path: ASN#0#chrII#0   seq_id: 170   st: 1667192   num_matches: 11303
+Processing node: 1419 offset: 1, al_len: 173, read_id: 73401, read_st: 0
+Processed all 11303 matches for path: ASN#0#chrII#0
+
+--------
+Processing path: ASN#0#chrII#0_reverse   seq_id: 171   st: 1678495   num_matches: 11628
+Processing node: 6 offset: 0, al_len: 51, read_id: 46805, read_st: 0
+Processed all 11628 matches for path: ASN#0#chrII#0_reverse
+
+--------
+Processing path: ASN#1#chrII#0   seq_id: 172   st: 1690123   num_matches: 10792
+Processing node: 2197 offset: 6, al_len: 99, read_id: 34896, read_st: 101
+Processed all 10792 matches for path: ASN#1#chrII#0
+
+--------
+Processing path: ASN#1#chrII#0_reverse   seq_id: 173   st: 1700915   num_matches: 11833
+Processing node: 4039 offset: 316, al_len: 84, read_id: 65490, read_st: 116
+Processed all 11833 matches for path: ASN#1#chrII#0_reverse
+
+--------
+Processing path: ASN#2#chrII_1#0   seq_id: 174   st: 1712748   num_matches: 971
+Processing node: 133312 offset: 0, al_len: 200, read_id: 3050, read_st: 0
+Processed all 971 matches for path: ASN#2#chrII_1#0
+
+--------
+Processing path: ASN#2#chrII_1#0_reverse   seq_id: 175   st: 1713719   num_matches: 902
+Processing node: 14208 offset: 159, al_len: 200, read_id: 71121, read_st: 0
+Processed all 902 matches for path: ASN#2#chrII_1#0_reverse
+
+--------
+Processing path: ASN#2#chrII_2#0   seq_id: 176   st: 1714621   num_matches: 2182
+Processing node: 8112 offset: 117, al_len: 31, read_id: 41052, read_st: 0
+Processed all 2182 matches for path: ASN#2#chrII_2#0
+
+--------
+Processing path: ASN#2#chrII_2#0_reverse   seq_id: 177   st: 1716803   num_matches: 1909
+Processing node: 45291 offset: 156, al_len: 77, read_id: 51882, read_st: 123
+Processed all 1909 matches for path: ASN#2#chrII_2#0_reverse
+
+--------
+Processing path: ASN#2#chrII_3#0   seq_id: 178   st: 1718712   num_matches: 1956
+Processing node: 2464 offset: 193, al_len: 200, read_id: 69960, read_st: 0
+Processed all 1956 matches for path: ASN#2#chrII_3#0
+
+--------
+Processing path: ASN#2#chrII_3#0_reverse   seq_id: 179   st: 1720668   num_matches: 1905
+Processing node: 2464 offset: 810, al_len: 46, read_id: 48873, read_st: 154
+Processed all 1905 matches for path: ASN#2#chrII_3#0_reverse
+
+--------
+Processing path: ASN#2#chrII_4#0   seq_id: 180   st: 1722573   num_matches: 1975
+Processing node: 3722 offset: 279, al_len: 90, read_id: 36791, read_st: 110
+Processed all 1975 matches for path: ASN#2#chrII_4#0
+
+--------
+Processing path: ASN#2#chrII_4#0_reverse   seq_id: 181   st: 1724548   num_matches: 2858
+Processing node: 3722 offset: 146, al_len: 200, read_id: 47965, read_st: 0
+Processed all 2858 matches for path: ASN#2#chrII_4#0_reverse
+
+--------
+Processing path: ASN#2#chrII_5#0   seq_id: 182   st: 1727406   num_matches: 2212
+Processing node: 4039 offset: 210, al_len: 200, read_id: 2235, read_st: 0
+Processed all 2212 matches for path: ASN#2#chrII_5#0
+
+--------
+Processing path: ASN#2#chrII_5#0_reverse   seq_id: 183   st: 1729618   num_matches: 616
+Processing node: 7517 offset: 10, al_len: 165, read_id: 67670, read_st: 0
+Processed all 616 matches for path: ASN#2#chrII_5#0_reverse
+
+--------
+Processing path: ATM_1a#0#chrII#0   seq_id: 184   st: 1730234   num_matches: 18190
+Processing node: 1702 offset: 823, al_len: 37, read_id: 97382, read_st: 0
+Processed all 18190 matches for path: ATM_1a#0#chrII#0
+
+--------
+Processing path: ATM_1a#0#chrII#0_reverse   seq_id: 185   st: 1748424   num_matches: 18253
+Processing node: 640 offset: 27, al_len: 103, read_id: 4397, read_st: 0
+Processed all 18253 matches for path: ATM_1a#0#chrII#0_reverse
+
+--------
+Processing path: ATV#0#chrII#0   seq_id: 186   st: 1766677   num_matches: 21080
+Processing node: 1776 offset: 790, al_len: 200, read_id: 91581, read_st: 0
+Processed all 21080 matches for path: ATV#0#chrII#0
+
+--------
+Processing path: ATV#0#chrII#0_reverse   seq_id: 187   st: 1787757   num_matches: 19903
+Processing node: 1776 offset: 400, al_len: 132, read_id: 3018, read_st: 0
+Processed all 19903 matches for path: ATV#0#chrII#0_reverse
+
+--------
+Processing path: AVB#0#chrII#0   seq_id: 188   st: 1807660   num_matches: 12645
+Processing node: 5376 offset: 5, al_len: 200, read_id: 46334, read_st: 0
+Processed all 12645 matches for path: AVB#0#chrII#0
+
+--------
+Processing path: AVB#0#chrII#0_reverse   seq_id: 189   st: 1820305   num_matches: 13020
+Processing node: 1254 offset: 42, al_len: 30, read_id: 44937, read_st: 170
+Processed all 13020 matches for path: AVB#0#chrII#0_reverse
+
+--------
+Processing path: AVI_1a#0#chrII#0   seq_id: 190   st: 1833325   num_matches: 5511
+Processing node: 4878 offset: 0, al_len: 200, read_id: 53059, read_st: 0
+Processed all 5511 matches for path: AVI_1a#0#chrII#0
+
+--------
+Processing path: AVI_1a#0#chrII#0_reverse   seq_id: 191   st: 1838836   num_matches: 4781
+Processing node: 8220 offset: 15, al_len: 200, read_id: 53500, read_st: 0
+Processed all 4781 matches for path: AVI_1a#0#chrII#0_reverse
+
+--------
+Processing path: AVN#0#chrII#0   seq_id: 192   st: 1843617   num_matches: 20691
+Processing node: 7344 offset: 127, al_len: 200, read_id: 12301, read_st: 0
+Processed all 20691 matches for path: AVN#0#chrII#0
+
+--------
+Processing path: AVN#0#chrII#0_reverse   seq_id: 193   st: 1864308   num_matches: 20548
+Processing node: 7344 offset: 435, al_len: 118, read_id: 71655, read_st: 82
+Processed all 20548 matches for path: AVN#0#chrII#0_reverse
+
+--------
+Processing path: BAD#0#chrII#0   seq_id: 194   st: 1884856   num_matches: 18217
+Processing node: 2254 offset: 54, al_len: 164, read_id: 76408, read_st: 36
+Processed all 18217 matches for path: BAD#0#chrII#0
+
+--------
+Processing path: BAD#0#chrII#0_reverse   seq_id: 195   st: 1903073   num_matches: 17290
+Processing node: 1024 offset: 41, al_len: 200, read_id: 30062, read_st: 0
+Processed all 17290 matches for path: BAD#0#chrII#0_reverse
+
+--------
+Processing path: BAF#0#chrII#0   seq_id: 196   st: 1920363   num_matches: 17598
+Processing node: 5408 offset: 505, al_len: 200, read_id: 8127, read_st: 0
+Processed all 17598 matches for path: BAF#0#chrII#0
+
+--------
+Processing path: BAF#0#chrII#0_reverse   seq_id: 197   st: 1937961   num_matches: 17518
+Processing node: 4792 offset: 0, al_len: 200, read_id: 73112, read_st: 0
+Processed all 17518 matches for path: BAF#0#chrII#0_reverse
+
+--------
+Processing path: BAF#1#chrII#0   seq_id: 198   st: 1955479   num_matches: 18288
+Processing node: 39887 offset: 6, al_len: 38, read_id: 34301, read_st: 162
+Processed all 18288 matches for path: BAF#1#chrII#0
+
+--------
+Processing path: BAF#1#chrII#0_reverse   seq_id: 199   st: 1973767   num_matches: 18221
+Processing node: 34207 offset: 6, al_len: 61, read_id: 90636, read_st: 139
+Processed all 18221 matches for path: BAF#1#chrII#0_reverse
+
+--------
+Processing path: BAF#2#chrII#0   seq_id: 200   st: 1991988   num_matches: 16167
+Processing node: 4783 offset: 0, al_len: 48, read_id: 23542, read_st: 152
+Processed all 16167 matches for path: BAF#2#chrII#0
+
+--------
+Processing path: BAF#2#chrII#0_reverse   seq_id: 201   st: 2008155   num_matches: 15483
+Processing node: 6869 offset: 305, al_len: 200, read_id: 98000, read_st: 0
+Processed all 15483 matches for path: BAF#2#chrII#0_reverse
+
+--------
+Processing path: BAG_1a#0#chrII#0   seq_id: 202   st: 2023638   num_matches: 5628
+Processing node: 2729 offset: 87, al_len: 126, read_id: 36879, read_st: 74
+Processed all 5628 matches for path: BAG_1a#0#chrII#0
+
+--------
+Processing path: BAG_1a#0#chrII#0_reverse   seq_id: 203   st: 2029266   num_matches: 4966
+Processing node: 3661 offset: 146, al_len: 128, read_id: 90194, read_st: 0
+Processed all 4966 matches for path: BAG_1a#0#chrII#0_reverse
+
+--------
+Processing path: BAH#0#chrII#0   seq_id: 204   st: 2034232   num_matches: 8636
+Processing node: 653 offset: 587, al_len: 200, read_id: 84020, read_st: 0
+Processed all 8636 matches for path: BAH#0#chrII#0
+
+--------
+Processing path: BAH#0#chrII#0_reverse   seq_id: 205   st: 2042868   num_matches: 7682
+Processing node: 906 offset: 6, al_len: 44, read_id: 62236, read_st: 0
+Processed all 7682 matches for path: BAH#0#chrII#0_reverse
+
+--------
+Processing path: BAI_1a#0#chrII#0   seq_id: 206   st: 2050550   num_matches: 12958
+Processing node: 96 offset: 113, al_len: 200, read_id: 2689, read_st: 0
+Processed all 12958 matches for path: BAI_1a#0#chrII#0
+
+--------
+Processing path: BAI_1a#0#chrII#0_reverse   seq_id: 207   st: 2063508   num_matches: 12788
+Processing node: 927 offset: 125, al_len: 66, read_id: 72814, read_st: 0
+Processed all 12788 matches for path: BAI_1a#0#chrII#0_reverse
+
+--------
+Processing path: BAK_1a#0#chrII#0   seq_id: 208   st: 2076296   num_matches: 14139
+Processing node: 1954 offset: 530, al_len: 49, read_id: 36962, read_st: 0
+Processed all 14139 matches for path: BAK_1a#0#chrII#0
+
+--------
+Processing path: BAK_1a#0#chrII#0_reverse   seq_id: 209   st: 2090435   num_matches: 14319
+Processing node: 761 offset: 4, al_len: 200, read_id: 90752, read_st: 0
+Processed all 14319 matches for path: BAK_1a#0#chrII#0_reverse
+
+--------
+Processing path: BAL_1a#0#chrII#0   seq_id: 210   st: 2104754   num_matches: 7259
+Processing node: 2916 offset: 84, al_len: 58, read_id: 82819, read_st: 142
+Processed all 7259 matches for path: BAL_1a#0#chrII#0
+
+--------
+Processing path: BAL_1a#0#chrII#0_reverse   seq_id: 211   st: 2112013   num_matches: 7770
+Processing node: 264 offset: 52, al_len: 200, read_id: 17917, read_st: 0
+Processed all 7770 matches for path: BAL_1a#0#chrII#0_reverse
+
+--------
+Processing path: BAM#0#chrII#0   seq_id: 212   st: 2119783   num_matches: 10614
+Processing node: 910 offset: 386, al_len: 200, read_id: 35740, read_st: 0
+Processed all 10614 matches for path: BAM#0#chrII#0
+
+--------
+Processing path: BAM#0#chrII#0_reverse   seq_id: 213   st: 2130397   num_matches: 9217
+Processing node: 910 offset: 184, al_len: 200, read_id: 61008, read_st: 0
+Processed all 9217 matches for path: BAM#0#chrII#0_reverse
+
+--------
+Processing path: BAP_1a#0#chrII#0   seq_id: 214   st: 2139614   num_matches: 14808
+Processing node: 1949 offset: 361, al_len: 200, read_id: 2938, read_st: 0
+Processed all 14808 matches for path: BAP_1a#0#chrII#0
+
+--------
+Processing path: BAP_1a#0#chrII#0_reverse   seq_id: 215   st: 2154422   num_matches: 14956
+Processing node: 1680 offset: 282, al_len: 33, read_id: 11483, read_st: 167
+Processed all 14956 matches for path: BAP_1a#0#chrII#0_reverse
+
+--------
+Processing path: BAQ_1a#0#chrII#0   seq_id: 216   st: 2169378   num_matches: 7965
+Processing node: 362 offset: 377, al_len: 140, read_id: 75158, read_st: 0
+Processed all 7965 matches for path: BAQ_1a#0#chrII#0
+
+--------
+Processing path: BAQ_1a#0#chrII#0_reverse   seq_id: 217   st: 2177343   num_matches: 8797
+Processing node: 362 offset: 6, al_len: 149, read_id: 92643, read_st: 0
+Processed all 8797 matches for path: BAQ_1a#0#chrII#0_reverse
+
+--------
+Processing path: BBF#0#chrII#0   seq_id: 218   st: 2186140   num_matches: 16124
+Processing node: 601 offset: 138, al_len: 200, read_id: 86924, read_st: 0
+Processed all 16124 matches for path: BBF#0#chrII#0
+
+--------
+Processing path: BBF#0#chrII#0_reverse   seq_id: 219   st: 2202264   num_matches: 16257
+Processing node: 4060 offset: 0, al_len: 200, read_id: 22658, read_st: 0
+Processed all 16257 matches for path: BBF#0#chrII#0_reverse
+
+--------
+Processing path: BBF#1#chrII#0   seq_id: 220   st: 2218521   num_matches: 12940
+Processing node: 315 offset: 30, al_len: 200, read_id: 58591, read_st: 0
+Processed all 12940 matches for path: BBF#1#chrII#0
+
+--------
+Processing path: BBF#1#chrII#0_reverse   seq_id: 221   st: 2231461   num_matches: 11392
+Processing node: 125 offset: 2, al_len: 133, read_id: 60979, read_st: 0
+Processed all 11392 matches for path: BBF#1#chrII#0_reverse
+
+--------
+Processing path: BBF#2#chrII#0   seq_id: 222   st: 2242853   num_matches: 9639
+Processing node: 2452 offset: 523, al_len: 104, read_id: 81130, read_st: 96
+Processed all 9639 matches for path: BBF#2#chrII#0
+
+--------
+Processing path: BBF#2#chrII#0_reverse   seq_id: 223   st: 2252492   num_matches: 10829
+Processing node: 1477 offset: 71, al_len: 200, read_id: 65030, read_st: 0
+Processed all 10829 matches for path: BBF#2#chrII#0_reverse
+
+--------
+Processing path: BBL#0#chrII#0   seq_id: 224   st: 2263321   num_matches: 18491
+Processing node: 1346 offset: 898, al_len: 93, read_id: 73705, read_st: 107
+Processed all 18491 matches for path: BBL#0#chrII#0
+
+--------
+Processing path: BBL#0#chrII#0_reverse   seq_id: 225   st: 2281812   num_matches: 17756
+Processing node: 1346 offset: 408, al_len: 200, read_id: 53985, read_st: 0
+Processed all 17756 matches for path: BBL#0#chrII#0_reverse
+
+--------
+Processing path: BBM_1a#0#chrII#0   seq_id: 226   st: 2299568   num_matches: 12733
+Processing node: 1498 offset: 27, al_len: 200, read_id: 34175, read_st: 0
+Processed all 12733 matches for path: BBM_1a#0#chrII#0
+
+--------
+Processing path: BBM_1a#0#chrII#0_reverse   seq_id: 227   st: 2312301   num_matches: 12042
+Processing node: 3232 offset: 29, al_len: 200, read_id: 41431, read_st: 0
+Processed all 12042 matches for path: BBM_1a#0#chrII#0_reverse
+
+--------
+Processing path: BBT#0#chrII#0   seq_id: 228   st: 2324343   num_matches: 19094
+Processing node: 917 offset: 154, al_len: 113, read_id: 10878, read_st: 87
+Processed all 19094 matches for path: BBT#0#chrII#0
+
+--------
+Processing path: BBT#0#chrII#0_reverse   seq_id: 229   st: 2343437   num_matches: 19255
+Processing node: 917 offset: 48, al_len: 186, read_id: 65024, read_st: 0
+Processed all 19255 matches for path: BBT#0#chrII#0_reverse
+
+--------
+Processing path: BCE_3a#0#chrII#0   seq_id: 230   st: 2362692   num_matches: 13069
+Processing node: 2579 offset: 60, al_len: 68, read_id: 40794, read_st: 132
+Processed all 13069 matches for path: BCE_3a#0#chrII#0
+
+--------
+Processing path: BCE_3a#0#chrII#0_reverse   seq_id: 231   st: 2375761   num_matches: 12474
+Processing node: 57 offset: 268, al_len: 190, read_id: 70769, read_st: 10
+Processed all 12474 matches for path: BCE_3a#0#chrII#0_reverse
+
+--------
+Processing path: BCN#0#chrII#0   seq_id: 232   st: 2388235   num_matches: 10972
+Processing node: 1529 offset: 0, al_len: 200, read_id: 5764, read_st: 0
+Processed all 10972 matches for path: BCN#0#chrII#0
+
+--------
+Processing path: BCN#0#chrII#0_reverse   seq_id: 233   st: 2399207   num_matches: 11047
+Processing node: 6636 offset: 99, al_len: 200, read_id: 31058, read_st: 0
+Processed all 11047 matches for path: BCN#0#chrII#0_reverse
+
+--------
+Processing path: BDC_1c#0#chrII#0   seq_id: 234   st: 2410254   num_matches: 9406
+Processing node: 1915 offset: 873, al_len: 58, read_id: 56743, read_st: 142
+Processed all 9406 matches for path: BDC_1c#0#chrII#0
+
+--------
+Processing path: BDC_1c#0#chrII#0_reverse   seq_id: 235   st: 2419660   num_matches: 14535
+Processing node: 6345 offset: 9, al_len: 200, read_id: 75346, read_st: 0
+Processed all 14535 matches for path: BDC_1c#0#chrII#0_reverse
+
+--------
+Processing path: BDF_1d#0#chrII#0   seq_id: 236   st: 2434195   num_matches: 14302
+Processing node: 6294 offset: 53, al_len: 54, read_id: 90046, read_st: 0
+Processed all 14302 matches for path: BDF_1d#0#chrII#0
+
+--------
+Processing path: BDF_1d#0#chrII#0_reverse   seq_id: 237   st: 2448497   num_matches: 8525
+Processing node: 1915 offset: 981, al_len: 77, read_id: 51882, read_st: 123
+Processed all 8525 matches for path: BDF_1d#0#chrII#0_reverse
+
+--------
+Processing path: BDH_1b#0#chrII#0   seq_id: 238   st: 2457022   num_matches: 19933
+Processing node: 670 offset: 7, al_len: 200, read_id: 78734, read_st: 0
+Processed all 19933 matches for path: BDH_1b#0#chrII#0
+
+--------
+Processing path: BDH_1b#0#chrII#0_reverse   seq_id: 239   st: 2476955   num_matches: 20605
+Processing node: 3343 offset: 15, al_len: 200, read_id: 70924, read_st: 0
+Processed all 20605 matches for path: BDH_1b#0#chrII#0_reverse
+
+--------
+Processing path: BDM_1a#0#chrII#0   seq_id: 240   st: 2497560   num_matches: 12741
+Processing node: 637 offset: 0, al_len: 200, read_id: 23780, read_st: 0
+Processed all 12741 matches for path: BDM_1a#0#chrII#0
+
+--------
+Processing path: BDM_1a#0#chrII#0_reverse   seq_id: 241   st: 2510301   num_matches: 12533
+Processing node: 1040 offset: 82, al_len: 58, read_id: 14153, read_st: 142
+Processed all 12533 matches for path: BDM_1a#0#chrII#0_reverse
+
+--------
+Processing path: BDN_1c#0#chrII#0   seq_id: 242   st: 2522834   num_matches: 18938
+Processing node: 694 offset: 830, al_len: 64, read_id: 60116, read_st: 136
+Processed all 18938 matches for path: BDN_1c#0#chrII#0
+
+--------
+Processing path: BDN_1c#0#chrII#0_reverse   seq_id: 243   st: 2541772   num_matches: 18690
+Processing node: 694 offset: 828, al_len: 38, read_id: 93348, read_st: 162
+Processed all 18690 matches for path: BDN_1c#0#chrII#0_reverse
+
+--------
+Processing path: BEM#0#chrII#0   seq_id: 244   st: 2560462   num_matches: 21321
+Processing node: 36334 offset: 0, al_len: 131, read_id: 33301, read_st: 69
+Processed all 21321 matches for path: BEM#0#chrII#0
+
+--------
+Processing path: BEM#0#chrII#0_reverse   seq_id: 245   st: 2581783   num_matches: 21248
+Processing node: 5669 offset: 2, al_len: 63, read_id: 87607, read_st: 0
+Processed all 21248 matches for path: BEM#0#chrII#0_reverse
+
+--------
+Processing path: BFH#0#chrII#0   seq_id: 246   st: 2603031   num_matches: 10514
+Processing node: 279 offset: 139, al_len: 200, read_id: 97851, read_st: 0
+Processed all 10514 matches for path: BFH#0#chrII#0
+
+--------
+Processing path: BFH#0#chrII#0_reverse   seq_id: 247   st: 2613545   num_matches: 9780
+Processing node: 4740 offset: 0, al_len: 200, read_id: 80550, read_st: 0
+Processed all 9780 matches for path: BFH#0#chrII#0_reverse
+
+--------
+Processing path: BFH#1#chrII#0   seq_id: 248   st: 2623325   num_matches: 10648
+Processing node: 786 offset: 2, al_len: 200, read_id: 80509, read_st: 0
+Processed all 10648 matches for path: BFH#1#chrII#0
+
+--------
+Processing path: BFH#1#chrII#0_reverse   seq_id: 249   st: 2633973   num_matches: 10530
+Processing node: 1176 offset: 79, al_len: 96, read_id: 15800, read_st: 104
+Processed all 10530 matches for path: BFH#1#chrII#0_reverse
+
+--------
+Processing path: BFH#2#chrII#0   seq_id: 250   st: 2644503   num_matches: 9575
+Processing node: 3219 offset: 18, al_len: 39, read_id: 7125, read_st: 0
+Processed all 9575 matches for path: BFH#2#chrII#0
+
+--------
+Processing path: BFH#2#chrII#0_reverse   seq_id: 251   st: 2654078   num_matches: 9274
+Processing node: 279 offset: 353, al_len: 200, read_id: 75145, read_st: 0
+Processed all 9274 matches for path: BFH#2#chrII#0_reverse
+
+--------
+Processing path: BFP_1a#0#chrII#0   seq_id: 252   st: 2663352   num_matches: 23830
+Processing node: 2605 offset: 0, al_len: 200, read_id: 45342, read_st: 0
+Processed all 23830 matches for path: BFP_1a#0#chrII#0
+
+--------
+Processing path: BFP_1a#0#chrII#0_reverse   seq_id: 253   st: 2687182   num_matches: 22962
+Processing node: 1498 offset: 14, al_len: 200, read_id: 45283, read_st: 0
+Processed all 22962 matches for path: BFP_1a#0#chrII#0_reverse
+
+--------
+Processing path: BGN_3a#0#chrII#0   seq_id: 254   st: 2710144   num_matches: 12042
+Processing node: 4058 offset: 116, al_len: 200, read_id: 67805, read_st: 0
+Processed all 12042 matches for path: BGN_3a#0#chrII#0
+
+--------
+Processing path: BGN_3a#0#chrII#0_reverse   seq_id: 255   st: 2722186   num_matches: 10839
+Processing node: 2847 offset: 41, al_len: 104, read_id: 29493, read_st: 96
+Processed all 10839 matches for path: BGN_3a#0#chrII#0_reverse
+
+--------
+Processing path: BGP_1a#0#chrII#0   seq_id: 256   st: 2733025   num_matches: 14080
+Processing node: 62 offset: 3, al_len: 200, read_id: 90058, read_st: 0
+Processed all 14080 matches for path: BGP_1a#0#chrII#0
+
+--------
+Processing path: BGP_1a#0#chrII#0_reverse   seq_id: 257   st: 2747105   num_matches: 14704
+Processing node: 62 offset: 3, al_len: 80, read_id: 91190, read_st: 0
+Processed all 14704 matches for path: BGP_1a#0#chrII#0_reverse
+
+--------
+Processing path: BHH#0#chrII#0   seq_id: 258   st: 2761809   num_matches: 18507
+Processing node: 2834 offset: 728, al_len: 69, read_id: 28865, read_st: 0
+Processed all 18507 matches for path: BHH#0#chrII#0
+
+--------
+Processing path: BHH#0#chrII#0_reverse   seq_id: 259   st: 2780316   num_matches: 16451
+Processing node: 2834 offset: 366, al_len: 200, read_id: 54100, read_st: 0
+Processed all 16451 matches for path: BHH#0#chrII#0_reverse
+
+--------
+Processing path: BJ4#0#chrII#0   seq_id: 260   st: 2796767   num_matches: 17854
+Processing node: 1631 offset: 83, al_len: 200, read_id: 13715, read_st: 0
+Processed all 17854 matches for path: BJ4#0#chrII#0
+
+--------
+Processing path: BJ4#0#chrII#0_reverse   seq_id: 261   st: 2814621   num_matches: 17008
+Processing node: 7591 offset: 48, al_len: 200, read_id: 29573, read_st: 0
+Processed all 17008 matches for path: BJ4#0#chrII#0_reverse
+
+--------
+Processing path: BLD_1a#0#chrII#0   seq_id: 262   st: 2831629   num_matches: 25466
+Processing node: 134711 offset: 66, al_len: 200, read_id: 52794, read_st: 0
+Processed all 25466 matches for path: BLD_1a#0#chrII#0
+
+--------
+Processing path: BLD_1a#0#chrII#0_reverse   seq_id: 263   st: 2857095   num_matches: 24904
+Processing node: 15230 offset: 4, al_len: 200, read_id: 9730, read_st: 0
+Processed all 24904 matches for path: BLD_1a#0#chrII#0_reverse
+
+--------
+Processing path: BMB#0#chrII#0   seq_id: 264   st: 2881999   num_matches: 7511
+Processing node: 2530 offset: 37, al_len: 200, read_id: 95803, read_st: 0
+Processed all 7511 matches for path: BMB#0#chrII#0
+
+--------
+Processing path: BMB#0#chrII#0_reverse   seq_id: 265   st: 2889510   num_matches: 3826
+Processing node: 8896 offset: 455, al_len: 200, read_id: 40502, read_st: 0
+Processed all 3826 matches for path: BMB#0#chrII#0_reverse
+
+--------
+Processing path: BMC_2a#0#chrII#0   seq_id: 266   st: 2893336   num_matches: 5373
+Processing node: 3956 offset: 32, al_len: 162, read_id: 50754, read_st: 38
+Processed all 5373 matches for path: BMC_2a#0#chrII#0
+
+--------
+Processing path: BMC_2a#0#chrII#0_reverse   seq_id: 267   st: 2898709   num_matches: 8201
+Processing node: 2344 offset: 0, al_len: 200, read_id: 68332, read_st: 0
+Processed all 8201 matches for path: BMC_2a#0#chrII#0_reverse
+
+--------
+Processing path: BPG#0#chrII#0   seq_id: 268   st: 2906910   num_matches: 20156
+Processing node: 2925 offset: 722, al_len: 200, read_id: 86896, read_st: 0
+Processed all 20156 matches for path: BPG#0#chrII#0
+
+--------
+Processing path: BPG#0#chrII#0_reverse   seq_id: 269   st: 2927066   num_matches: 18874
+Processing node: 2925 offset: 130, al_len: 121, read_id: 120, read_st: 0
+Processed all 18874 matches for path: BPG#0#chrII#0_reverse
+
+--------
+Processing path: BPK#0#chrII#0   seq_id: 270   st: 2945940   num_matches: 7795
+Processing node: 16269 offset: 4, al_len: 200, read_id: 44642, read_st: 0
+Processed all 7795 matches for path: BPK#0#chrII#0
+
+--------
+Processing path: BPK#0#chrII#0_reverse   seq_id: 271   st: 2953735   num_matches: 8058
+Processing node: 7632 offset: 157, al_len: 200, read_id: 35578, read_st: 0
+Processed all 8058 matches for path: BPK#0#chrII#0_reverse
+
+--------
+Processing path: BPK#1#chrII#0   seq_id: 272   st: 2961793   num_matches: 8349
+Processing node: 2710 offset: 635, al_len: 83, read_id: 24631, read_st: 0
+Processed all 8349 matches for path: BPK#1#chrII#0
+
+--------
+Processing path: BPK#1#chrII#0_reverse   seq_id: 273   st: 2970142   num_matches: 9247
+Processing node: 2710 offset: 281, al_len: 200, read_id: 75690, read_st: 0
+Processed all 9247 matches for path: BPK#1#chrII#0_reverse
+
+--------
+Processing path: BPK#2#chrII_1#0   seq_id: 274   st: 2979389   num_matches: 1971
+Processing node: 15019 offset: 524, al_len: 200, read_id: 51836, read_st: 0
+Processed all 1971 matches for path: BPK#2#chrII_1#0
+
+--------
+Processing path: BPK#2#chrII_1#0_reverse   seq_id: 275   st: 2981360   num_matches: 1901
+Processing node: 15019 offset: 814, al_len: 200, read_id: 75645, read_st: 0
+Processed all 1901 matches for path: BPK#2#chrII_1#0_reverse
+
+--------
+Processing path: BPK#2#chrII_2#0   seq_id: 276   st: 2983261   num_matches: 6101
+Processing node: 3553 offset: 0, al_len: 46, read_id: 79583, read_st: 154
+Processed all 6101 matches for path: BPK#2#chrII_2#0
+
+--------
+Processing path: BPK#2#chrII_2#0_reverse   seq_id: 277   st: 2989362   num_matches: 5000
+Processing node: 16922 offset: 33, al_len: 61, read_id: 33877, read_st: 0
+Processed all 5000 matches for path: BPK#2#chrII_2#0_reverse
+
+--------
+Processing path: BTE#0#chrII#0   seq_id: 278   st: 2994362   num_matches: 21259
+Processing node: 7625 offset: 8, al_len: 46, read_id: 80302, read_st: 0
+Processed all 21259 matches for path: BTE#0#chrII#0
+
+--------
+Processing path: BTE#0#chrII#0_reverse   seq_id: 279   st: 3015621   num_matches: 20751
+Processing node: 3646 offset: 2, al_len: 110, read_id: 29287, read_st: 0
+Processed all 20751 matches for path: BTE#0#chrII#0_reverse
+
+--------
+Processing path: BY4742#0#chrII#0   seq_id: 280   st: 3036372   num_matches: 10871
+Processing node: 2904 offset: 2, al_len: 200, read_id: 93449, read_st: 0
+Processed all 10871 matches for path: BY4742#0#chrII#0
+
+--------
+Processing path: BY4742#0#chrII#0_reverse   seq_id: 281   st: 3047243   num_matches: 12105
+Processing node: 2904 offset: 0, al_len: 200, read_id: 75547, read_st: 0
+Processed all 12105 matches for path: BY4742#0#chrII#0_reverse
+
+--------
+Processing path: CAS_1a#0#chrII#0   seq_id: 282   st: 3059348   num_matches: 24497
+Processing node: 55554 offset: 34, al_len: 91, read_id: 87968, read_st: 0
+Processed all 24497 matches for path: CAS_1a#0#chrII#0
+
+--------
+Processing path: CAS_1a#0#chrII#0_reverse   seq_id: 283   st: 3083845   num_matches: 23619
+Processing node: 26656 offset: 0, al_len: 200, read_id: 89740, read_st: 0
+Processed all 23619 matches for path: CAS_1a#0#chrII#0_reverse
+
+--------
+Processing path: CBK#0#chrII#0   seq_id: 284   st: 3107464   num_matches: 11806
+Processing node: 891 offset: 22, al_len: 140, read_id: 15315, read_st: 60
+Processed all 11806 matches for path: CBK#0#chrII#0
+
+--------
+Processing path: CBK#0#chrII#0_reverse   seq_id: 285   st: 3119270   num_matches: 8699
+Processing node: 1124 offset: 1, al_len: 200, read_id: 61157, read_st: 0
+Processed all 8699 matches for path: CBK#0#chrII#0_reverse
+
+--------
+Processing path: CBM#0#chrII_chrVII#0   seq_id: 286   st: 3127969   num_matches: 14552
+Processing node: 821 offset: 8, al_len: 79, read_id: 19921, read_st: 0
+Processed all 14552 matches for path: CBM#0#chrII_chrVII#0
+
+--------
+Processing path: CBM#0#chrII_chrVII#0_reverse   seq_id: 287   st: 3142521   num_matches: 16012
+Processing node: 239 offset: 83, al_len: 200, read_id: 50991, read_st: 0
+Processed all 16012 matches for path: CBM#0#chrII_chrVII#0_reverse
+
+--------
+Processing path: CBM#1#chrII_1#0   seq_id: 288   st: 3158533   num_matches: 73
+Processing node: 1370 offset: 0, al_len: 200, read_id: 3365, read_st: 0
+Processed all 73 matches for path: CBM#1#chrII_1#0
+
+--------
+Processing path: CBM#1#chrII_1#0_reverse   seq_id: 289   st: 3158606   num_matches: 121
+Processing node: 4944 offset: 6, al_len: 200, read_id: 51061, read_st: 0
+Processed all 121 matches for path: CBM#1#chrII_1#0_reverse
+
+--------
+Processing path: CBM#1#chrII_10#0   seq_id: 290   st: 3158727   num_matches: 102
+Processing node: 12792 offset: 6, al_len: 200, read_id: 83740, read_st: 0
+Processed all 102 matches for path: CBM#1#chrII_10#0
+
+--------
+Processing path: CBM#1#chrII_10#0_reverse   seq_id: 291   st: 3158829   num_matches: 178
+Processing node: 75839 offset: 2, al_len: 45, read_id: 76597, read_st: 155
+Processed all 178 matches for path: CBM#1#chrII_10#0_reverse
+
+--------
+Processing path: CBM#1#chrII_11#0   seq_id: 292   st: 3159007   num_matches: 3514
+Processing node: 21410 offset: 22, al_len: 200, read_id: 59899, read_st: 0
+Processed all 3514 matches for path: CBM#1#chrII_11#0
+
+--------
+Processing path: CBM#1#chrII_11#0_reverse   seq_id: 293   st: 3162521   num_matches: 3308
+Processing node: 45251 offset: 0, al_len: 129, read_id: 73241, read_st: 0
+Processed all 3308 matches for path: CBM#1#chrII_11#0_reverse
+
+--------
+Processing path: CBM#1#chrII_12#0   seq_id: 294   st: 3165829   num_matches: 430
+Processing node: 57471 offset: 2, al_len: 31, read_id: 95624, read_st: 151
+Processed all 430 matches for path: CBM#1#chrII_12#0
+
+--------
+Processing path: CBM#1#chrII_12#0_reverse   seq_id: 295   st: 3166259   num_matches: 466
+Processing node: 36249 offset: 32, al_len: 38, read_id: 21963, read_st: 0
+Processed all 466 matches for path: CBM#1#chrII_12#0_reverse
+
+--------
+Processing path: CBM#1#chrII_2#0   seq_id: 296   st: 3166725   num_matches: 3925
+Processing node: 4628 offset: 359, al_len: 193, read_id: 57549, read_st: 0
+Processed all 3925 matches for path: CBM#1#chrII_2#0
+
+--------
+Processing path: CBM#1#chrII_2#0_reverse   seq_id: 297   st: 3170650   num_matches: 3876
+Processing node: 48332 offset: 391, al_len: 101, read_id: 33690, read_st: 99
+Processed all 3876 matches for path: CBM#1#chrII_2#0_reverse
+
+--------
+Processing path: CBM#1#chrII_3#0   seq_id: 298   st: 3174526   num_matches: 2144
+Processing node: 17497 offset: 0, al_len: 88, read_id: 79153, read_st: 0
+Processed all 2144 matches for path: CBM#1#chrII_3#0
+
+--------
+Processing path: CBM#1#chrII_3#0_reverse   seq_id: 299   st: 3176670   num_matches: 2103
+Processing node: 42588 offset: 9, al_len: 200, read_id: 87952, read_st: 0
+Processed all 2103 matches for path: CBM#1#chrII_3#0_reverse
+
+--------
+Processing path: CBM#1#chrII_4#0   seq_id: 300   st: 3178773   num_matches: 1367
+Processing node: 10080 offset: 20, al_len: 66, read_id: 13019, read_st: 134
+Processed all 1367 matches for path: CBM#1#chrII_4#0
+
+--------
+Processing path: CBM#1#chrII_4#0_reverse   seq_id: 301   st: 3180140   num_matches: 1065
+Processing node: 1793 offset: 3, al_len: 43, read_id: 92897, read_st: 0
+Processed all 1065 matches for path: CBM#1#chrII_4#0_reverse
+
+--------
+Processing path: CBM#1#chrII_5#0   seq_id: 610   st: 4944767   num_matches: 620
+Processing node: 638743 offset: 1005, al_len: 200, read_id: 85555, read_st: 0
+Processed all 620 matches for path: CBM#1#chrII_5#0
+
+--------
+Processing path: CBM#1#chrII_5#0_reverse   seq_id: 611   st: 4945387   num_matches: 494
+Processing node: 638743 offset: 559, al_len: 200, read_id: 34952, read_st: 0
+Processed all 494 matches for path: CBM#1#chrII_5#0_reverse
+
+--------
+Processing path: CBM#1#chrII_6#0   seq_id: 302   st: 3181205   num_matches: 130
+Processing node: 62193 offset: 11, al_len: 200, read_id: 42254, read_st: 0
+Processed all 130 matches for path: CBM#1#chrII_6#0
+
+--------
+Processing path: CBM#1#chrII_6#0_reverse   seq_id: 303   st: 3181335   num_matches: 127
+Processing node: 59525 offset: 0, al_len: 200, read_id: 3750, read_st: 0
+Processed all 127 matches for path: CBM#1#chrII_6#0_reverse
+
+--------
+Processing path: CBM#1#chrII_7#0   seq_id: 304   st: 3181462   num_matches: 121
+Processing node: 26409 offset: 1, al_len: 200, read_id: 64650, read_st: 0
+Processed all 121 matches for path: CBM#1#chrII_7#0
+
+--------
+Processing path: CBM#1#chrII_7#0_reverse   seq_id: 305   st: 3181583   num_matches: 38
+Processing node: 43432 offset: 0, al_len: 200, read_id: 98591, read_st: 0
+Processed all 38 matches for path: CBM#1#chrII_7#0_reverse
+
+--------
+Processing path: CBM#1#chrII_8#0   seq_id: 306   st: 3181621   num_matches: 1475
+Processing node: 3852 offset: 4, al_len: 200, read_id: 29434, read_st: 0
+Processed all 1475 matches for path: CBM#1#chrII_8#0
+
+--------
+Processing path: CBM#1#chrII_8#0_reverse   seq_id: 307   st: 3183096   num_matches: 1395
+Processing node: 6025 offset: 0, al_len: 39, read_id: 36256, read_st: 0
+Processed all 1395 matches for path: CBM#1#chrII_8#0_reverse
+
+--------
+Processing path: CBM#1#chrII_9#0   seq_id: 308   st: 3184491   num_matches: 313
+Processing node: 29922 offset: 0, al_len: 200, read_id: 53600, read_st: 0
+Processed all 313 matches for path: CBM#1#chrII_9#0
+
+--------
+Processing path: CBM#1#chrII_9#0_reverse   seq_id: 309   st: 3184804   num_matches: 202
+Processing node: 42555 offset: 0, al_len: 200, read_id: 41395, read_st: 0
+Processed all 202 matches for path: CBM#1#chrII_9#0_reverse
+
+--------
+Processing path: CBM#2#chrII_1#0   seq_id: 310   st: 3185006   num_matches: 455
+Processing node: 24195 offset: 34, al_len: 200, read_id: 61651, read_st: 0
+Processed all 455 matches for path: CBM#2#chrII_1#0
+
+--------
+Processing path: CBM#2#chrII_1#0_reverse   seq_id: 311   st: 3185461   num_matches: 628
+Processing node: 13728 offset: 4, al_len: 54, read_id: 15997, read_st: 146
+Processed all 628 matches for path: CBM#2#chrII_1#0_reverse
+
+--------
+Processing path: CBM#2#chrII_10#0   seq_id: 612   st: 4945881   num_matches: 388
+Processing node: 177785 offset: 281, al_len: 200, read_id: 19146, read_st: 0
+Processed all 388 matches for path: CBM#2#chrII_10#0
+
+--------
+Processing path: CBM#2#chrII_10#0_reverse   seq_id: 613   st: 4946269   num_matches: 382
+Processing node: 177785 offset: 527, al_len: 184, read_id: 21671, read_st: 16
+Processed all 382 matches for path: CBM#2#chrII_10#0_reverse
+
+--------
+Processing path: CBM#2#chrII_12#0   seq_id: 312   st: 3186089   num_matches: 1161
+Processing node: 531742 offset: 1023, al_len: 59, read_id: 51884, read_st: 109
+Processed all 1161 matches for path: CBM#2#chrII_12#0
+
+--------
+Processing path: CBM#2#chrII_12#0_reverse   seq_id: 313   st: 3187250   num_matches: 1227
+Processing node: 17596 offset: 1, al_len: 177, read_id: 39575, read_st: 23
+Processed all 1227 matches for path: CBM#2#chrII_12#0_reverse
+
+--------
+Processing path: CBM#2#chrII_13#0   seq_id: 614   st: 4946651   num_matches: 352
+Processing node: 234660 offset: 986, al_len: 72, read_id: 84553, read_st: 0
+Processed all 352 matches for path: CBM#2#chrII_13#0
+
+--------
+Processing path: CBM#2#chrII_13#0_reverse   seq_id: 615   st: 4947003   num_matches: 335
+Processing node: 234660 offset: 918, al_len: 66, read_id: 97462, read_st: 134
+Processed all 335 matches for path: CBM#2#chrII_13#0_reverse
+
+--------
+Processing path: CBM#2#chrII_14#0   seq_id: 314   st: 3188477   num_matches: 761
+Processing node: 2846 offset: 7, al_len: 178, read_id: 33826, read_st: 0
+Processed all 761 matches for path: CBM#2#chrII_14#0
+
+--------
+Processing path: CBM#2#chrII_14#0_reverse   seq_id: 315   st: 3189238   num_matches: 703
+Processing node: 9527 offset: 4, al_len: 200, read_id: 31635, read_st: 0
+Processed all 703 matches for path: CBM#2#chrII_14#0_reverse
+
+--------
+Processing path: CBM#2#chrII_15#0   seq_id: 616   st: 4947338   num_matches: 435
+Processing node: 751451 offset: 710, al_len: 115, read_id: 3879, read_st: 0
+Processed all 435 matches for path: CBM#2#chrII_15#0
+
+--------
+Processing path: CBM#2#chrII_15#0_reverse   seq_id: 617   st: 4947773   num_matches: 487
+Processing node: 751451 offset: 230, al_len: 76, read_id: 22420, read_st: 124
+Processed all 487 matches for path: CBM#2#chrII_15#0_reverse
+
+--------
+Processing path: CBM#2#chrII_16#0   seq_id: 316   st: 3189941   num_matches: 807
+Processing node: 15277 offset: 70, al_len: 200, read_id: 97166, read_st: 0
+Processed all 807 matches for path: CBM#2#chrII_16#0
+
+--------
+Processing path: CBM#2#chrII_16#0_reverse   seq_id: 317   st: 3190748   num_matches: 35
+Processing node: 443668 offset: 1, al_len: 200, read_id: 2871, read_st: 0
+Processed all 35 matches for path: CBM#2#chrII_16#0_reverse
+
+--------
+Processing path: CBM#2#chrII_2#0   seq_id: 318   st: 3190783   num_matches: 579
+Processing node: 64539 offset: 650, al_len: 200, read_id: 70821, read_st: 0
+Processed all 579 matches for path: CBM#2#chrII_2#0
+
+--------
+Processing path: CBM#2#chrII_2#0_reverse   seq_id: 319   st: 3191362   num_matches: 611
+Processing node: 16530 offset: 59, al_len: 200, read_id: 97283, read_st: 0
+Processed all 611 matches for path: CBM#2#chrII_2#0_reverse
+
+--------
+Processing path: CBM#2#chrII_3#0   seq_id: 320   st: 3191973   num_matches: 2129
+Processing node: 25811 offset: 0, al_len: 200, read_id: 24624, read_st: 0
+Processed all 2129 matches for path: CBM#2#chrII_3#0
+
+--------
+Processing path: CBM#2#chrII_3#0_reverse   seq_id: 321   st: 3194102   num_matches: 2281
+Processing node: 239 offset: 261, al_len: 200, read_id: 81530, read_st: 0
+Processed all 2281 matches for path: CBM#2#chrII_3#0_reverse
+
+--------
+Processing path: CBM#2#chrII_4#0   seq_id: 322   st: 3196383   num_matches: 1146
+Processing node: 93423 offset: 3, al_len: 160, read_id: 36989, read_st: 40
+Processed all 1146 matches for path: CBM#2#chrII_4#0
+
+--------
+Processing path: CBM#2#chrII_4#0_reverse   seq_id: 323   st: 3197529   num_matches: 2109
+Processing node: 42306 offset: 3, al_len: 200, read_id: 35416, read_st: 0
+Processed all 2109 matches for path: CBM#2#chrII_4#0_reverse
+
+--------
+Processing path: CBM#2#chrII_5#0   seq_id: 324   st: 3199638   num_matches: 1127
+Processing node: 1793 offset: 12, al_len: 200, read_id: 71215, read_st: 0
+Processed all 1127 matches for path: CBM#2#chrII_5#0
+
+--------
+Processing path: CBM#2#chrII_5#0_reverse   seq_id: 325   st: 3200765   num_matches: 793
+Processing node: 32677 offset: 4, al_len: 200, read_id: 54651, read_st: 0
+Processed all 793 matches for path: CBM#2#chrII_5#0_reverse
+
+--------
+Processing path: CBM#2#chrII_6#0   seq_id: 326   st: 3201558   num_matches: 565
+Processing node: 306975 offset: 4, al_len: 42, read_id: 26270, read_st: 123
+Processed all 565 matches for path: CBM#2#chrII_6#0
+
+--------
+Processing path: CBM#2#chrII_6#0_reverse   seq_id: 327   st: 3202123   num_matches: 707
+Processing node: 10458 offset: 8, al_len: 200, read_id: 45019, read_st: 0
+Processed all 707 matches for path: CBM#2#chrII_6#0_reverse
+
+--------
+Processing path: CBM#2#chrII_7#0   seq_id: 328   st: 3202830   num_matches: 120
+Processing node: 11814 offset: 5, al_len: 200, read_id: 18071, read_st: 0
+Processed all 120 matches for path: CBM#2#chrII_7#0
+
+--------
+Processing path: CBM#2#chrII_7#0_reverse   seq_id: 329   st: 3202950   num_matches: 164
+Processing node: 63504 offset: 16, al_len: 90, read_id: 94350, read_st: 0
+Processed all 164 matches for path: CBM#2#chrII_7#0_reverse
+
+--------
+Processing path: CBM#2#chrII_8#0   seq_id: 618   st: 4948260   num_matches: 861
+Processing node: 405315 offset: 297, al_len: 200, read_id: 18738, read_st: 0
+Processed all 861 matches for path: CBM#2#chrII_8#0
+
+--------
+Processing path: CBM#2#chrII_8#0_reverse   seq_id: 619   st: 4949121   num_matches: 819
+Processing node: 405315 offset: 967, al_len: 200, read_id: 55224, read_st: 0
+Processed all 819 matches for path: CBM#2#chrII_8#0_reverse
+
+--------
+Processing path: CBM#2#chrII_9#0   seq_id: 330   st: 3203114   num_matches: 669
+Processing node: 144690 offset: 380, al_len: 200, read_id: 89537, read_st: 0
+Processed all 669 matches for path: CBM#2#chrII_9#0
+
+--------
+Processing path: CBM#2#chrII_9#0_reverse   seq_id: 331   st: 3203783   num_matches: 720
+Processing node: 1096 offset: 2, al_len: 200, read_id: 46003, read_st: 0
+Processed all 720 matches for path: CBM#2#chrII_9#0_reverse
+
+--------
+Processing path: CBS432#0#chrII#0   seq_id: 332   st: 3204503   num_matches: 101
+Processing node: 54767 offset: 2, al_len: 32, read_id: 11327, read_st: 0
+Processed all 101 matches for path: CBS432#0#chrII#0
+
+--------
+Processing path: CBS432#0#chrII#0_reverse   seq_id: 333   st: 3204604   num_matches: 112
+Processing node: 10162 offset: 0, al_len: 149, read_id: 41907, read_st: 51
+Processed all 112 matches for path: CBS432#0#chrII#0_reverse
+
+--------
+Processing path: CBS7001#0#chrII#0   seq_id: 602   st: 4944753   num_matches: 5
+Processing node: 220421 offset: 42, al_len: 56, read_id: 13457, read_st: 56
+Processed all 5 matches for path: CBS7001#0#chrII#0
+
+--------
+Processing path: CBS7001#0#chrII#0_reverse   seq_id: 603   st: 4944758   num_matches: 4
+Processing node: 343240 offset: 34, al_len: 34, read_id: 20268, read_st: 146
+Processed all 4 matches for path: CBS7001#0#chrII#0_reverse
+
+--------
+Processing path: CCC_1a#0#chrII#0   seq_id: 334   st: 3204716   num_matches: 7839
+Processing node: 5460 offset: 79, al_len: 200, read_id: 8205, read_st: 0
+Processed all 7839 matches for path: CCC_1a#0#chrII#0
+
+--------
+Processing path: CCC_1a#0#chrII#0_reverse   seq_id: 335   st: 3212555   num_matches: 7624
+Processing node: 341 offset: 3, al_len: 152, read_id: 5373, read_st: 48
+Processed all 7624 matches for path: CCC_1a#0#chrII#0_reverse
+
+--------
+Processing path: CCN#0#chrII#0   seq_id: 336   st: 3220179   num_matches: 12650
+Processing node: 50 offset: 39, al_len: 92, read_id: 26570, read_st: 0
+Processed all 12650 matches for path: CCN#0#chrII#0
+
+--------
+Processing path: CCN#0#chrII#0_reverse   seq_id: 337   st: 3232829   num_matches: 11910
+Processing node: 50 offset: 13, al_len: 75, read_id: 50707, read_st: 125
+Processed all 11910 matches for path: CCN#0#chrII#0_reverse
+
+--------
+Processing path: CCQ_1a#0#chrII#0   seq_id: 338   st: 3244739   num_matches: 18116
+Processing node: 1355 offset: 2, al_len: 200, read_id: 39287, read_st: 0
+Processed all 18116 matches for path: CCQ_1a#0#chrII#0
+
+--------
+Processing path: CCQ_1a#0#chrII#0_reverse   seq_id: 339   st: 3262855   num_matches: 17866
+Processing node: 2042 offset: 219, al_len: 75, read_id: 82224, read_st: 33
+Processed all 17866 matches for path: CCQ_1a#0#chrII#0_reverse
+
+--------
+Processing path: CCT_1a#0#chrII#0   seq_id: 340   st: 3280721   num_matches: 16704
+Processing node: 827 offset: 697, al_len: 200, read_id: 40986, read_st: 0
+Processed all 16704 matches for path: CCT_1a#0#chrII#0
+
+--------
+Processing path: CCT_1a#0#chrII#0_reverse   seq_id: 341   st: 3297425   num_matches: 17435
+Processing node: 5541 offset: 141, al_len: 200, read_id: 53298, read_st: 0
+Processed all 17435 matches for path: CCT_1a#0#chrII#0_reverse
+
+--------
+Processing path: CDA#0#chrII#0   seq_id: 342   st: 3314860   num_matches: 17315
+Processing node: 1810 offset: 13, al_len: 200, read_id: 18582, read_st: 0
+Processed all 17315 matches for path: CDA#0#chrII#0
+
+--------
+Processing path: CDA#0#chrII#0_reverse   seq_id: 343   st: 3332175   num_matches: 16874
+Processing node: 827 offset: 67, al_len: 200, read_id: 25151, read_st: 0
+Processed all 16874 matches for path: CDA#0#chrII#0_reverse
+
+--------
+Processing path: CDG_1a#0#chrII#0   seq_id: 344   st: 3349049   num_matches: 16706
+Processing node: 6559 offset: 78, al_len: 200, read_id: 99232, read_st: 0
+Processed all 16706 matches for path: CDG_1a#0#chrII#0
+
+--------
+Processing path: CDG_1a#0#chrII#0_reverse   seq_id: 345   st: 3365755   num_matches: 16838
+Processing node: 13 offset: 18, al_len: 53, read_id: 47443, read_st: 0
+Processed all 16838 matches for path: CDG_1a#0#chrII#0_reverse
+
+--------
+Processing path: CDN_1a#0#chrII#0   seq_id: 346   st: 3382593   num_matches: 11635
+Processing node: 643 offset: 10, al_len: 32, read_id: 37700, read_st: 168
+Processed all 11635 matches for path: CDN_1a#0#chrII#0
+
+--------
+Processing path: CDN_1a#0#chrII#0_reverse   seq_id: 347   st: 3394228   num_matches: 9889
+Processing node: 7595 offset: 0, al_len: 200, read_id: 40949, read_st: 0
+Processed all 9889 matches for path: CDN_1a#0#chrII#0_reverse
+
+--------
+Processing path: CEI_1a#0#chrII#0   seq_id: 348   st: 3404117   num_matches: 3074
+Processing node: 2019 offset: 25, al_len: 200, read_id: 67264, read_st: 0
+Processed all 3074 matches for path: CEI_1a#0#chrII#0
+
+--------
+Processing path: CEI_1a#0#chrII#0_reverse   seq_id: 349   st: 3407191   num_matches: 2711
+Processing node: 3144 offset: 88, al_len: 104, read_id: 34333, read_st: 96
+Processed all 2711 matches for path: CEI_1a#0#chrII#0_reverse
+
+--------
+Processing path: CEL_1a#0#chrII#0   seq_id: 350   st: 3409902   num_matches: 15008
+Processing node: 2480 offset: 0, al_len: 53, read_id: 50779, read_st: 147
+Processed all 15008 matches for path: CEL_1a#0#chrII#0
+
+--------
+Processing path: CEL_1a#0#chrII#0_reverse   seq_id: 351   st: 3424910   num_matches: 15925
+Processing node: 16126 offset: 27, al_len: 38, read_id: 32897, read_st: 162
+Processed all 15925 matches for path: CEL_1a#0#chrII#0_reverse
+
+--------
+Processing path: CENPK1137D#0#chrII#0   seq_id: 352   st: 3440835   num_matches: 15657
+Processing node: 255 offset: 12, al_len: 121, read_id: 77006, read_st: 0
+Processed all 15657 matches for path: CENPK1137D#0#chrII#0
+
+--------
+Processing path: CENPK1137D#0#chrII#0_reverse   seq_id: 353   st: 3456492   num_matches: 13701
+Processing node: 255 offset: 19, al_len: 200, read_id: 40029, read_st: 0
+Processed all 13701 matches for path: CENPK1137D#0#chrII#0_reverse
+
+--------
+Processing path: CEQ_1a#0#chrII_chrX#0   seq_id: 354   st: 3470193   num_matches: 5862
+Processing node: 84 offset: 281, al_len: 73, read_id: 23048, read_st: 127
+Processed all 5862 matches for path: CEQ_1a#0#chrII_chrX#0
+
+--------
+Processing path: CEQ_1a#0#chrII_chrX#0_reverse   seq_id: 355   st: 3476055   num_matches: 5657
+Processing node: 84 offset: 3, al_len: 200, read_id: 30398, read_st: 0
+Processed all 5657 matches for path: CEQ_1a#0#chrII_chrX#0_reverse
+
+--------
+Processing path: CFA#0#chrII#0   seq_id: 356   st: 3481712   num_matches: 16785
+Processing node: 4155 offset: 7, al_len: 200, read_id: 3633, read_st: 0
+Processed all 16785 matches for path: CFA#0#chrII#0
+
+--------
+Processing path: CFA#0#chrII#0_reverse   seq_id: 357   st: 3498497   num_matches: 17112
+Processing node: 337 offset: 2, al_len: 200, read_id: 88806, read_st: 0
+Processed all 17112 matches for path: CFA#0#chrII#0_reverse
+
+--------
+Processing path: CFC#0#chrII#0   seq_id: 358   st: 3515609   num_matches: 23985
+Processing node: 2052 offset: 4, al_len: 200, read_id: 29011, read_st: 0
+Processed all 23985 matches for path: CFC#0#chrII#0
+
+--------
+Processing path: CFC#0#chrII#0_reverse   seq_id: 359   st: 3539594   num_matches: 23738
+Processing node: 1271 offset: 51, al_len: 200, read_id: 75706, read_st: 0
+Processed all 23738 matches for path: CFC#0#chrII#0_reverse
+
+--------
+Processing path: CFF#0#chrII#0   seq_id: 360   st: 3563332   num_matches: 18363
+Processing node: 239 offset: 67, al_len: 200, read_id: 26430, read_st: 0
+Processed all 18363 matches for path: CFF#0#chrII#0
+
+--------
+Processing path: CFF#0#chrII#0_reverse   seq_id: 361   st: 3581695   num_matches: 17071
+Processing node: 3912 offset: 408, al_len: 200, read_id: 17070, read_st: 0
+Processed all 17071 matches for path: CFF#0#chrII#0_reverse
+
+--------
+Processing path: CFF#1#chrII_1#0   seq_id: 362   st: 3598766   num_matches: 2827
+Processing node: 28979 offset: 181, al_len: 200, read_id: 85537, read_st: 0
+Processed all 2827 matches for path: CFF#1#chrII_1#0
+
+--------
+Processing path: CFF#1#chrII_1#0_reverse   seq_id: 363   st: 3601593   num_matches: 2598
+Processing node: 28979 offset: 579, al_len: 200, read_id: 24229, read_st: 0
+Processed all 2598 matches for path: CFF#1#chrII_1#0_reverse
+
+--------
+Processing path: CFF#1#chrII_10#0   seq_id: 364   st: 3604191   num_matches: 1114
+Processing node: 7669 offset: 74, al_len: 57, read_id: 77521, read_st: 0
+Processed all 1114 matches for path: CFF#1#chrII_10#0
+
+--------
+Processing path: CFF#1#chrII_10#0_reverse   seq_id: 365   st: 3605305   num_matches: 1069
+Processing node: 7669 offset: 102, al_len: 71, read_id: 91198, read_st: 129
+Processed all 1069 matches for path: CFF#1#chrII_10#0_reverse
+
+--------
+Processing path: CFF#1#chrII_2#0   seq_id: 366   st: 3606374   num_matches: 287
+Processing node: 192639 offset: 169, al_len: 200, read_id: 74574, read_st: 0
+Processed all 287 matches for path: CFF#1#chrII_2#0
+
+--------
+Processing path: CFF#1#chrII_2#0_reverse   seq_id: 367   st: 3606661   num_matches: 260
+Processing node: 14394 offset: 316, al_len: 200, read_id: 5329, read_st: 0
+Processed all 260 matches for path: CFF#1#chrII_2#0_reverse
+
+--------
+Processing path: CFF#1#chrII_3#0   seq_id: 620   st: 4949940   num_matches: 503
+Processing node: 565787 offset: 412, al_len: 82, read_id: 83710, read_st: 0
+Processed all 503 matches for path: CFF#1#chrII_3#0
+
+--------
+Processing path: CFF#1#chrII_3#0_reverse   seq_id: 621   st: 4950443   num_matches: 546
+Processing node: 565787 offset: 797, al_len: 200, read_id: 68181, read_st: 0
+Processed all 546 matches for path: CFF#1#chrII_3#0_reverse
+
+--------
+Processing path: CFF#1#chrII_4#0   seq_id: 368   st: 3606921   num_matches: 2024
+Processing node: 7511 offset: 4, al_len: 200, read_id: 7730, read_st: 0
+Processed all 2024 matches for path: CFF#1#chrII_4#0
+
+--------
+Processing path: CFF#1#chrII_4#0_reverse   seq_id: 369   st: 3608945   num_matches: 3058
+Processing node: 2620 offset: 0, al_len: 56, read_id: 1751, read_st: 0
+Processed all 3058 matches for path: CFF#1#chrII_4#0_reverse
+
+--------
+Processing path: CFF#1#chrII_5#0   seq_id: 370   st: 3612003   num_matches: 1505
+Processing node: 4531 offset: 22, al_len: 75, read_id: 47612, read_st: 0
+Processed all 1505 matches for path: CFF#1#chrII_5#0
+
+--------
+Processing path: CFF#1#chrII_5#0_reverse   seq_id: 371   st: 3613508   num_matches: 1923
+Processing node: 4531 offset: 8, al_len: 200, read_id: 87055, read_st: 0
+Processed all 1923 matches for path: CFF#1#chrII_5#0_reverse
+
+--------
+Processing path: CFF#1#chrII_6#0   seq_id: 372   st: 3615431   num_matches: 1
+Processing node: 1015686 offset: 0, al_len: 200, read_id: 63299, read_st: 0
+Processed all 1 matches for path: CFF#1#chrII_6#0
+
+--------
+Processing path: CFF#1#chrII_6#0_reverse   seq_id: 373   st: 3615432   num_matches: 31
+Processing node: 252112 offset: 29, al_len: 200, read_id: 6010, read_st: 0
+Processed all 31 matches for path: CFF#1#chrII_6#0_reverse
+
+--------
+Processing path: CFF#1#chrII_7#0   seq_id: 374   st: 3615463   num_matches: 495
+Processing node: 23066 offset: 569, al_len: 105, read_id: 84038, read_st: 95
+Processed all 495 matches for path: CFF#1#chrII_7#0
+
+--------
+Processing path: CFF#1#chrII_7#0_reverse   seq_id: 375   st: 3615958   num_matches: 494
+Processing node: 23066 offset: 424, al_len: 200, read_id: 56682, read_st: 0
+Processed all 494 matches for path: CFF#1#chrII_7#0_reverse
+
+--------
+Processing path: CFF#1#chrII_8#0   seq_id: 376   st: 3616452   num_matches: 23
+Processing node: 18206 offset: 3, al_len: 200, read_id: 51174, read_st: 0
+Processed all 23 matches for path: CFF#1#chrII_8#0
+
+--------
+Processing path: CFF#1#chrII_9#0   seq_id: 378   st: 3616475   num_matches: 2010
+Processing node: 14066 offset: 7, al_len: 77, read_id: 96607, read_st: 123
+Processed all 2010 matches for path: CFF#1#chrII_9#0
+
+--------
+Processing path: CFF#1#chrII_9#0_reverse   seq_id: 379   st: 3618485   num_matches: 1904
+Processing node: 36539 offset: 905, al_len: 86, read_id: 51262, read_st: 114
+Processed all 1904 matches for path: CFF#1#chrII_9#0_reverse
+
+--------
+Processing path: CFF#2#chrII_1#0   seq_id: 380   st: 3620389   num_matches: 595
+Processing node: 574385 offset: 0, al_len: 200, read_id: 46357, read_st: 0
+Processed all 595 matches for path: CFF#2#chrII_1#0
+
+--------
+Processing path: CFF#2#chrII_1#0_reverse   seq_id: 381   st: 3620984   num_matches: 610
+Processing node: 99686 offset: 0, al_len: 200, read_id: 15650, read_st: 0
+Processed all 610 matches for path: CFF#2#chrII_1#0_reverse
+
+--------
+Processing path: CFF#2#chrII_10#0   seq_id: 382   st: 3621594   num_matches: 144
+Processing node: 12934 offset: 0, al_len: 200, read_id: 95504, read_st: 0
+Processed all 144 matches for path: CFF#2#chrII_10#0
+
+--------
+Processing path: CFF#2#chrII_10#0_reverse   seq_id: 383   st: 3621738   num_matches: 79
+Processing node: 6371 offset: 1, al_len: 154, read_id: 34576, read_st: 0
+Processed all 79 matches for path: CFF#2#chrII_10#0_reverse
+
+--------
+Processing path: CFF#2#chrII_11#0   seq_id: 384   st: 3621817   num_matches: 438
+Processing node: 367283 offset: 5, al_len: 200, read_id: 69390, read_st: 0
+Processed all 438 matches for path: CFF#2#chrII_11#0
+
+--------
+Processing path: CFF#2#chrII_11#0_reverse   seq_id: 385   st: 3622255   num_matches: 531
+Processing node: 497433 offset: 944, al_len: 72, read_id: 5486, read_st: 128
+Processed all 531 matches for path: CFF#2#chrII_11#0_reverse
+
+--------
+Processing path: CFF#2#chrII_12#0   seq_id: 386   st: 3622786   num_matches: 195
+Processing node: 73666 offset: 10, al_len: 200, read_id: 4184, read_st: 0
+Processed all 195 matches for path: CFF#2#chrII_12#0
+
+--------
+Processing path: CFF#2#chrII_12#0_reverse   seq_id: 387   st: 3622981   num_matches: 128
+Processing node: 141249 offset: 7, al_len: 200, read_id: 25213, read_st: 0
+Processed all 128 matches for path: CFF#2#chrII_12#0_reverse
+
+--------
+Processing path: CFF#2#chrII_13#0   seq_id: 388   st: 3623109   num_matches: 204
+Processing node: 35716 offset: 221, al_len: 200, read_id: 13528, read_st: 0
+Processed all 204 matches for path: CFF#2#chrII_13#0
+
+--------
+Processing path: CFF#2#chrII_13#0_reverse   seq_id: 389   st: 3623313   num_matches: 149
+Processing node: 271484 offset: 303, al_len: 200, read_id: 37786, read_st: 0
+Processed all 149 matches for path: CFF#2#chrII_13#0_reverse
+
+--------
+Processing path: CFF#2#chrII_14#0   seq_id: 390   st: 3623462   num_matches: 733
+Processing node: 18432 offset: 9, al_len: 103, read_id: 22521, read_st: 97
+Processed all 733 matches for path: CFF#2#chrII_14#0
+
+--------
+Processing path: CFF#2#chrII_14#0_reverse   seq_id: 391   st: 3624195   num_matches: 859
+Processing node: 30593 offset: 4, al_len: 200, read_id: 20610, read_st: 0
+Processed all 859 matches for path: CFF#2#chrII_14#0_reverse
+
+--------
+Processing path: CFF#2#chrII_15#0   seq_id: 392   st: 3625054   num_matches: 384
+Processing node: 25746 offset: 162, al_len: 43, read_id: 73828, read_st: 157
+Processed all 384 matches for path: CFF#2#chrII_15#0
+
+--------
+Processing path: CFF#2#chrII_15#0_reverse   seq_id: 393   st: 3625438   num_matches: 236
+Processing node: 25746 offset: 726, al_len: 200, read_id: 16537, read_st: 0
+Processed all 236 matches for path: CFF#2#chrII_15#0_reverse
+
+--------
+Processing path: CFF#2#chrII_16#0   seq_id: 394   st: 3625674   num_matches: 648
+Processing node: 5843 offset: 3, al_len: 200, read_id: 73777, read_st: 0
+Processed all 648 matches for path: CFF#2#chrII_16#0
+
+--------
+Processing path: CFF#2#chrII_16#0_reverse   seq_id: 395   st: 3626322   num_matches: 1721
+Processing node: 19103 offset: 50, al_len: 200, read_id: 92443, read_st: 0
+Processed all 1721 matches for path: CFF#2#chrII_16#0_reverse
+
+--------
+Processing path: CFF#2#chrII_2#0   seq_id: 622   st: 4950989   num_matches: 259
+Processing node: 246695 offset: 73, al_len: 99, read_id: 69065, read_st: 0
+Processed all 259 matches for path: CFF#2#chrII_2#0
+
+--------
+Processing path: CFF#2#chrII_2#0_reverse   seq_id: 623   st: 4951248   num_matches: 243
+Processing node: 246695 offset: 790, al_len: 200, read_id: 43463, read_st: 0
+Processed all 243 matches for path: CFF#2#chrII_2#0_reverse
+
+--------
+Processing path: CFF#2#chrII_3#0   seq_id: 396   st: 3628043   num_matches: 1606
+Processing node: 14394 offset: 194, al_len: 105, read_id: 2625, read_st: 0
+Processed all 1606 matches for path: CFF#2#chrII_3#0
+
+--------
+Processing path: CFF#2#chrII_3#0_reverse   seq_id: 397   st: 3629649   num_matches: 1097
+Processing node: 50314 offset: 2, al_len: 200, read_id: 16979, read_st: 0
+Processed all 1097 matches for path: CFF#2#chrII_3#0_reverse
+
+--------
+Processing path: CFF#2#chrII_4#0   seq_id: 398   st: 3630746   num_matches: 1993
+Processing node: 47299 offset: 25, al_len: 200, read_id: 19007, read_st: 0
+Processed all 1993 matches for path: CFF#2#chrII_4#0
+
+--------
+Processing path: CFF#2#chrII_4#0_reverse   seq_id: 399   st: 3632739   num_matches: 1180
+Processing node: 35099 offset: 25, al_len: 84, read_id: 86213, read_st: 116
+Processed all 1180 matches for path: CFF#2#chrII_4#0_reverse
+
+--------
+Processing path: CFF#2#chrII_5#0   seq_id: 400   st: 3633919   num_matches: 1411
+Processing node: 40246 offset: 846, al_len: 200, read_id: 50030, read_st: 0
+Processed all 1411 matches for path: CFF#2#chrII_5#0
+
+--------
+Processing path: CFF#2#chrII_5#0_reverse   seq_id: 401   st: 3635330   num_matches: 1436
+Processing node: 40246 offset: 247, al_len: 149, read_id: 81454, read_st: 0
+Processed all 1436 matches for path: CFF#2#chrII_5#0_reverse
+
+--------
+Processing path: CFF#2#chrII_6#0   seq_id: 402   st: 3636766   num_matches: 43
+Processing node: 22097 offset: 4, al_len: 200, read_id: 93867, read_st: 0
+Processed all 43 matches for path: CFF#2#chrII_6#0
+
+--------
+Processing path: CFF#2#chrII_6#0_reverse   seq_id: 403   st: 3636809   num_matches: 25
+Processing node: 405587 offset: 3, al_len: 96, read_id: 22521, read_st: 0
+Processed all 25 matches for path: CFF#2#chrII_6#0_reverse
+
+--------
+Processing path: CFF#2#chrII_7#0   seq_id: 404   st: 3636834   num_matches: 1392
+Processing node: 10978 offset: 0, al_len: 78, read_id: 82544, read_st: 0
+Processed all 1392 matches for path: CFF#2#chrII_7#0
+
+--------
+Processing path: CFF#2#chrII_7#0_reverse   seq_id: 405   st: 3638226   num_matches: 1350
+Processing node: 5010 offset: 0, al_len: 128, read_id: 27482, read_st: 0
+Processed all 1350 matches for path: CFF#2#chrII_7#0_reverse
+
+--------
+Processing path: CFF#2#chrII_8#0   seq_id: 406   st: 3639576   num_matches: 112
+Processing node: 8734 offset: 0, al_len: 200, read_id: 67659, read_st: 0
+Processed all 112 matches for path: CFF#2#chrII_8#0
+
+--------
+Processing path: CFF#2#chrII_8#0_reverse   seq_id: 407   st: 3639688   num_matches: 55
+Processing node: 25453 offset: 1, al_len: 200, read_id: 87164, read_st: 0
+Processed all 55 matches for path: CFF#2#chrII_8#0_reverse
+
+--------
+Processing path: CFF#2#chrII_9#0   seq_id: 408   st: 3639743   num_matches: 657
+Processing node: 126371 offset: 104, al_len: 81, read_id: 38570, read_st: 0
+Processed all 657 matches for path: CFF#2#chrII_9#0
+
+--------
+Processing path: CFF#2#chrII_9#0_reverse   seq_id: 409   st: 3640400   num_matches: 401
+Processing node: 214689 offset: 607, al_len: 104, read_id: 5897, read_st: 96
+Processed all 401 matches for path: CFF#2#chrII_9#0_reverse
+
+--------
+Processing path: CFS#0#chrII#0   seq_id: 410   st: 3640801   num_matches: 15367
+Processing node: 2380 offset: 142, al_len: 200, read_id: 90450, read_st: 0
+Processed all 15367 matches for path: CFS#0#chrII#0
+
+--------
+Processing path: CFS#0#chrII#0_reverse   seq_id: 411   st: 3656168   num_matches: 14439
+Processing node: 2380 offset: 714, al_len: 80, read_id: 40979, read_st: 120
+Processed all 14439 matches for path: CFS#0#chrII#0_reverse
+
+--------
+Processing path: CGH_1#0#chrII#0   seq_id: 412   st: 3670607   num_matches: 14492
+Processing node: 337 offset: 16, al_len: 200, read_id: 33881, read_st: 0
+Processed all 14492 matches for path: CGH_1#0#chrII#0
+
+--------
+Processing path: CGH_1#0#chrII#0_reverse   seq_id: 413   st: 3685099   num_matches: 16876
+Processing node: 959 offset: 233, al_len: 72, read_id: 5942, read_st: 0
+Processed all 16876 matches for path: CGH_1#0#chrII#0_reverse
+
+--------
+Processing path: CGH_3#0#chrII#0   seq_id: 414   st: 3701975   num_matches: 17702
+Processing node: 959 offset: 7, al_len: 200, read_id: 30268, read_st: 0
+Processed all 17702 matches for path: CGH_3#0#chrII#0
+
+--------
+Processing path: CGH_3#0#chrII#0_reverse   seq_id: 415   st: 3719677   num_matches: 15032
+Processing node: 7681 offset: 417, al_len: 39, read_id: 86672, read_st: 161
+Processed all 15032 matches for path: CGH_3#0#chrII#0_reverse
+
+--------
+Processing path: CHS_3a#0#chrII#0   seq_id: 416   st: 3734709   num_matches: 16195
+Processing node: 249 offset: 4, al_len: 200, read_id: 88152, read_st: 0
+Processed all 16195 matches for path: CHS_3a#0#chrII#0
+
+--------
+Processing path: CHS_3a#0#chrII#0_reverse   seq_id: 417   st: 3750904   num_matches: 17730
+Processing node: 2611 offset: 11, al_len: 200, read_id: 45712, read_st: 0
+Processed all 17730 matches for path: CHS_3a#0#chrII#0_reverse
+
+--------
+Processing path: CIC#0#chrII#0   seq_id: 418   st: 3768634   num_matches: 15819
+Processing node: 94 offset: 294, al_len: 200, read_id: 88352, read_st: 0
+Processed all 15819 matches for path: CIC#0#chrII#0
+
+--------
+Processing path: CIC#0#chrII#0_reverse   seq_id: 419   st: 3784453   num_matches: 14272
+Processing node: 94 offset: 119, al_len: 200, read_id: 34059, read_st: 0
+Processed all 14272 matches for path: CIC#0#chrII#0_reverse
+
+--------
+Processing path: CIC#1#chrII_1#0   seq_id: 420   st: 3798725   num_matches: 1080
+Processing node: 49230 offset: 146, al_len: 116, read_id: 78843, read_st: 0
+Processed all 1080 matches for path: CIC#1#chrII_1#0
+
+--------
+Processing path: CIC#1#chrII_1#0_reverse   seq_id: 421   st: 3799805   num_matches: 1824
+Processing node: 14374 offset: 1, al_len: 119, read_id: 19920, read_st: 81
+Processed all 1824 matches for path: CIC#1#chrII_1#0_reverse
+
+--------
+Processing path: CIC#1#chrII_2#0   seq_id: 624   st: 4951491   num_matches: 1281
+Processing node: 1229700 offset: 541, al_len: 200, read_id: 90240, read_st: 0
+Processed all 1281 matches for path: CIC#1#chrII_2#0
+
+--------
+Processing path: CIC#1#chrII_2#0_reverse   seq_id: 625   st: 4952772   num_matches: 1202
+Processing node: 1229700 offset: 219, al_len: 200, read_id: 92545, read_st: 0
+Processed all 1202 matches for path: CIC#1#chrII_2#0_reverse
+
+--------
+Processing path: CIC#1#chrII_3#0   seq_id: 422   st: 3801629   num_matches: 2512
+Processing node: 32120 offset: 0, al_len: 200, read_id: 22453, read_st: 0
+Processed all 2512 matches for path: CIC#1#chrII_3#0
+
+--------
+Processing path: CIC#1#chrII_3#0_reverse   seq_id: 423   st: 3804141   num_matches: 2370
+Processing node: 6017 offset: 14, al_len: 200, read_id: 67901, read_st: 0
+Processed all 2370 matches for path: CIC#1#chrII_3#0_reverse
+
+--------
+Processing path: CIC#1#chrII_4#0   seq_id: 424   st: 3806511   num_matches: 2278
+Processing node: 3547 offset: 0, al_len: 71, read_id: 72612, read_st: 129
+Processed all 2278 matches for path: CIC#1#chrII_4#0
+
+--------
+Processing path: CIC#1#chrII_4#0_reverse   seq_id: 425   st: 3808789   num_matches: 2047
+Processing node: 4934 offset: 0, al_len: 173, read_id: 4161, read_st: 27
+Processed all 2047 matches for path: CIC#1#chrII_4#0_reverse
+
+--------
+Processing path: CIC#1#chrII_5#0   seq_id: 426   st: 3810836   num_matches: 114
+Processing node: 61698 offset: 51, al_len: 200, read_id: 49680, read_st: 0
+Processed all 114 matches for path: CIC#1#chrII_5#0
+
+--------
+Processing path: CIC#1#chrII_5#0_reverse   seq_id: 427   st: 3810950   num_matches: 170
+Processing node: 34880 offset: 4, al_len: 200, read_id: 49985, read_st: 0
+Processed all 170 matches for path: CIC#1#chrII_5#0_reverse
+
+--------
+Processing path: CIC#1#chrII_6#0   seq_id: 428   st: 3811120   num_matches: 2176
+Processing node: 852 offset: 28, al_len: 200, read_id: 50221, read_st: 0
+Processed all 2176 matches for path: CIC#1#chrII_6#0
+
+--------
+Processing path: CIC#1#chrII_6#0_reverse   seq_id: 429   st: 3813296   num_matches: 3298
+Processing node: 852 offset: 30, al_len: 200, read_id: 75484, read_st: 0
+Processed all 3298 matches for path: CIC#1#chrII_6#0_reverse
+
+--------
+Processing path: CIC#1#chrII_7#0   seq_id: 430   st: 3816594   num_matches: 271
+Processing node: 721359 offset: 962, al_len: 200, read_id: 50631, read_st: 0
+Processed all 271 matches for path: CIC#1#chrII_7#0
+
+--------
+Processing path: CIC#1#chrII_7#0_reverse   seq_id: 431   st: 3816865   num_matches: 3102
+Processing node: 30096 offset: 114, al_len: 200, read_id: 83482, read_st: 0
+Processed all 3102 matches for path: CIC#1#chrII_7#0_reverse
+
+--------
+Processing path: CIC#2#chrII_1#0   seq_id: 432   st: 3819967   num_matches: 2864
+Processing node: 10550 offset: 319, al_len: 200, read_id: 51907, read_st: 0
+Processed all 2864 matches for path: CIC#2#chrII_1#0
+
+--------
+Processing path: CIC#2#chrII_1#0_reverse   seq_id: 433   st: 3822831   num_matches: 1644
+Processing node: 63090 offset: 260, al_len: 200, read_id: 3563, read_st: 0
+Processed all 1644 matches for path: CIC#2#chrII_1#0_reverse
+
+--------
+Processing path: CIC#2#chrII_2#0   seq_id: 434   st: 3824475   num_matches: 2652
+Processing node: 7732 offset: 95, al_len: 65, read_id: 4045, read_st: 135
+Processed all 2652 matches for path: CIC#2#chrII_2#0
+
+--------
+Processing path: CIC#2#chrII_2#0_reverse   seq_id: 435   st: 3827127   num_matches: 3040
+Processing node: 29100 offset: 53, al_len: 86, read_id: 30272, read_st: 0
+Processed all 3040 matches for path: CIC#2#chrII_2#0_reverse
+
+--------
+Processing path: CIC#2#chrII_3#0   seq_id: 436   st: 3830167   num_matches: 540
+Processing node: 1478 offset: 11, al_len: 200, read_id: 90538, read_st: 0
+Processed all 540 matches for path: CIC#2#chrII_3#0
+
+--------
+Processing path: CIC#2#chrII_3#0_reverse   seq_id: 437   st: 3830707   num_matches: 502
+Processing node: 1478 offset: 2, al_len: 200, read_id: 87117, read_st: 0
+Processed all 502 matches for path: CIC#2#chrII_3#0_reverse
+
+--------
+Processing path: CIC#2#chrII_4#0   seq_id: 626   st: 4953974   num_matches: 276
+Processing node: 637491 offset: 83, al_len: 200, read_id: 37771, read_st: 0
+Processed all 276 matches for path: CIC#2#chrII_4#0
+
+--------
+Processing path: CIC#2#chrII_4#0_reverse   seq_id: 627   st: 4954250   num_matches: 290
+Processing node: 637491 offset: 561, al_len: 120, read_id: 11475, read_st: 0
+Processed all 290 matches for path: CIC#2#chrII_4#0_reverse
+
+--------
+Processing path: CIC#2#chrII_5#0   seq_id: 438   st: 3831209   num_matches: 186
+Processing node: 33183 offset: 0, al_len: 67, read_id: 48904, read_st: 133
+Processed all 186 matches for path: CIC#2#chrII_5#0
+
+--------
+Processing path: CIC#2#chrII_5#0_reverse   seq_id: 439   st: 3831395   num_matches: 70
+Processing node: 20618 offset: 0, al_len: 86, read_id: 82230, read_st: 114
+Processed all 70 matches for path: CIC#2#chrII_5#0_reverse
+
+--------
+Processing path: CIC#2#chrII_6#0   seq_id: 440   st: 3831465   num_matches: 38
+Processing node: 93536 offset: 6, al_len: 200, read_id: 69737, read_st: 0
+Processed all 38 matches for path: CIC#2#chrII_6#0
+
+--------
+Processing path: CIC#2#chrII_6#0_reverse   seq_id: 441   st: 3831503   num_matches: 12
+Processing node: 90269 offset: 109, al_len: 35, read_id: 81076, read_st: 165
+Processed all 12 matches for path: CIC#2#chrII_6#0_reverse
+
+--------
+Processing path: CIC#2#chrII_7#0   seq_id: 442   st: 3831515   num_matches: 118
+Processing node: 15938 offset: 0, al_len: 165, read_id: 17991, read_st: 27
+Processed all 118 matches for path: CIC#2#chrII_7#0
+
+--------
+Processing path: CIC#2#chrII_7#0_reverse   seq_id: 443   st: 3831633   num_matches: 126
+Processing node: 56959 offset: 37, al_len: 69, read_id: 75644, read_st: 131
+Processed all 126 matches for path: CIC#2#chrII_7#0_reverse
+
+--------
+Processing path: CIC#2#chrII_8#0   seq_id: 444   st: 3831759   num_matches: 2738
+Processing node: 11509 offset: 3, al_len: 200, read_id: 34213, read_st: 0
+Processed all 2738 matches for path: CIC#2#chrII_8#0
+
+--------
+Processing path: CIC#2#chrII_8#0_reverse   seq_id: 445   st: 3834497   num_matches: 3562
+Processing node: 9532 offset: 680, al_len: 114, read_id: 16738, read_st: 86
+Processed all 3562 matches for path: CIC#2#chrII_8#0_reverse
+
+--------
+Processing path: CIC#2#chrII_9#0   seq_id: 446   st: 3838059   num_matches: 3190
+Processing node: 274489 offset: 933, al_len: 200, read_id: 69955, read_st: 0
+Processed all 3190 matches for path: CIC#2#chrII_9#0
+
+--------
+Processing path: CIC#2#chrII_9#0_reverse   seq_id: 447   st: 3841249   num_matches: 207
+Processing node: 423632 offset: 212, al_len: 61, read_id: 34353, read_st: 139
+Processed all 207 matches for path: CIC#2#chrII_9#0_reverse
+
+--------
+Processing path: CIH#0#chrII#0   seq_id: 448   st: 3841456   num_matches: 13632
+Processing node: 1439 offset: 0, al_len: 200, read_id: 27039, read_st: 0
+Processed all 13632 matches for path: CIH#0#chrII#0
+
+--------
+Processing path: CIH#0#chrII#0_reverse   seq_id: 449   st: 3855088   num_matches: 15570
+Processing node: 944 offset: 81, al_len: 200, read_id: 91020, read_st: 0
+Processed all 15570 matches for path: CIH#0#chrII#0_reverse
+
+--------
+Processing path: CIH#1#chrII_1#0   seq_id: 450   st: 3870658   num_matches: 3884
+Processing node: 12520 offset: 8, al_len: 200, read_id: 14998, read_st: 0
+Processed all 3884 matches for path: CIH#1#chrII_1#0
+
+--------
+Processing path: CIH#1#chrII_1#0_reverse   seq_id: 451   st: 3874542   num_matches: 2440
+Processing node: 7530 offset: 0, al_len: 200, read_id: 16575, read_st: 0
+Processed all 2440 matches for path: CIH#1#chrII_1#0_reverse
+
+--------
+Processing path: CIH#1#chrII_2#0   seq_id: 452   st: 3876982   num_matches: 3667
+Processing node: 4050 offset: 0, al_len: 200, read_id: 53186, read_st: 0
+Processed all 3667 matches for path: CIH#1#chrII_2#0
+
+--------
+Processing path: CIH#1#chrII_2#0_reverse   seq_id: 453   st: 3880649   num_matches: 4973
+Processing node: 8323 offset: 15, al_len: 200, read_id: 45180, read_st: 0
+Processed all 4973 matches for path: CIH#1#chrII_2#0_reverse
+
+--------
+Processing path: CIH#2#chrII_1#0   seq_id: 454   st: 3885622   num_matches: 1338
+Processing node: 14137 offset: 18, al_len: 118, read_id: 59078, read_st: 0
+Processed all 1338 matches for path: CIH#2#chrII_1#0
+
+--------
+Processing path: CIH#2#chrII_1#0_reverse   seq_id: 455   st: 3886960   num_matches: 1392
+Processing node: 3988 offset: 50, al_len: 160, read_id: 18025, read_st: 0
+Processed all 1392 matches for path: CIH#2#chrII_1#0_reverse
+
+--------
+Processing path: CIH#2#chrII_2#0   seq_id: 456   st: 3888352   num_matches: 1511
+Processing node: 16931 offset: 92, al_len: 200, read_id: 78997, read_st: 0
+Processed all 1511 matches for path: CIH#2#chrII_2#0
+
+--------
+Processing path: CIH#2#chrII_2#0_reverse   seq_id: 457   st: 3889863   num_matches: 1533
+Processing node: 16931 offset: 633, al_len: 193, read_id: 70164, read_st: 0
+Processed all 1533 matches for path: CIH#2#chrII_2#0_reverse
+
+--------
+Processing path: CIH#2#chrII_3#0   seq_id: 458   st: 3891396   num_matches: 4812
+Processing node: 661 offset: 0, al_len: 200, read_id: 99782, read_st: 0
+Processed all 4812 matches for path: CIH#2#chrII_3#0
+
+--------
+Processing path: CIH#2#chrII_3#0_reverse   seq_id: 459   st: 3896208   num_matches: 5228
+Processing node: 7280 offset: 0, al_len: 200, read_id: 10414, read_st: 0
+Processed all 5228 matches for path: CIH#2#chrII_3#0_reverse
+
+--------
+Processing path: CIH#2#chrII_4#0   seq_id: 460   st: 3901436   num_matches: 5239
+Processing node: 1476 offset: 0, al_len: 200, read_id: 18037, read_st: 0
+Processed all 5239 matches for path: CIH#2#chrII_4#0
+
+--------
+Processing path: CIH#2#chrII_4#0_reverse   seq_id: 461   st: 3906675   num_matches: 3120
+Processing node: 1894 offset: 13, al_len: 200, read_id: 28005, read_st: 0
+Processed all 3120 matches for path: CIH#2#chrII_4#0_reverse
+
+--------
+Processing path: CKB#0#chrII#0   seq_id: 462   st: 3909795   num_matches: 13782
+Processing node: 5887 offset: 5, al_len: 200, read_id: 41630, read_st: 0
+Processed all 13782 matches for path: CKB#0#chrII#0
+
+--------
+Processing path: CKB#0#chrII#0_reverse   seq_id: 463   st: 3923577   num_matches: 12592
+Processing node: 681 offset: 0, al_len: 200, read_id: 85712, read_st: 0
+Processed all 12592 matches for path: CKB#0#chrII#0_reverse
+
+--------
+Processing path: CKB#1#chrII#0   seq_id: 464   st: 3936169   num_matches: 7494
+Processing node: 10044 offset: 743, al_len: 86, read_id: 15252, read_st: 0
+Processed all 7494 matches for path: CKB#1#chrII#0
+
+--------
+Processing path: CKB#1#chrII#0_reverse   seq_id: 465   st: 3943663   num_matches: 11553
+Processing node: 10044 offset: 664, al_len: 200, read_id: 42472, read_st: 0
+Processed all 11553 matches for path: CKB#1#chrII#0_reverse
+
+--------
+Processing path: CKB#2#chrII#0   seq_id: 466   st: 3955216   num_matches: 13981
+Processing node: 5216 offset: 498, al_len: 200, read_id: 73701, read_st: 0
+Processed all 13981 matches for path: CKB#2#chrII#0
+
+--------
+Processing path: CKB#2#chrII#0_reverse   seq_id: 467   st: 3969197   num_matches: 10121
+Processing node: 5216 offset: 1011, al_len: 200, read_id: 14302, read_st: 0
+Processed all 10121 matches for path: CKB#2#chrII#0_reverse
+
+--------
+Processing path: CL216#0#chrII#0_reverse   seq_id: 605   st: 4944762   num_matches: 1
+Processing node: 443992 offset: 5, al_len: 33, read_id: 67668, read_st: 0
+Processed all 1 matches for path: CL216#0#chrII#0_reverse
+
+--------
+Processing path: CL450#0#chrII#0   seq_id: 606   st: 4944763   num_matches: 1
+Processing node: 871636 offset: 5, al_len: 40, read_id: 73206, read_st: 0
+Processed all 1 matches for path: CL450#0#chrII#0
+
+--------
+Processing path: CL450#0#chrII#0_reverse   seq_id: 607   st: 4944764   num_matches: 1
+Processing node: 429069 offset: 1, al_len: 44, read_id: 18234, read_st: 0
+Processed all 1 matches for path: CL450#0#chrII#0_reverse
+
+--------
+Processing path: CLL#0#chrII#0   seq_id: 468   st: 3979318   num_matches: 7491
+Processing node: 10476 offset: 13, al_len: 110, read_id: 8864, read_st: 90
+Processed all 7491 matches for path: CLL#0#chrII#0
+
+--------
+Processing path: CLL#0#chrII#0_reverse   seq_id: 469   st: 3986809   num_matches: 7536
+Processing node: 1191 offset: 67, al_len: 39, read_id: 61540, read_st: 161
+Processed all 7536 matches for path: CLL#0#chrII#0_reverse
+
+--------
+Processing path: CLL#1#chrII_1#0   seq_id: 470   st: 3994345   num_matches: 1381
+Processing node: 55079 offset: 373, al_len: 60, read_id: 66631, read_st: 0
+Processed all 1381 matches for path: CLL#1#chrII_1#0
+
+--------
+Processing path: CLL#1#chrII_1#0_reverse   seq_id: 471   st: 3995726   num_matches: 1457
+Processing node: 47994 offset: 72, al_len: 90, read_id: 9027, read_st: 0
+Processed all 1457 matches for path: CLL#1#chrII_1#0_reverse
+
+--------
+Processing path: CLL#1#chrII_2#0   seq_id: 472   st: 3997183   num_matches: 979
+Processing node: 3386 offset: 409, al_len: 37, read_id: 47460, read_st: 163
+Processed all 979 matches for path: CLL#1#chrII_2#0
+
+--------
+Processing path: CLL#1#chrII_2#0_reverse   seq_id: 473   st: 3998162   num_matches: 946
+Processing node: 3386 offset: 311, al_len: 200, read_id: 3984, read_st: 0
+Processed all 946 matches for path: CLL#1#chrII_2#0_reverse
+
+--------
+Processing path: CLL#1#chrII_3#0   seq_id: 474   st: 3999108   num_matches: 208
+Processing node: 53488 offset: 6, al_len: 200, read_id: 75971, read_st: 0
+Processed all 208 matches for path: CLL#1#chrII_3#0
+
+--------
+Processing path: CLL#1#chrII_3#0_reverse   seq_id: 475   st: 3999316   num_matches: 210
+Processing node: 212772 offset: 0, al_len: 55, read_id: 94536, read_st: 145
+Processed all 210 matches for path: CLL#1#chrII_3#0_reverse
+
+--------
+Processing path: CLL#1#chrII_4#0   seq_id: 476   st: 3999526   num_matches: 179
+Processing node: 6493 offset: 3, al_len: 200, read_id: 704, read_st: 0
+Processed all 179 matches for path: CLL#1#chrII_4#0
+
+--------
+Processing path: CLL#1#chrII_4#0_reverse   seq_id: 477   st: 3999705   num_matches: 72
+Processing node: 64334 offset: 2, al_len: 200, read_id: 41951, read_st: 0
+Processed all 72 matches for path: CLL#1#chrII_4#0_reverse
+
+--------
+Processing path: CLL#1#chrII_5#0   seq_id: 478   st: 3999777   num_matches: 1541
+Processing node: 18357 offset: 538, al_len: 200, read_id: 66826, read_st: 0
+Processed all 1541 matches for path: CLL#1#chrII_5#0
+
+--------
+Processing path: CLL#1#chrII_5#0_reverse   seq_id: 479   st: 4001318   num_matches: 812
+Processing node: 45848 offset: 27, al_len: 31, read_id: 70795, read_st: 169
+Processed all 812 matches for path: CLL#1#chrII_5#0_reverse
+
+--------
+Processing path: CLL#1#chrII_6#0   seq_id: 480   st: 4002130   num_matches: 867
+Processing node: 10357 offset: 0, al_len: 200, read_id: 97464, read_st: 0
+Processed all 867 matches for path: CLL#1#chrII_6#0
+
+--------
+Processing path: CLL#1#chrII_6#0_reverse   seq_id: 481   st: 4002997   num_matches: 633
+Processing node: 8239 offset: 0, al_len: 200, read_id: 68805, read_st: 0
+Processed all 633 matches for path: CLL#1#chrII_6#0_reverse
+
+--------
+Processing path: CLL#1#chrII_7#0   seq_id: 482   st: 4003630   num_matches: 187
+Processing node: 19627 offset: 30, al_len: 32, read_id: 38604, read_st: 168
+Processed all 187 matches for path: CLL#1#chrII_7#0
+
+--------
+Processing path: CLL#1#chrII_7#0_reverse   seq_id: 483   st: 4003817   num_matches: 113
+Processing node: 31142 offset: 0, al_len: 200, read_id: 88064, read_st: 0
+Processed all 113 matches for path: CLL#1#chrII_7#0_reverse
+
+--------
+Processing path: CLL#1#chrII_8#0   seq_id: 484   st: 4003930   num_matches: 362
+Processing node: 24815 offset: 51, al_len: 194, read_id: 56177, read_st: 0
+Processed all 362 matches for path: CLL#1#chrII_8#0
+
+--------
+Processing path: CLL#1#chrII_8#0_reverse   seq_id: 485   st: 4004292   num_matches: 612
+Processing node: 24815 offset: 281, al_len: 79, read_id: 70877, read_st: 0
+Processed all 612 matches for path: CLL#1#chrII_8#0_reverse
+
+--------
+Processing path: CLL#2#chrII_1#0   seq_id: 486   st: 4004904   num_matches: 617
+Processing node: 18379 offset: 71, al_len: 200, read_id: 40876, read_st: 0
+Processed all 617 matches for path: CLL#2#chrII_1#0
+
+--------
+Processing path: CLL#2#chrII_1#0_reverse   seq_id: 487   st: 4005521   num_matches: 658
+Processing node: 63121 offset: 40, al_len: 80, read_id: 90726, read_st: 120
+Processed all 658 matches for path: CLL#2#chrII_1#0_reverse
+
+--------
+Processing path: CLL#2#chrII_2#0   seq_id: 488   st: 4006179   num_matches: 1010
+Processing node: 14174 offset: 1007, al_len: 52, read_id: 65787, read_st: 0
+Processed all 1010 matches for path: CLL#2#chrII_2#0
+
+--------
+Processing path: CLL#2#chrII_2#0_reverse   seq_id: 489   st: 4007189   num_matches: 872
+Processing node: 14174 offset: 765, al_len: 47, read_id: 44059, read_st: 0
+Processed all 872 matches for path: CLL#2#chrII_2#0_reverse
+
+--------
+Processing path: CLL#2#chrII_3#0   seq_id: 490   st: 4008061   num_matches: 4683
+Processing node: 4465 offset: 4, al_len: 90, read_id: 29050, read_st: 0
+Processed all 4683 matches for path: CLL#2#chrII_3#0
+
+--------
+Processing path: CLL#2#chrII_3#0_reverse   seq_id: 491   st: 4012744   num_matches: 4874
+Processing node: 4966 offset: 214, al_len: 44, read_id: 62948, read_st: 156
+Processed all 4874 matches for path: CLL#2#chrII_3#0_reverse
+
+--------
+Processing path: CLL#2#chrII_4#0   seq_id: 492   st: 4017618   num_matches: 1462
+Processing node: 19317 offset: 24, al_len: 200, read_id: 56960, read_st: 0
+Processed all 1462 matches for path: CLL#2#chrII_4#0
+
+--------
+Processing path: CLL#2#chrII_4#0_reverse   seq_id: 493   st: 4019080   num_matches: 469
+Processing node: 19317 offset: 5, al_len: 200, read_id: 14488, read_st: 0
+Processed all 469 matches for path: CLL#2#chrII_4#0_reverse
+
+--------
+Processing path: CLN#0#chrII#0   seq_id: 494   st: 4019549   num_matches: 12243
+Processing node: 1782 offset: 231, al_len: 153, read_id: 22664, read_st: 47
+Processed all 12243 matches for path: CLN#0#chrII#0
+
+--------
+Processing path: CLN#0#chrII#0_reverse   seq_id: 495   st: 4031792   num_matches: 11095
+Processing node: 1782 offset: 127, al_len: 200, read_id: 71425, read_st: 0
+Processed all 11095 matches for path: CLN#0#chrII#0_reverse
+
+--------
+Processing path: CMF#0#chrII#0   seq_id: 496   st: 4042887   num_matches: 7411
+Processing node: 3306 offset: 12, al_len: 93, read_id: 68335, read_st: 107
+Processed all 7411 matches for path: CMF#0#chrII#0
+
+--------
+Processing path: CMF#0#chrII#0_reverse   seq_id: 497   st: 4050298   num_matches: 8976
+Processing node: 1656 offset: 15, al_len: 200, read_id: 29090, read_st: 0
+Processed all 8976 matches for path: CMF#0#chrII#0_reverse
+
+--------
+Processing path: CMF#1#chrII#0   seq_id: 498   st: 4059274   num_matches: 8130
+Processing node: 3124 offset: 98, al_len: 200, read_id: 60747, read_st: 0
+Processed all 8130 matches for path: CMF#1#chrII#0
+
+--------
+Processing path: CMF#1#chrII#0_reverse   seq_id: 499   st: 4067404   num_matches: 10096
+Processing node: 2505 offset: 6, al_len: 200, read_id: 60264, read_st: 0
+Processed all 10096 matches for path: CMF#1#chrII#0_reverse
+
+--------
+Processing path: CMF#2#chrII#0   seq_id: 500   st: 4077500   num_matches: 8454
+Processing node: 1191 offset: 30, al_len: 200, read_id: 29465, read_st: 0
+Processed all 8454 matches for path: CMF#2#chrII#0
+
+--------
+Processing path: CMF#2#chrII#0_reverse   seq_id: 501   st: 4085954   num_matches: 6171
+Processing node: 650 offset: 0, al_len: 200, read_id: 40222, read_st: 0
+Processed all 6171 matches for path: CMF#2#chrII#0_reverse
+
+--------
+Processing path: CNB_1a#0#chrII#0   seq_id: 502   st: 4092125   num_matches: 14704
+Processing node: 944 offset: 20, al_len: 53, read_id: 12421, read_st: 147
+Processed all 14704 matches for path: CNB_1a#0#chrII#0
+
+--------
+Processing path: CNB_1a#0#chrII#0_reverse   seq_id: 503   st: 4106829   num_matches: 15848
+Processing node: 3042 offset: 518, al_len: 200, read_id: 4660, read_st: 0
+Processed all 15848 matches for path: CNB_1a#0#chrII#0_reverse
+
+--------
+Processing path: CNT#0#chrII#0   seq_id: 504   st: 4122677   num_matches: 19334
+Processing node: 5196 offset: 6, al_len: 120, read_id: 31633, read_st: 80
+Processed all 19334 matches for path: CNT#0#chrII#0
+
+--------
+Processing path: CNT#0#chrII#0_reverse   seq_id: 505   st: 4142011   num_matches: 18841
+Processing node: 6605 offset: 291, al_len: 33, read_id: 81222, read_st: 0
+Processed all 18841 matches for path: CNT#0#chrII#0_reverse
+
+--------
+Processing path: CNT#1#chrII_1#0   seq_id: 506   st: 4160852   num_matches: 6139
+Processing node: 6992 offset: 116, al_len: 44, read_id: 55421, read_st: 156
+Processed all 6139 matches for path: CNT#1#chrII_1#0
+
+--------
+Processing path: CNT#1#chrII_1#0_reverse   seq_id: 507   st: 4166991   num_matches: 4269
+Processing node: 6992 offset: 107, al_len: 78, read_id: 3311, read_st: 122
+Processed all 4269 matches for path: CNT#1#chrII_1#0_reverse
+
+--------
+Processing path: CNT#1#chrII_2#0   seq_id: 508   st: 4171260   num_matches: 5880
+Processing node: 3241 offset: 910, al_len: 200, read_id: 85550, read_st: 0
+Processed all 5880 matches for path: CNT#1#chrII_2#0
+
+--------
+Processing path: CNT#1#chrII_2#0_reverse   seq_id: 509   st: 4177140   num_matches: 6121
+Processing node: 1209 offset: 0, al_len: 200, read_id: 40125, read_st: 0
+Processed all 6121 matches for path: CNT#1#chrII_2#0_reverse
+
+--------
+Processing path: CNT#2#chrII#0   seq_id: 510   st: 4183261   num_matches: 14592
+Processing node: 1251 offset: 387, al_len: 200, read_id: 86657, read_st: 0
+Processed all 14592 matches for path: CNT#2#chrII#0
+
+--------
+Processing path: CNT#2#chrII#0_reverse   seq_id: 511   st: 4197853   num_matches: 15878
+Processing node: 1251 offset: 381, al_len: 200, read_id: 23441, read_st: 0
+Processed all 15878 matches for path: CNT#2#chrII#0_reverse
+
+--------
+Processing path: CPA_1a#0#chrII#0   seq_id: 512   st: 4213731   num_matches: 14170
+Processing node: 5285 offset: 876, al_len: 200, read_id: 59694, read_st: 0
+Processed all 14170 matches for path: CPA_1a#0#chrII#0
+
+--------
+Processing path: CPA_1a#0#chrII#0_reverse   seq_id: 513   st: 4227901   num_matches: 14413
+Processing node: 2446 offset: 0, al_len: 200, read_id: 26794, read_st: 0
+Processed all 14413 matches for path: CPA_1a#0#chrII#0_reverse
+
+--------
+Processing path: CPG_1a#0#chrII#0   seq_id: 514   st: 4242314   num_matches: 12440
+Processing node: 4791 offset: 327, al_len: 38, read_id: 31859, read_st: 162
+Processed all 12440 matches for path: CPG_1a#0#chrII#0
+
+--------
+Processing path: CPG_1a#0#chrII#0_reverse   seq_id: 515   st: 4254754   num_matches: 12020
+Processing node: 4791 offset: 493, al_len: 36, read_id: 92817, read_st: 164
+Processed all 12020 matches for path: CPG_1a#0#chrII#0_reverse
+
+--------
+Processing path: CPI_1c#0#chrII#0   seq_id: 516   st: 4266774   num_matches: 12631
+Processing node: 2151 offset: 468, al_len: 184, read_id: 19478, read_st: 0
+Processed all 12631 matches for path: CPI_1c#0#chrII#0
+
+--------
+Processing path: CPI_1c#0#chrII#0_reverse   seq_id: 517   st: 4279405   num_matches: 11777
+Processing node: 2151 offset: 323, al_len: 103, read_id: 31963, read_st: 0
+Processed all 11777 matches for path: CPI_1c#0#chrII#0_reverse
+
+--------
+Processing path: CPS#0#chrII#0   seq_id: 518   st: 4291182   num_matches: 15554
+Processing node: 2812 offset: 2, al_len: 88, read_id: 41656, read_st: 0
+Processed all 15554 matches for path: CPS#0#chrII#0
+
+--------
+Processing path: CPS#0#chrII#0_reverse   seq_id: 519   st: 4306736   num_matches: 15200
+Processing node: 308 offset: 39, al_len: 200, read_id: 52050, read_st: 0
+Processed all 15200 matches for path: CPS#0#chrII#0_reverse
+
+--------
+Processing path: CQI_4a#0#chrII#0   seq_id: 520   st: 4321936   num_matches: 19448
+Processing node: 134 offset: 0, al_len: 200, read_id: 43422, read_st: 0
+Processed all 19448 matches for path: CQI_4a#0#chrII#0
+
+--------
+Processing path: CQI_4a#0#chrII#0_reverse   seq_id: 521   st: 4341384   num_matches: 19893
+Processing node: 249 offset: 8, al_len: 191, read_id: 84686, read_st: 0
+Processed all 19893 matches for path: CQI_4a#0#chrII#0_reverse
+
+--------
+Processing path: CQS_1a#0#chrII#0   seq_id: 522   st: 4361277   num_matches: 16554
+Processing node: 1727 offset: 224, al_len: 73, read_id: 93861, read_st: 0
+Processed all 16554 matches for path: CQS_1a#0#chrII#0
+
+--------
+Processing path: CQS_1a#0#chrII#0_reverse   seq_id: 523   st: 4377831   num_matches: 16195
+Processing node: 2384 offset: 538, al_len: 200, read_id: 31334, read_st: 0
+Processed all 16195 matches for path: CQS_1a#0#chrII#0_reverse
+
+--------
+Processing path: CR85#0#chrII#0   seq_id: 628   st: 4954540   num_matches: 8
+Processing node: 493299 offset: 98, al_len: 32, read_id: 76083, read_st: 168
+Processed all 8 matches for path: CR85#0#chrII#0
+
+--------
+Processing path: CR85#0#chrII#0_reverse   seq_id: 629   st: 4954548   num_matches: 8
+Processing node: 105790 offset: 131, al_len: 37, read_id: 64888, read_st: 0
+Processed all 8 matches for path: CR85#0#chrII#0_reverse
+
+--------
+Processing path: CRB_1a#0#chrII#0   seq_id: 524   st: 4394026   num_matches: 18412
+Processing node: 13666 offset: 411, al_len: 200, read_id: 77112, read_st: 0
+Processed all 18412 matches for path: CRB_1a#0#chrII#0
+
+--------
+Processing path: CRB_1a#0#chrII#0_reverse   seq_id: 525   st: 4412438   num_matches: 19159
+Processing node: 9199 offset: 123, al_len: 200, read_id: 28928, read_st: 0
+Processed all 19159 matches for path: CRB_1a#0#chrII#0_reverse
+
+--------
+Processing path: CRE#0#chrII#0   seq_id: 526   st: 4431597   num_matches: 26537
+Processing node: 1460 offset: 5, al_len: 200, read_id: 21386, read_st: 0
+Processed all 26537 matches for path: CRE#0#chrII#0
+
+--------
+Processing path: CRE#0#chrII#0_reverse   seq_id: 527   st: 4458134   num_matches: 26567
+Processing node: 41211 offset: 6, al_len: 31, read_id: 32339, read_st: 169
+Processed all 26567 matches for path: CRE#0#chrII#0_reverse
+
+--------
+Processing path: CRL#0#chrII#0   seq_id: 528   st: 4484701   num_matches: 17997
+Processing node: 2455 offset: 15, al_len: 69, read_id: 61772, read_st: 0
+Processed all 17997 matches for path: CRL#0#chrII#0
+
+--------
+Processing path: CRL#0#chrII#0_reverse   seq_id: 529   st: 4502698   num_matches: 17042
+Processing node: 2455 offset: 21, al_len: 40, read_id: 45361, read_st: 160
+Processed all 17042 matches for path: CRL#0#chrII#0_reverse
+
+--------
+Processing path: DBVPG6044#0#chrII#0   seq_id: 530   st: 4519740   num_matches: 15697
+Processing node: 4667 offset: 45, al_len: 62, read_id: 88139, read_st: 138
+Processed all 15697 matches for path: DBVPG6044#0#chrII#0
+
+--------
+Processing path: DBVPG6044#0#chrII#0_reverse   seq_id: 531   st: 4535437   num_matches: 15818
+Processing node: 3258 offset: 203, al_len: 200, read_id: 48592, read_st: 0
+Processed all 15818 matches for path: DBVPG6044#0#chrII#0_reverse
+
+--------
+Processing path: DBVPG6765#0#chrII#0   seq_id: 532   st: 4551255   num_matches: 19003
+Processing node: 1461 offset: 744, al_len: 200, read_id: 19672, read_st: 0
+Processed all 19003 matches for path: DBVPG6765#0#chrII#0
+
+--------
+Processing path: DBVPG6765#0#chrII#0_reverse   seq_id: 533   st: 4570258   num_matches: 18057
+Processing node: 1461 offset: 717, al_len: 45, read_id: 62452, read_st: 0
+Processed all 18057 matches for path: DBVPG6765#0#chrII#0_reverse
+
+--------
+Processing path: DG1768#0#chrII#0   seq_id: 534   st: 4588315   num_matches: 85
+Processing node: 31064 offset: 29, al_len: 46, read_id: 22329, read_st: 154
+Processed all 85 matches for path: DG1768#0#chrII#0
+
+--------
+Processing path: DG1768#0#chrII#0_reverse   seq_id: 535   st: 4588400   num_matches: 63
+Processing node: 54633 offset: 30, al_len: 44, read_id: 3368, read_st: 0
+Processed all 63 matches for path: DG1768#0#chrII#0_reverse
+
+--------
+Processing path: EM14S013B#0#chrII#0   seq_id: 536   st: 4588463   num_matches: 2883
+Processing node: 1004 offset: 91, al_len: 57, read_id: 51185, read_st: 143
+Processed all 2883 matches for path: EM14S013B#0#chrII#0
+
+--------
+Processing path: EM14S013B#0#chrII#0_reverse   seq_id: 537   st: 4591346   num_matches: 2996
+Processing node: 1004 offset: 63, al_len: 61, read_id: 21432, read_st: 0
+Processed all 2996 matches for path: EM14S013B#0#chrII#0_reverse
+
+--------
+Processing path: FM1318#0#chrII#0   seq_id: 608   st: 4944765   num_matches: 1
+Processing node: 700780 offset: 10, al_len: 31, read_id: 73225, read_st: 1
+Processed all 1 matches for path: FM1318#0#chrII#0
+
+--------
+Processing path: FM1318#0#chrII#0_reverse   seq_id: 609   st: 4944766   num_matches: 1
+Processing node: 806332 offset: 22, al_len: 87, read_id: 91577, read_st: 0
+Processed all 1 matches for path: FM1318#0#chrII#0_reverse
+
+--------
+Processing path: HLJ1#0#chrII#0   seq_id: 538   st: 4594342   num_matches: 11155
+Processing node: 1220 offset: 233, al_len: 173, read_id: 74704, read_st: 27
+Processed all 11155 matches for path: HLJ1#0#chrII#0
+
+--------
+Processing path: HLJ1#0#chrII#0_reverse   seq_id: 539   st: 4605497   num_matches: 10795
+Processing node: 337 offset: 13, al_len: 70, read_id: 82153, read_st: 130
+Processed all 10795 matches for path: HLJ1#0#chrII#0_reverse
+
+--------
+Processing path: HN1#0#chrII#0   seq_id: 540   st: 4616292   num_matches: 7284
+Processing node: 264 offset: 46, al_len: 200, read_id: 5597, read_st: 0
+Processed all 7284 matches for path: HN1#0#chrII#0
+
+--------
+Processing path: HN1#0#chrII#0_reverse   seq_id: 541   st: 4623576   num_matches: 6573
+Processing node: 5749 offset: 104, al_len: 114, read_id: 11878, read_st: 86
+Processed all 6573 matches for path: HN1#0#chrII#0_reverse
+
+--------
+Processing path: IFO1802#0#chrII#0   seq_id: 630   st: 4954556   num_matches: 14
+Processing node: 150736 offset: 74, al_len: 35, read_id: 19171, read_st: 68
+Processed all 14 matches for path: IFO1802#0#chrII#0
+
+--------
+Processing path: IFO1802#0#chrII#0_reverse   seq_id: 631   st: 4954570   num_matches: 10
+Processing node: 99776 offset: 487, al_len: 39, read_id: 87930, read_st: 161
+Processed all 10 matches for path: IFO1802#0#chrII#0_reverse
+
+--------
+Processing path: IFO1815#0#chrII#0   seq_id: 542   st: 4630149   num_matches: 33
+Processing node: 23334 offset: 9, al_len: 31, read_id: 64911, read_st: 169
+Processed all 33 matches for path: IFO1815#0#chrII#0
+
+--------
+Processing path: IFO1815#0#chrII#0_reverse   seq_id: 543   st: 4630182   num_matches: 27
+Processing node: 44594 offset: 575, al_len: 32, read_id: 29323, read_st: 160
+Processed all 27 matches for path: IFO1815#0#chrII#0_reverse
+
+--------
+Processing path: JXXY161#0#chrII#0   seq_id: 544   st: 4630209   num_matches: 3581
+Processing node: 2731 offset: 1, al_len: 200, read_id: 76748, read_st: 0
+Processed all 3581 matches for path: JXXY161#0#chrII#0
+
+--------
+Processing path: JXXY161#0#chrII#0_reverse   seq_id: 545   st: 4633790   num_matches: 3670
+Processing node: 1261 offset: 15, al_len: 66, read_id: 84570, read_st: 134
+Processed all 3670 matches for path: JXXY161#0#chrII#0_reverse
+
+--------
+Processing path: L1374#0#chrII#0   seq_id: 546   st: 4637460   num_matches: 18225
+Processing node: 7632 offset: 620, al_len: 200, read_id: 69367, read_st: 0
+Processed all 18225 matches for path: L1374#0#chrII#0
+
+--------
+Processing path: L1374#0#chrII#0_reverse   seq_id: 547   st: 4655685   num_matches: 19087
+Processing node: 7632 offset: 598, al_len: 200, read_id: 24815, read_st: 0
+Processed all 19087 matches for path: L1374#0#chrII#0_reverse
+
+--------
+Processing path: LL2011_012#0#chrII#0   seq_id: 548   st: 4674772   num_matches: 53
+Processing node: 24031 offset: 16, al_len: 42, read_id: 26270, read_st: 123
+Processed all 53 matches for path: LL2011_012#0#chrII#0
+
+--------
+Processing path: LL2011_012#0#chrII#0_reverse   seq_id: 549   st: 4674825   num_matches: 40
+Processing node: 24031 offset: 85, al_len: 44, read_id: 3361, read_st: 156
+Processed all 40 matches for path: LL2011_012#0#chrII#0_reverse
+
+--------
+Processing path: LL2012_001#0#chrII#0   seq_id: 550   st: 4674865   num_matches: 58
+Processing node: 11416 offset: 27, al_len: 71, read_id: 80046, read_st: 129
+Processed all 58 matches for path: LL2012_001#0#chrII#0
+
+--------
+Processing path: LL2012_001#0#chrII#0_reverse   seq_id: 551   st: 4674923   num_matches: 42
+Processing node: 19256 offset: 2, al_len: 31, read_id: 33393, read_st: 169
+Processed all 42 matches for path: LL2012_001#0#chrII#0_reverse
+
+--------
+Processing path: LL2012_016#0#chrII#0   seq_id: 552   st: 4674965   num_matches: 56
+Processing node: 59881 offset: 31, al_len: 33, read_id: 20624, read_st: 0
+Processed all 56 matches for path: LL2012_016#0#chrII#0
+
+--------
+Processing path: LL2012_016#0#chrII#0_reverse   seq_id: 553   st: 4675021   num_matches: 53
+Processing node: 590 offset: 9, al_len: 84, read_id: 79218, read_st: 6
+Processed all 53 matches for path: LL2012_016#0#chrII#0_reverse
+
+--------
+Processing path: MSH604#0#chrII#0   seq_id: 554   st: 4675074   num_matches: 54
+Processing node: 13418 offset: 109, al_len: 51, read_id: 29644, read_st: 0
+Processed all 54 matches for path: MSH604#0#chrII#0
+
+--------
+Processing path: MSH604#0#chrII#0_reverse   seq_id: 555   st: 4675128   num_matches: 38
+Processing node: 89755 offset: 38, al_len: 43, read_id: 92746, read_st: 0
+Processed all 38 matches for path: MSH604#0#chrII#0_reverse
+
+--------
+Processing path: N44#0#chrII#0   seq_id: 556   st: 4675166   num_matches: 109
+Processing node: 295 offset: 17, al_len: 61, read_id: 97209, read_st: 0
+Processed all 109 matches for path: N44#0#chrII#0
+
+--------
+Processing path: N44#0#chrII#0_reverse   seq_id: 557   st: 4675275   num_matches: 83
+Processing node: 86279 offset: 101, al_len: 44, read_id: 18234, read_st: 0
+Processed all 83 matches for path: N44#0#chrII#0_reverse
+
+--------
+Processing path: NCYC3947#0#chrII#0   seq_id: 558   st: 4675358   num_matches: 10
+Processing node: 85213 offset: 0, al_len: 32, read_id: 91901, read_st: 68
+Processed all 10 matches for path: NCYC3947#0#chrII#0
+
+--------
+Processing path: NCYC3947#0#chrII#0_reverse   seq_id: 559   st: 4675368   num_matches: 26
+Processing node: 104114 offset: 6, al_len: 56, read_id: 2704, read_st: 144
+Processed all 26 matches for path: NCYC3947#0#chrII#0_reverse
+
+--------
+Processing path: NCYC3962#0#chrII#0   seq_id: 560   st: 4675394   num_matches: 28
+Processing node: 69793 offset: 22, al_len: 44, read_id: 10900, read_st: 156
+Processed all 28 matches for path: NCYC3962#0#chrII#0
+
+--------
+Processing path: NCYC3962#0#chrII#0_reverse   seq_id: 561   st: 4675422   num_matches: 8
+Processing node: 156631 offset: 3, al_len: 44, read_id: 3368, read_st: 0
+Processed all 8 matches for path: NCYC3962#0#chrII#0_reverse
+
+--------
+Processing path: R23#0#chrII#0   seq_id: 562   st: 4675430   num_matches: 87
+Processing node: 20284 offset: 25, al_len: 86, read_id: 62354, read_st: 0
+Processed all 87 matches for path: R23#0#chrII#0
+
+--------
+Processing path: R23#0#chrII#0_reverse   seq_id: 563   st: 4675517   num_matches: 65
+Processing node: 20284 offset: 131, al_len: 40, read_id: 81612, read_st: 160
+Processed all 65 matches for path: R23#0#chrII#0_reverse
+
+--------
+Processing path: RM11#0#chrII#0   seq_id: 564   st: 4675582   num_matches: 18098
+Processing node: 22537 offset: 56, al_len: 164, read_id: 48506, read_st: 36
+Processed all 18098 matches for path: RM11#0#chrII#0
+
+--------
+Processing path: RM11#0#chrII#0_reverse   seq_id: 565   st: 4693680   num_matches: 17955
+Processing node: 22270 offset: 610, al_len: 200, read_id: 30569, read_st: 0
+Processed all 17955 matches for path: RM11#0#chrII#0_reverse
+
+--------
+Processing path: S288C#0#chrII#0   seq_id: 566   st: 4711635   num_matches: 4646
+Processing node: 4818 offset: 61, al_len: 200, read_id: 25940, read_st: 0
+Processed all 4646 matches for path: S288C#0#chrII#0
+
+--------
+Processing path: S288C#0#chrII#0_reverse   seq_id: 567   st: 4716281   num_matches: 3462
+Processing node: 4685 offset: 0, al_len: 191, read_id: 70573, read_st: 0
+Processed all 3462 matches for path: S288C#0#chrII#0_reverse
+
+--------
+Processing path: SGDref#0#chrII#0   seq_id: 568   st: 4719743   num_matches: 473
+Processing node: 109695 offset: 957, al_len: 200, read_id: 20415, read_st: 0
+Processed all 473 matches for path: SGDref#0#chrII#0
+
+--------
+Processing path: SGDref#0#chrII#0_reverse   seq_id: 569   st: 4720216   num_matches: 436
+Processing node: 109695 offset: 206, al_len: 133, read_id: 10373, read_st: 0
+Processed all 436 matches for path: SGDref#0#chrII#0_reverse
+
+--------
+Processing path: SK1#0#chrII#0   seq_id: 570   st: 4720652   num_matches: 17413
+Processing node: 5128 offset: 178, al_len: 152, read_id: 4553, read_st: 48
+Processed all 17413 matches for path: SK1#0#chrII#0
+
+--------
+Processing path: SK1#0#chrII#0_reverse   seq_id: 571   st: 4738065   num_matches: 16924
+Processing node: 5128 offset: 355, al_len: 200, read_id: 12168, read_st: 0
+Processed all 16924 matches for path: SK1#0#chrII#0_reverse
+
+--------
+Processing path: SX2#0#chrII#0   seq_id: 572   st: 4754989   num_matches: 4638
+Processing node: 653 offset: 494, al_len: 41, read_id: 98871, read_st: 159
+Processed all 4638 matches for path: SX2#0#chrII#0
+
+--------
+Processing path: SX2#0#chrII#0_reverse   seq_id: 573   st: 4759627   num_matches: 6086
+Processing node: 653 offset: 172, al_len: 160, read_id: 8699, read_st: 0
+Processed all 6086 matches for path: SX2#0#chrII#0_reverse
+
+--------
+Processing path: UFRJ50816#0#chrII#0   seq_id: 574   st: 4765713   num_matches: 40
+Processing node: 57581 offset: 53, al_len: 44, read_id: 83848, read_st: 156
+Processed all 40 matches for path: UFRJ50816#0#chrII#0
+
+--------
+Processing path: UFRJ50816#0#chrII#0_reverse   seq_id: 575   st: 4765753   num_matches: 31
+Processing node: 27222 offset: 26, al_len: 39, read_id: 67554, read_st: 161
+Processed all 31 matches for path: UFRJ50816#0#chrII#0_reverse
+
+--------
+Processing path: UWOPS034614#0#chrII#0   seq_id: 576   st: 4765784   num_matches: 4418
+Processing node: 8295 offset: 90, al_len: 82, read_id: 20426, read_st: 118
+Processed all 4418 matches for path: UWOPS034614#0#chrII#0
+
+--------
+Processing path: UWOPS034614#0#chrII#0_reverse   seq_id: 577   st: 4770202   num_matches: 3538
+Processing node: 650 offset: 1, al_len: 71, read_id: 76967, read_st: 0
+Processed all 3538 matches for path: UWOPS034614#0#chrII#0_reverse
+
+--------
+Processing path: UWOPS052272#0#chrII#0   seq_id: 578   st: 4773740   num_matches: 3182
+Processing node: 3407 offset: 44, al_len: 200, read_id: 70603, read_st: 0
+Processed all 3182 matches for path: UWOPS052272#0#chrII#0
+
+--------
+Processing path: UWOPS052272#0#chrII#0_reverse   seq_id: 579   st: 4776922   num_matches: 4462
+Processing node: 3407 offset: 224, al_len: 42, read_id: 4292, read_st: 0
+Processed all 4462 matches for path: UWOPS052272#0#chrII#0_reverse
+
+--------
+Processing path: UWOPS837873#0#chrII#0   seq_id: 580   st: 4781384   num_matches: 15595
+Processing node: 1576 offset: 37, al_len: 129, read_id: 11026, read_st: 71
+Processed all 15595 matches for path: UWOPS837873#0#chrII#0
+
+--------
+Processing path: UWOPS837873#0#chrII#0_reverse   seq_id: 581   st: 4796979   num_matches: 14896
+Processing node: 12 offset: 29, al_len: 200, read_id: 37077, read_st: 0
+Processed all 14896 matches for path: UWOPS837873#0#chrII#0_reverse
+
+--------
+Processing path: UWOPS919171#0#chrII#0   seq_id: 582   st: 4811875   num_matches: 66
+Processing node: 4183 offset: 3, al_len: 38, read_id: 17198, read_st: 146
+Processed all 66 matches for path: UWOPS919171#0#chrII#0
+
+--------
+Processing path: UWOPS919171#0#chrII#0_reverse   seq_id: 583   st: 4811941   num_matches: 74
+Processing node: 14633 offset: 6, al_len: 37, read_id: 88867, read_st: 163
+Processed all 74 matches for path: UWOPS919171#0#chrII#0_reverse
+
+--------
+Processing path: W303#0#chrII#0   seq_id: 584   st: 4812015   num_matches: 12377
+Processing node: 1547 offset: 2, al_len: 200, read_id: 24011, read_st: 0
+Processed all 12377 matches for path: W303#0#chrII#0
+
+--------
+Processing path: W303#0#chrII#0_reverse   seq_id: 585   st: 4824392   num_matches: 6591
+Processing node: 17131 offset: 11, al_len: 200, read_id: 51460, read_st: 0
+Processed all 6591 matches for path: W303#0#chrII#0_reverse
+
+--------
+Processing path: WX20#0#chrII#0   seq_id: 586   st: 4830983   num_matches: 75
+Processing node: 11971 offset: 100, al_len: 36, read_id: 22695, read_st: 164
+Processed all 75 matches for path: WX20#0#chrII#0
+
+--------
+Processing path: WX20#0#chrII#0_reverse   seq_id: 587   st: 4831058   num_matches: 52
+Processing node: 54938 offset: 146, al_len: 43, read_id: 92746, read_st: 0
+Processed all 52 matches for path: WX20#0#chrII#0_reverse
+
+--------
+Processing path: XXYS14#0#chrII#0   seq_id: 588   st: 4831110   num_matches: 3039
+Processing node: 6926 offset: 41, al_len: 60, read_id: 41755, read_st: 0
+Processed all 3039 matches for path: XXYS14#0#chrII#0
+
+--------
+Processing path: XXYS14#0#chrII#0_reverse   seq_id: 589   st: 4834149   num_matches: 3293
+Processing node: 2841 offset: 10, al_len: 41, read_id: 5492, read_st: 159
+Processed all 3293 matches for path: XXYS14#0#chrII#0_reverse
+
+--------
+Processing path: Y12#0#chrII#0   seq_id: 590   st: 4837442   num_matches: 15271
+Processing node: 4689 offset: 73, al_len: 121, read_id: 54026, read_st: 0
+Processed all 15271 matches for path: Y12#0#chrII#0
+
+--------
+Processing path: Y12#0#chrII#0_reverse   seq_id: 591   st: 4852713   num_matches: 14542
+Processing node: 4689 offset: 11, al_len: 200, read_id: 77, read_st: 0
+Processed all 14542 matches for path: Y12#0#chrII#0_reverse
+
+--------
+Processing path: Y55#0#chrII#0   seq_id: 592   st: 4867255   num_matches: 11746
+Processing node: 25558 offset: 442, al_len: 104, read_id: 79375, read_st: 96
+Processed all 11746 matches for path: Y55#0#chrII#0
+
+--------
+Processing path: Y55#0#chrII#0_reverse   seq_id: 593   st: 4879001   num_matches: 13870
+Processing node: 4960 offset: 680, al_len: 67, read_id: 1340, read_st: 0
+Processed all 13870 matches for path: Y55#0#chrII#0_reverse
+
+--------
+Processing path: YGL3210#0#chrII#0   seq_id: 594   st: 4892871   num_matches: 13251
+Processing node: 1254 offset: 18, al_len: 51, read_id: 65379, read_st: 62
+Processed all 13251 matches for path: YGL3210#0#chrII#0
+
+--------
+Processing path: YGL3210#0#chrII#0_reverse   seq_id: 595   st: 4906122   num_matches: 11471
+Processing node: 587 offset: 0, al_len: 200, read_id: 87162, read_st: 0
+Processed all 11471 matches for path: YGL3210#0#chrII#0_reverse
+
+--------
+Processing path: YPS128#0#chrII#0   seq_id: 596   st: 4917593   num_matches: 6719
+Processing node: 4799 offset: 40, al_len: 200, read_id: 97048, read_st: 0
+Processed all 6719 matches for path: YPS128#0#chrII#0
+
+--------
+Processing path: YPS128#0#chrII#0_reverse   seq_id: 597   st: 4924312   num_matches: 7530
+Processing node: 4799 offset: 33, al_len: 200, read_id: 63124, read_st: 0
+Processed all 7530 matches for path: YPS128#0#chrII#0_reverse
+
+--------
+Processing path: YPS138#0#chrII#0   seq_id: 598   st: 4931842   num_matches: 82
+Processing node: 35814 offset: 494, al_len: 36, read_id: 80441, read_st: 0
+Processed all 82 matches for path: YPS138#0#chrII#0
+
+--------
+Processing path: YPS138#0#chrII#0_reverse   seq_id: 599   st: 4931924   num_matches: 58
+Processing node: 8853 offset: 72, al_len: 31, read_id: 85115, read_st: 169
+Processed all 58 matches for path: YPS138#0#chrII#0_reverse
+
+--------
+Processing path: YPS606#0#chrII#0   seq_id: 600   st: 4931982   num_matches: 6299
+Processing node: 687 offset: 5, al_len: 200, read_id: 70576, read_st: 0
+Processed all 6299 matches for path: YPS606#0#chrII#0
+
+--------
+Processing path: YPS606#0#chrII#0_reverse   seq_id: 601   st: 4938281   num_matches: 6472
+Processing node: 8179 offset: 6, al_len: 200, read_id: 99307, read_st: 0
+Processed all 6472 matches for path: YPS606#0#chrII#0_reverse
+
+--------
+Processing path: ZP591#0#chrII#0   seq_id: 632   st: 4954580   num_matches: 9
+Processing node: 363570 offset: 35, al_len: 33, read_id: 21750, read_st: 0
+Processed all 9 matches for path: ZP591#0#chrII#0
+
+--------
+Processing path: ZP591#0#chrII#0_reverse   seq_id: 633   st: 4954589   num_matches: 2
+Processing node: 130823 offset: 28, al_len: 30, read_id: 4300, read_st: 170
+Processed all 2 matches for path: ZP591#0#chrII#0_reverse
+
+---------------------
+Total GAF entries: 4954591
+Coverage data written to: opt3_full_coverage.csv
+       39.53 real        37.78 user         0.57 sys
+           201965568  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               30443  page reclaims
+                   0  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                 449  voluntary context switches
+               13665  involuntary context switches
+        514610823486  instructions retired
+        130553397461  cycles elapsed
+           168298240  peak memory footprint

@@ -1,0 +1,14 @@
+Tag:          yeast235-chrII
+Started:      Sat May 23 21:36:23 PDT 2026
+Host:         M-Q7Q6XPVH36
+OS:           Darwin M-Q7Q6XPVH36 24.6.0 Darwin Kernel Version 24.6.0: Fri Feb 27 19:34:42 PST 2026; root:xnu-11417.140.69.709.8~1/RELEASE_ARM64_T6020 arm64
+Config:       /Users/hlakshmidevi/personal/mem-projection/pangenome-pipeline/configs/yeast235-chrII-normalized.env
+Index dir:    /Users/hlakshmidevi/personal/mem-projection/pangenome-pipeline/runs/v1-current
+Trials:       3
+
+Binaries:
+  PI_v1    /Users/hlakshmidevi/personal/pangenome-index-latest/bin-v1/find_mems  md5=42ae90e1008ef76cd0f4fa940e6b627e
+  PI_v2    /Users/hlakshmidevi/personal/pangenome-index-latest/bin/find_mems  md5=b86ee2d1452659fe834c6f79fb5a3cac
+  GP_v1    /Users/hlakshmidevi/personal/gafpack/target/v1/gafpack  md5=714d99f3cb6ccccc67c59890f34de146
+  GP_v2    /Users/hlakshmidevi/personal/gafpack/target/release/gafpack  md5=83b1c5b4b5b1d4d205ebb73fd5d4c7b3
+Finished: Sat May 23 21:39:54 PDT 2026

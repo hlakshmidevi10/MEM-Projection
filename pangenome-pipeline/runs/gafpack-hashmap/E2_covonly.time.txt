@@ -1,0 +1,28 @@
+Processing gfa file: /Users/hlakshmidevi/personal/mem-projection/yeast-235/yeast-235-chrI/final_output2/yeast235_chrII_100kb_laced_sorted_normalized_new.gfa
+Args: S288C_chrII_N100K_R1_200_normalized_path_pos.bin, S288C_chrII_N100K_R1_200_normalized_seq_id_starts.out
+Path names file: yeast235_chrII_100kb_normalized.paths
+Size of cumulative starts: 635; Total no. of entries: 4954591
+Total paths: 317
+Loaded 4954591 path_pos records (118910184 bytes)
+---------------------
+Total GAF entries: 4954591
+Path-scan passes: total=632 over 632 seq_ids (mean=1.0, max=1); step-visits≈21591821
+Coverage data written to: E2_covonly_coverage.csv
+        2.87 real         2.36 user         0.32 sys
+           251772928  maximum resident set size
+                   0  average shared memory size
+                   0  average unshared data size
+                   0  average unshared stack size
+               26046  page reclaims
+                   0  page faults
+                   0  swaps
+                   0  block input operations
+                   0  block output operations
+                   0  messages sent
+                   0  messages received
+                   0  signals received
+                  35  voluntary context switches
+                4577  involuntary context switches
+         23338920330  instructions retired
+          7295228625  cycles elapsed
+           166561664  peak memory footprint
