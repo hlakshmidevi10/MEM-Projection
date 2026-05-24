@@ -13,6 +13,36 @@
 !yeast-8/s28cc_flo1_chr1_186000_214000/
 !yeast-8/s28cc_flo1_chr1_186000_214000/**
 
+# Keep the pangenome-pipeline driver / configs / docs / perf harness.
+# Run artifacts (gigabytes of dataset-specific output under runs/<tag>/ and
+# perf/<tag>/) are intentionally excluded; only hand-written narrative
+# (*.md, *.txt) and machine-readable summaries (*.tsv) are kept.
+!pangenome-pipeline/
+!pangenome-pipeline/**/
+!pangenome-pipeline/**/*.sh
+!pangenome-pipeline/**/*.py
+!pangenome-pipeline/**/*.md
+!pangenome-pipeline/**/*.txt
+!pangenome-pipeline/**/*.tsv
+!pangenome-pipeline/configs/*.env
+# Re-ignore: large generated binary/text artifacts under runs/ and per-trial perf logs.
+pangenome-pipeline/runs/**/*.seq
+pangenome-pipeline/runs/**/*.rl_bwt
+pangenome-pipeline/runs/**/*.ri
+pangenome-pipeline/runs/**/*.tags
+pangenome-pipeline/runs/**/*.paths
+pangenome-pipeline/runs/**/*.bin
+pangenome-pipeline/runs/**/*.gaf
+pangenome-pipeline/runs/**/*.csv
+pangenome-pipeline/runs/**/*.out
+pangenome-pipeline/runs/**/*.env
+pangenome-pipeline/runs/**/*.log
+pangenome-pipeline/runs/**/*.time
+pangenome-pipeline/runs/**/*.tsv
+pangenome-pipeline/runs/**/*.sh
+pangenome-pipeline/perf/**/trial-*/
+pangenome-pipeline/perf/**/warmup/
+
 # Keep the .gitignore itself
 !.gitignore
 

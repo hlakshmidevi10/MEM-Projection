@@ -1,0 +1,7 @@
+Run:       gafpack-bufwriter
+Config:    /Users/hlakshmidevi/personal/mem-projection/pangenome-pipeline/configs/yeast235-chrII-normalized.env
+Started:   Mon May 11 21:25:36 CDT 2026
+Host:      M-Q7Q6XPVH36
+PI_BIN:    /Users/hlakshmidevi/personal/pangenome-index-latest/bin
+PI commit: 06ef581 2026-05-10 18:44:12 -0700 Merge pull request #1 from hlakshmidevi10/find-mems-binary-io
+Finished: Mon May 11 21:26:39 CDT 2026

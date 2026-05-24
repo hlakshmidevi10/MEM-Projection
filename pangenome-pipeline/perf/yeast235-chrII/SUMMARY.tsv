@@ -1,0 +1,19 @@
+format	trial	step	wall_s	maxrss_mb	gaf_lines	bin_bytes	bin_records	cov_md5	stderr_warns	gafpack_total_entries
+v1	1	find_mems	23.72	1379	-	-	-	-	-	-
+v1	1	gafpack	2.06	239	4954592	118910184	4954591	c7ad02f5b5d1388d189a4e1cef70fcce	0
+0	4954591
+v2	1	find_mems	23.48	1361	-	-	-	-	-	-
+v2	1	gafpack	1.84	199	4954592	79273456	4954591	c7ad02f5b5d1388d189a4e1cef70fcce	0
+0	4954591
+v1	2	find_mems	23.22	1296	-	-	-	-	-	-
+v1	2	gafpack	2.06	248	4954592	118910184	4954591	c7ad02f5b5d1388d189a4e1cef70fcce	0
+0	4954591
+v2	2	find_mems	24.35	1360	-	-	-	-	-	-
+v2	2	gafpack	1.85	201	4954592	79273456	4954591	c7ad02f5b5d1388d189a4e1cef70fcce	0
+0	4954591
+v1	3	find_mems	23.49	1438	-	-	-	-	-	-
+v1	3	gafpack	2.05	242	4954592	118910184	4954591	c7ad02f5b5d1388d189a4e1cef70fcce	0
+0	4954591
+v2	3	find_mems	23.91	1255	-	-	-	-	-	-
+v2	3	gafpack	1.85	192	4954592	79273456	4954591	c7ad02f5b5d1388d189a4e1cef70fcce	0
+0	4954591

@@ -1,0 +1,12 @@
+# step                  wall_s  maxrss_MB
+01_gbz_stats                 0        251
+02_gbz_extract               1        304
+03_grlbwt                   13        631
+04_build_rindex             20        846
+05_build_tags             3743       3537
+06_convert_tags             30       1289
+07_path_extract              1        252
+08_print_stats               5        927
+09_find_mems                32       1131
+10_gafpack                 149         90
+11_validate_gaf             15       1557

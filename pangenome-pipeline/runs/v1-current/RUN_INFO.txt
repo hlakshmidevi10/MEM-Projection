@@ -1,0 +1,10 @@
+Run:        v1-current
+Config:     /Users/hlakshmidevi/personal/mem-projection/pangenome-pipeline/configs/yeast235-chrII-normalized.env
+Started:    Sat May 23 20:12:41 PDT 2026
+Host:       M-Q7Q6XPVH36
+PI_BIN:     /Users/hlakshmidevi/personal/pangenome-index-latest/bin-v1
+GAFPACK:    /Users/hlakshmidevi/personal/gafpack/target/v1/gafpack
+BIN_FORMAT: v1
+PI commit:  5ce98cf 2026-05-12 10:59:22 -0500 Merge pull request #2 from hlakshmidevi10/find-mems-pathbp
+GP commit:  98d73d1 2026-05-12 10:58:59 -0500 Merge pull request #3 from hlakshmidevi10/gafpack-pathbp
+Finished: Sat May 23 20:13:50 PDT 2026
