@@ -1,0 +1,32 @@
+Tag:          yeast235-chrII-n5
+Started:      Tue May 26 08:45:14 PDT 2026
+Host:         M-Q7Q6XPVH36
+OS:           Darwin M-Q7Q6XPVH36 24.6.0 Darwin Kernel Version 24.6.0: Fri Feb 27 19:34:42 PST 2026; root:xnu-11417.140.69.709.8~1/RELEASE_ARM64_T6020 arm64
+Config:       /Users/hlakshmidevi/personal/mem-projection/pangenome-pipeline/configs/yeast235-chrII-normalized.env
+Index dir:    /Users/hlakshmidevi/personal/mem-projection/pangenome-pipeline/runs/v1-current
+Mode:         v2 only (default)
+Trials:       5
+
+Parameters:
+  KMER:       31      (build_tags -k)
+  MEM_LEN:    30      (find_mems minimum MEM length)
+  MIN_OCC:    1      (find_mems minimum BWT occurrences)
+  THREADS:    16
+
+Binaries:
+  PI_v2    /Users/hlakshmidevi/personal/pangenome-index-latest/bin/find_mems  md5=81e92b8b337d18feda1b19865bc55fd5
+  GP_v2    /Users/hlakshmidevi/personal/gafpack/target/release/gafpack  md5=90f9685d8471952d82c50e0830c507af
+
+Input files (sizes captured once; invariant across trials):
+  yeast235_chrII_100kb_laced_sorted_normalized.gbz:        60073104 bytes  /Users/hlakshmidevi/personal/mem-projection/yeast-235/yeast-235-chrI/final_output2/yeast235_chrII_100kb_laced_sorted_normalized.gbz
+  yeast235_chrII_100kb_laced_sorted_normalized_new.gfa:       225954502 bytes  /Users/hlakshmidevi/personal/mem-projection/yeast-235/yeast-235-chrI/final_output2/yeast235_chrII_100kb_laced_sorted_normalized_new.gfa
+  S288C_chrII_N100K_R1_200_reads.txt:        20100000 bytes  /Users/hlakshmidevi/personal/mem-projection/yeast-235/yeast-235-chrI/S288C_chrII_N100K_R1_200_reads.txt
+
+Index files in INDEX_DIR (built once via run.sh; reused across trials):
+  yeast235_chrII_100kb_normalized.seq:       337356602 bytes
+  yeast235_chrII_100kb_normalized.rl_bwt:        70166771 bytes
+  yeast235_chrII_100kb_normalized.ri:       160282045 bytes
+  yeast235_chrII_100kb_normalized.tags:      1352068728 bytes
+  yeast235_chrII_100kb_normalized_compressed.tags:      1010810638 bytes
+  yeast235_chrII_100kb_normalized.paths:            5025 bytes
+Finished: Tue May 26 08:48:10 PDT 2026
