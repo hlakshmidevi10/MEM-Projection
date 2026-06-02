@@ -4,10 +4,12 @@
 Reusable driver for the `pangenome-index-latest` → `gafpack` → `validate_gaf` workflow. One config file per input dataset; one subdir under `runs/` per execution.
 
 ```
-run.sh                 ./run.sh <config.env> [tag]   → runs/<tag>/
-compare.sh             ./compare.sh <config.env> <tag> [ref-dir]
-configs/*.env          inputs + params (see yeast235-chrII-normalized.env for the contract)
-runs/<tag>/            all artifacts + logs/ + RUN_INFO.txt + FINDINGS.md
+run.sh                       ./run.sh <config.env> [tag]   → runs/<tag>/
+compare.sh                   ./compare.sh <config.env> <tag> [ref-dir]
+bootstrap_vesuvio.sh         per-user install of all deps on a fresh Linux host
+configs/*.env                inputs + params (see yeast235-chrII-normalized.env for the contract)
+runs/<tag>/                  all artifacts + logs/ + RUN_INFO.txt + FINDINGS.md
+vesuvio-build-issues.md      field notes on porting to Guix-on-Debian — read before debugging build failures on a non-Mac host
 ```
 
 ## Correctness criterion
