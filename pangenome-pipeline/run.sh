@@ -20,6 +20,10 @@ GAFPACK="${GAFPACK:-gafpack}"
 GRLBWT="${GRLBWT:-grlbwt-cli}"
 GBZ_STATS="${GBZ_STATS:-gbz_stats}"
 GBZ_EXTRACT="${GBZ_EXTRACT:-gbz_extract}"
+# vg is used in step 01b to derive ${BASE}.gfa from $GBZ. This is the only
+# safe way to guarantee that gafpack walks the same node IDs that find_mems
+# saw via the GBZ; see CLAUDE.md "GFA derivation contract".
+VG="${VG:-/Users/hlakshmidevi/personal/vg/bin/vg}"
 VALIDATE_GAF="${VALIDATE_GAF:-$MEM_PROJ/scripts/validate_gaf_v2.py}"
 
 # /usr/bin/time -l on some macOS hosts fails with
@@ -141,10 +145,27 @@ profile_redirect() {
 }
 
 echo "=== Input check ==="
-for f in "$GBZ" "$GFA" "$READS"; do
-    [ -e "$f" ] || { echo "Missing input: $f"; exit 1; }
-    printf "  %-8s %s (%s)\n" "$(basename "$f"):" "$f" "$(du -h "$f" | cut -f1)"
-done
+# $GFA is intentionally NOT in this list anymore. The pipeline derives
+# ${BASE}.gfa from $GBZ in step 01b — having the user point at a pre-existing
+# GFA is unsafe because there's no way for the script to verify it came from
+# the same source as $GBZ (and at HPRC scale, a mismatch silently produces
+# wrong projections, not an error). If a config still sets $GFA we ignore it
+# with a warning.
+# $READS is OPTIONAL: if missing, steps 01..08 still run (index build +
+# derive_gfa + path_extract) and the script stops cleanly before step 09.
+# Re-invoke once $READS exists to resume from step 09 onward.
+[ -e "$GBZ" ] || { echo "Missing input: $GBZ"; exit 1; }
+printf "  %-8s %s (%s)\n" "$(basename "$GBZ"):" "$GBZ" "$(du -h "$GBZ" | cut -f1)"
+HAVE_READS=0
+if [ -n "${READS:-}" ] && [ -e "$READS" ]; then
+    HAVE_READS=1
+    printf "  %-8s %s (%s)\n" "$(basename "$READS"):" "$READS" "$(du -h "$READS" | cut -f1)"
+else
+    echo "  READS:   ${READS:-<unset>} (not present) — index-only mode; steps 09-11 will be skipped"
+fi
+if [ -n "${GFA:-}" ]; then
+    echo "  NOTE: config sets GFA=$GFA — ignored. run.sh derives \${BASE}.gfa from \$GBZ."
+fi
 echo
 
 # === Index build ============================================================
@@ -153,6 +174,27 @@ profile 01_gbz_stats "$GBZ_STATS" -i "$GBZ"
 NUM_SEQ=$(awk '/^Sequences:/ {print $2}' "$LOGS/01_gbz_stats.log")
 [ -n "$NUM_SEQ" ] || { echo "Could not parse NUM_SEQ from gbz_stats"; exit 1; }
 echo "    NUM_SEQ=$NUM_SEQ"
+
+# === 01b derive_gfa =========================================================
+# The GFA gafpack walks (step 10) and the GFA validate_gaf reconstructs paths
+# against (step 11) MUST be derived from $GBZ. Any other GFA — even one that
+# "came from" the same upstream source — is unsafe: gfa2gbwt may have split
+# segments >1024 bp into multiple GBZ nodes, so the GBZ's node IDs no longer
+# match the GFA's segment IDs. Result: find_mems emits records targeting GBZ
+# node IDs that don't appear on the GFA's P-lines, gafpack walks the wrong
+# graph, and projections are silently wrong (validate_gaf will still pass on
+# substring matching but the GAF describes paths that don't exist).
+#
+# Canonical recipe: vg convert -fW --no-translation $GBZ
+#   - matches mem-projection/Readme.md:128, the only documented gbz→gfa form
+#   - -W emits haplotypes (decays to P-lines for embedded paths in this vg
+#     build; verified against final_output2/*.gfa: 317 P / 0 W)
+#   - --no-translation suppresses T-lines so segment IDs in the emitted GFA
+#     equal the GBZ's node IDs by construction
+echo "=== 01b derive_gfa (vg convert -fW --no-translation) ==="
+DERIVED_GFA="${BASE}.gfa"
+[ -f "$DERIVED_GFA" ] || profile_redirect 01b_derive_gfa "$DERIVED_GFA" \
+    "$VG" convert -fW --no-translation "$GBZ"
 
 echo "=== 02 gbz_extract ==="
 [ -f "${BASE}.seq" ] || profile_redirect 02_gbz_extract "${BASE}.seq" "$GBZ_EXTRACT" -b -t "$THREADS" -p "$GBZ"
@@ -178,13 +220,33 @@ echo "=== 08 print_stats ==="
 profile 08_print_stats "$PI_BIN/print_stats" "${BASE}.ri" "${BASE}_compressed.tags"
 
 # === Query / projection =====================================================
+if [ "$HAVE_READS" -eq 0 ]; then
+    echo
+    echo "=== Index-only mode complete — \$READS not set/missing ==="
+    echo "    Built (in runs/$TAG/):"
+    ls -1 "${BASE}".seq "${BASE}".rl_bwt "${BASE}".ri "${BASE}".tags \
+          "${BASE}_compressed.tags" "${BASE}".paths "${BASE}".gfa 2>/dev/null | sed 's/^/      /'
+    echo
+    echo "    To run steps 09-11 (find_mems → gafpack → validate):"
+    echo "      1. set READS=<path> in $CONFIG"
+    echo "      2. re-invoke: $0 $1 $TAG"
+    echo "    Steps 01-08 will be skipped (outputs exist); 09 onward will run."
+    summarize_timing > "$TIMING"
+    echo
+    echo "=== TIMING SUMMARY ($TIMING) ==="
+    cat "$TIMING"
+    echo "Finished (index-only): $(date)" >> "$RUN_DIR/RUN_INFO.txt"
+    exit 0
+fi
+
 echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC) ==="
 [ -f "${OUT}_path_pos_v2.bin" ] || profile 09_find_mems "$PI_BIN/find_mems" \
     "${BASE}.ri" "${BASE}_compressed.tags" "$READS" "$MEM_LEN" "$MIN_OCC" "$OUT"
 
 echo "=== 10 gafpack ==="
+# Uses ${DERIVED_GFA} from step 01b — NOT any GFA from the config.
 [ -f "${OUT}.gaf" ] || profile 10_gafpack "$GAFPACK" \
-    --gfa "$GFA" \
+    --gfa "$DERIVED_GFA" \
     --path-pos "${OUT}_path_pos_v2.bin" \
     --seq-id-starts "${OUT}_seq_id_starts.out" \
     --path-names "${BASE}.paths" \
@@ -192,7 +254,9 @@ echo "=== 10 gafpack ==="
 
 # === Validation =============================================================
 echo "=== 11 validate_gaf (n=$VALIDATE_SAMPLE) ==="
-profile 11_validate_gaf python3 "$VALIDATE_GAF" "${OUT}.gaf" "$READS" "$GFA" --sample "$VALIDATE_SAMPLE"
+# validate_gaf reconstructs path sequences against the same GFA gafpack
+# walked, so it MUST also use ${DERIVED_GFA}.
+profile 11_validate_gaf python3 "$VALIDATE_GAF" "${OUT}.gaf" "$READS" "$DERIVED_GFA" --sample "$VALIDATE_SAMPLE"
 
 echo
 echo "Finished: $(date)" >> "$RUN_DIR/RUN_INFO.txt"
@@ -201,6 +265,8 @@ echo "=== TIMING SUMMARY ($TIMING) ==="
 cat "$TIMING"
 echo
 echo "=== OUTPUTS (runs/$TAG/) ==="
+# ${BASE}.* covers .seq .rl_bwt .ri .tags .paths .gfa (derived in 01b);
+# _compressed.tags is named separately; ${OUT}* is find_mems/gafpack output.
 ls -lh "${BASE}".* "${BASE}_compressed.tags" "${OUT}"* 2>/dev/null | awk '{printf "  %-55s %8s\n", $NF, $5}'
 echo
 grep -E '^(Valid|Invalid|Total) entries' "$LOGS/11_validate_gaf.log" || true
