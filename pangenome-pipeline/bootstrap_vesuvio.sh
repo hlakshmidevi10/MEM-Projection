@@ -491,18 +491,30 @@ fi
 # PEP 668 "externally managed environment". The clean answer is a per-tool
 # venv at $HOME/.venvs/gaftools — fully isolated, no system mutation, and the
 # script symlinks its entrypoint into $PREFIX/bin so $PATH discovery still works.
+#
+# Pinned to 1.3.0: gaftools 1.4.0 ships a broken `find_path` (cli/find_path.py
+# validate() references args.nodes / args.regions, which the argparse parser
+# doesn't define -> AttributeError on every invocation). 1.3.0 is what
+# scripts/validate_gaf_v2.py was developed/tested against. Bump this pin when
+# upstream releases a fix.
+GAFTOOLS_VERSION="${GAFTOOLS_VERSION:-1.3.0}"
+NEED_INSTALL=0
 if ! command -v gaftools >/dev/null 2>&1; then
+    NEED_INSTALL=1
+elif [ "$(gaftools --version 2>&1 | awk '{print $NF}')" != "$GAFTOOLS_VERSION" ]; then
+    log "found gaftools $(gaftools --version 2>&1 | awk '{print $NF}'), need $GAFTOOLS_VERSION — reinstalling"
+    NEED_INSTALL=1
+fi
+if [ "$NEED_INSTALL" -eq 1 ]; then
     GAFTOOLS_VENV="$HOME/.venvs/gaftools"
-    if [ ! -x "$GAFTOOLS_VENV/bin/gaftools" ]; then
-        log "create venv at $GAFTOOLS_VENV and install gaftools"
-        python3 -m venv "$GAFTOOLS_VENV"
-        "$GAFTOOLS_VENV/bin/pip" install --upgrade pip
-        "$GAFTOOLS_VENV/bin/pip" install gaftools
-    fi
+    log "create/refresh venv at $GAFTOOLS_VENV and install gaftools==$GAFTOOLS_VERSION"
+    [ -d "$GAFTOOLS_VENV" ] || python3 -m venv "$GAFTOOLS_VENV"
+    "$GAFTOOLS_VENV/bin/pip" install --upgrade pip
+    "$GAFTOOLS_VENV/bin/pip" install --upgrade "gaftools==$GAFTOOLS_VERSION"
     ln -sf "$GAFTOOLS_VENV/bin/gaftools" "$PREFIX/bin/gaftools"
-    ok "gaftools installed via venv: $PREFIX/bin/gaftools -> $GAFTOOLS_VENV/bin/gaftools"
+    ok "gaftools $GAFTOOLS_VERSION installed via venv: $PREFIX/bin/gaftools -> $GAFTOOLS_VENV/bin/gaftools"
 else
-    ok "gaftools already on PATH: $(command -v gaftools)"
+    ok "gaftools $GAFTOOLS_VERSION already on PATH: $(command -v gaftools)"
 fi
 
 # ---- 11. Persistent shell env ---------------------------------------------

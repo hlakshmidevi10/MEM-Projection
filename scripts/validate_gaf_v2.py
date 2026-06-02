@@ -102,10 +102,12 @@ def convert_to_forward_path(path_str):
 
 def run_gaftools_find_path(paths_file, gfa_file, output_file):
     """Run gaftools find_path command to get sequences for all paths."""
-    # gaftools renamed --paths_file to --paths-file (underscore to dash) somewhere
-    # between the version this script was originally written against and the
-    # current PyPI release (verified working: 1.3.x on vesuvio).
-    cmd = ['gaftools', 'find_path', '--paths-file', paths_file, gfa_file, '-o', output_file]
+    # Requires gaftools==1.3.0 (pinned by bootstrap_vesuvio.sh). 1.4.0 ships
+    # a broken find_path (validate() reads args.nodes / args.regions which the
+    # parser doesn't define, raising AttributeError). 1.4.0 also renamed the
+    # flag from --paths_file to --paths-file, but that's moot since 1.4.0
+    # crashes before the flag is consumed.
+    cmd = ['gaftools', 'find_path', '--paths_file', paths_file, gfa_file, '-o', output_file]
     try:
         result = subprocess.run(cmd, capture_output=True, text=True, check=True)
         return True, None

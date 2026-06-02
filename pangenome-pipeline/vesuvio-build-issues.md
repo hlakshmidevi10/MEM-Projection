@@ -388,31 +388,44 @@ tools' intermediates.
 
 ---
 
-### 12. `gaftools find_path` flag renamed (run.sh step 11)
+### 12. `gaftools` 1.4.0 is broken; pin to 1.3.0 (run.sh step 11)
 
-**Symptom:**
+**Symptom 1** (with old script + new gaftools):
 ```
-=== 11 validate_gaf (n=2000) ===
-Running gaftools to get path sequences...
-Failed to run gaftools:
-  gaftools error: unrecognized arguments: --paths_file yeast...gfa
+gaftools error: unrecognized arguments: --paths_file yeast...gfa
+```
+**Symptom 2** (after renaming `--paths_file` → `--paths-file`):
+```
+File ".../gaftools/cli/find_path.py", line 101, in validate
+    if args.nodes and args.regions:
+AttributeError: 'Namespace' object has no attribute 'nodes'
 ```
 
-**Root cause:** `scripts/validate_gaf_v2.py` calls
-`gaftools find_path --paths_file ...`. Current gaftools (1.3.x as installed by
-pip into our venv) renamed that to `--paths-file` (underscore → dash). The
-Mac's gaftools install happens to be an older version that still accepts the
-underscore form.
+**Root cause:** gaftools 1.4.0 (the version pip pulls on a fresh install today)
+ships with `cli/find_path.py:validate()` reading `args.nodes` and `args.regions`,
+but those flags aren't defined in the argument parser. Every `gaftools find_path`
+invocation crashes during validation, before the actual logic runs. **It's a
+genuine upstream bug in 1.4.0.** 1.3.0 doesn't have it.
 
-**Fix:** One-character change in `validate_gaf_v2.py:105` —
-`--paths_file` → `--paths-file`.
+The Mac happens to have gaftools 1.3.0 installed (in conda), so the dev box
+masks the issue.
 
-**Lesson:** Pip-installed Python tools floating to their latest version on
-fresh installs can introduce surface API drift. Pinning gaftools to a specific
-version in the bootstrap (`pip install gaftools==X.Y.Z`) would prevent this,
-but at the cost of locking out upstream fixes. The trade-off here was to
-accept the drift and patch our script — both call sites use the same flag, so
-the change is trivial.
+**Fix:** Pin to 1.3.0 in `bootstrap_vesuvio.sh`:
+```bash
+GAFTOOLS_VERSION="${GAFTOOLS_VERSION:-1.3.0}"
+pip install --upgrade "gaftools==$GAFTOOLS_VERSION"
+```
+The script also detects when an existing install is the wrong version and
+reinstalls (so re-running after a `pip install gaftools` upgrade auto-recovers).
+
+1.3.0 uses `--paths_file` (underscore); `validate_gaf_v2.py` is updated to
+match. When 1.4.x ships a fix, bump `GAFTOOLS_VERSION` and revisit the flag
+(`--paths-file` with dash).
+
+**Lesson:** Pip-installed Python tools without a pin will float to whatever
+PyPI considers latest. A broken release in transit time can take down a
+fresh install. For tools where API stability matters more than getting fixes
+fast, pin and bump deliberately.
 
 ---
 
