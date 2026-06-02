@@ -222,7 +222,17 @@ echo "=== 02 gbz_extract ==="
 [ -f "${BASE}.seq" ] || profile_redirect 02_gbz_extract "${BASE}.seq" "$GBZ_EXTRACT" -b -t "$THREADS" -p "$GBZ"
 
 echo "=== 03 grlbwt ==="
-[ -f "${BASE}.rl_bwt" ] || profile 03_grlbwt "$GRLBWT" "${BASE}.seq" -t "$THREADS" -o "${BASE}.rl_bwt"
+# -T/--tmp: grlbwt-cli writes intermediates to /tmp by default, then uses
+# std::filesystem::rename to move the final .rl_bwt to $PWD. On hosts where
+# /tmp is a different filesystem from the run dir (Linux with /tmp as tmpfs,
+# Guix systems, sometimes /home on a separate volume), rename(2) fails with
+# 'Invalid cross-device link'. Pinning tmp inside $RUN_DIR puts intermediates
+# on the same filesystem as the output, making the rename atomic again.
+GRLBWT_TMP="$RUN_DIR/grl_tmp"
+mkdir -p "$GRLBWT_TMP"
+[ -f "${BASE}.rl_bwt" ] || profile 03_grlbwt "$GRLBWT" "${BASE}.seq" -t "$THREADS" -T "$GRLBWT_TMP" -o "${BASE}.rl_bwt"
+# Clean up tmp if it's empty (grlbwt usually cleans up itself on success)
+rmdir "$GRLBWT_TMP" 2>/dev/null || true
 
 echo "=== 04 build_rindex ==="
 [ -f "${BASE}.ri" ] || profile_redirect 04_build_rindex "${BASE}.ri" "$PI_BIN/build_rindex" "${BASE}.rl_bwt"

@@ -27,7 +27,7 @@ goes sideways.
 The pipeline itself (`run.sh`, the binaries, the configs) is identical across
 both hosts. The divergences are all in the toolchain *around* the pipeline.
 
-## The 10 hurdles, in order encountered
+## The 11 hurdles, in order encountered
 
 Each entry: **(symptom) → (root cause) → (fix in `bootstrap_vesuvio.sh`)**.
 Commits referenced are on branch `vesuvio-bootstrap`.
@@ -352,6 +352,39 @@ by default.
 **Lesson:** "Standard" Unix binaries (`time`, `bc`, `dc`, `xargs`, `column`)
 aren't always present on minimal Debian. Probe by absolute path candidates,
 not `command -v`, since shell built-ins can mask them.
+
+---
+
+### 11. `grlbwt-cli` cross-device rename failure (run.sh step 03)
+
+**Symptom:**
+```
+=== 03 grlbwt ===
+>>> [03_grlbwt] .../grlbwt-cli yeast235_chrII_100kb_normalized.seq -t 16 ...
+terminate called after throwing an instance of 'std::filesystem::__cxx11::filesystem_error'
+  what(): filesystem error: cannot rename: Invalid cross-device link
+  [/tmp/grl.bwt.vUCkSR/bwt_lev_0_OP6] [yeast235_chrII_100kb_normalized.rl_bwt]
+```
+
+**Root cause:** `grlbwt-cli` writes intermediates to `/tmp/grl.bwt.XXXX/` and
+uses `std::filesystem::rename` to move the final output to the run dir.
+`rename(2)` requires source and destination to be on the same filesystem
+(it's an atomic inode move, not a copy). On vesuvio (and many Linux hosts),
+`/tmp` is `tmpfs` (RAM-backed) while `$HOME` is on a regular disk filesystem.
+Cross-fs rename → EXDEV → uncaught exception → abort.
+
+The Mac doesn't hit this because macOS `/tmp` is on the same APFS volume as
+`/Users/<you>`.
+
+**Fix:** `grlbwt-cli` has a `-T / --tmp` flag. Updated `run.sh` step 03 to
+pass `-T $RUN_DIR/grl_tmp`, putting intermediates on the same filesystem as
+the final output by construction.
+
+**Lesson:** Any tool that uses `rename(2)` to "move" cross-directory results
+needs its tmpdir co-located with its output on Linux. Default-`/tmp` tools
+either need `TMPDIR` overridden or an explicit `--tmpdir` flag. Other common
+offenders: `sort -T`, `sed --temp` (some builds), various bioinformatics
+tools' intermediates.
 
 ---
 
