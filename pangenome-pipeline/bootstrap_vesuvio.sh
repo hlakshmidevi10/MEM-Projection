@@ -137,6 +137,24 @@ EOF
         || missing_headers+=("C++17 (g++ >=9)")
     rm -f /tmp/_pf_cxx /tmp/_pf_cxx.cpp
 
+    # TLS / CA certificates check: cargo fetches crates from crates.io over
+    # HTTPS during gafpack build. Guix doesn't bundle CA certs in the base
+    # profile — without `guix install nss-certs`, cargo fails with
+    # "server certificate verification failed. CAfile: none CRLfile: none".
+    # Probe by trying to hit a known-good HTTPS endpoint with curl.
+    if ! curl -sSf --max-time 5 https://crates.io/ -o /dev/null 2>/dev/null; then
+        # Try with explicit Debian CA bundle as a fallback test, to distinguish
+        # "no certs anywhere" from "certs exist but no env var pointing at them".
+        if [ -f /etc/ssl/certs/ca-certificates.crt ] \
+            && curl -sSf --max-time 5 \
+                --cacert /etc/ssl/certs/ca-certificates.crt \
+                https://crates.io/ -o /dev/null 2>/dev/null; then
+            missing_headers+=("CA certs (system bundle exists but SSL_CERT_FILE unset — see install hint)")
+        else
+            missing_headers+=("CA certificates (no working bundle — install nss-certs)")
+        fi
+    fi
+
     if [ ${#missing_bins[@]}    -eq 0 ] \
     && [ ${#missing_libs[@]}    -eq 0 ] \
     && [ ${#missing_headers[@]} -eq 0 ]; then
@@ -168,9 +186,10 @@ EOF
     gcc-toolchain make cmake pkg-config coreutils \
     autoconf automake libtool gettext m4 \
     zstd zstd:lib openssl bzip2 xz lz4 zlib \
-    python python-pip rust rust:cargo
+    python python-pip rust rust:cargo \
+    nss-certs                            # CA bundle for cargo's HTTPS fetches
 
-  # Then re-source profile and retry:
+  # Then re-source profile (sets SSL_CERT_FILE/SSL_CERT_DIR after nss-certs):
   GUIX_PROFILE="$HOME/.guix-profile"; . "$GUIX_PROFILE/etc/profile"
 EOF
     exit 1
@@ -438,10 +457,18 @@ else
 fi
 
 # ---- 8. gafpack ------------------------------------------------------------
+# CC/CXX explicitly set: gafpack's transitive deps (bzip2-sys, liblzma-sys,
+# zstd-sys) use the cc-rs Rust build-script library to compile C sources at
+# build time. cc-rs probes $CC first, falling back to `cc`/`c++`. Guix's
+# gcc-toolchain only provides `gcc`/`g++` (no `cc` alias, unlike Debian's
+# build-essential), so without $CC=gcc the build dies with
+# "ToolNotFound: failed to find tool 'cc'". Setting them here is a no-op on
+# hosts where /usr/bin/cc exists.
 if [ ! -x "$ROOT/$GAFPACK_DIR_NAME/target/release/gafpack" ]; then
     clone_or_update "$GAFPACK_REPO" "$GAFPACK_DIR_NAME" "$GAFPACK_BRANCH"
-    log "cargo build --release gafpack"
-    (cd "$ROOT/$GAFPACK_DIR_NAME" && cargo build --release)
+    log "cargo build --release gafpack (CC=gcc CXX=g++)"
+    (cd "$ROOT/$GAFPACK_DIR_NAME" \
+        && CC="${CC:-gcc}" CXX="${CXX:-g++}" cargo build --release)
     ok "gafpack built at $ROOT/$GAFPACK_DIR_NAME/target/release/gafpack"
 else
     ok "gafpack already built"
