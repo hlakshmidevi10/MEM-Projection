@@ -251,13 +251,24 @@ echo "=== 07 path_extract ==="
 echo "=== 08 print_stats ==="
 profile 08_print_stats "$PI_BIN/print_stats" "${BASE}.ri" "${BASE}_compressed.tags"
 
+# === 08b build_lightweight_tags =============================================
+# Lightweight tags (.ltags) are an alternative tag-index format that find_mems
+# can read in --lightweight-tags mode. Per perf/yeast235-chrII/FINDINGS_PERF.md
+# the lite pipeline is ~24% faster overall: tag-query work drops ~89% (cheap
+# .ltags lookups), with dedup work moved to gafpack via --dedup-read-node.
+# Built FROM the compressed tags from step 06.
+echo "=== 08b build_lightweight_tags ==="
+[ -f "${BASE}.ltags" ] || profile 08b_build_lightweight_tags \
+    "$PI_BIN/build_lightweight_tags" "${BASE}_compressed.tags" "${BASE}.ltags"
+
 # === Query / projection =====================================================
 if [ "$HAVE_READS" -eq 0 ]; then
     echo
     echo "=== Index-only mode complete — \$READS not set/missing ==="
     echo "    Built (in runs/$TAG/):"
     ls -1 "${BASE}".seq "${BASE}".rl_bwt "${BASE}".ri "${BASE}".tags \
-          "${BASE}_compressed.tags" "${BASE}".paths "${BASE}".gfa 2>/dev/null | sed 's/^/      /'
+          "${BASE}_compressed.tags" "${BASE}".ltags "${BASE}".paths \
+          "${BASE}".gfa 2>/dev/null | sed 's/^/      /'
     echo
     echo "    To run steps 09-11 (find_mems → gafpack → validate):"
     echo "      1. set READS=<path> in $CONFIG"
@@ -271,18 +282,26 @@ if [ "$HAVE_READS" -eq 0 ]; then
     exit 0
 fi
 
-echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC) ==="
+echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, --lightweight-tags) ==="
+# Lightweight mode: consume ${BASE}.ltags (built in 08b) instead of
+# ${BASE}_compressed.tags. Per-MEM tag lookup is much cheaper here; dedup
+# of read-graph positions moves to gafpack via --dedup-read-node (step 10).
 [ -f "${OUT}_path_pos_v2.bin" ] || profile 09_find_mems "$PI_BIN/find_mems" \
-    "${BASE}.ri" "${BASE}_compressed.tags" "$READS" "$MEM_LEN" "$MIN_OCC" "$OUT"
+    "${BASE}.ri" "${BASE}.ltags" "$READS" "$MEM_LEN" "$MIN_OCC" "$OUT" \
+    --lightweight-tags
 
-echo "=== 10 gafpack ==="
+echo "=== 10 gafpack (--dedup-read-node, lightweight pipeline) ==="
 # Uses ${DERIVED_GFA} from step 01b — NOT any GFA from the config.
+# --dedup-read-node: lightweight find_mems doesn't dedup graph positions
+# per read; gafpack does it instead. Required for correctness when paired
+# with --lightweight-tags in step 09.
 [ -f "${OUT}.gaf" ] || profile 10_gafpack "$GAFPACK" \
     --gfa "$DERIVED_GFA" \
     --path-pos "${OUT}_path_pos_v2.bin" \
     --seq-id-starts "${OUT}_seq_id_starts.out" \
     --path-names "${BASE}.paths" \
-    --gaf-file-prefix "$OUT"
+    --gaf-file-prefix "$OUT" \
+    --dedup-read-node
 
 # === Validation =============================================================
 echo "=== 11 validate_gaf (n=$VALIDATE_SAMPLE) ==="
