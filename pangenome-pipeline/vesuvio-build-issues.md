@@ -27,7 +27,7 @@ goes sideways.
 The pipeline itself (`run.sh`, the binaries, the configs) is identical across
 both hosts. The divergences are all in the toolchain *around* the pipeline.
 
-## The 11 hurdles, in order encountered
+## The 12 hurdles, in order encountered
 
 Each entry: **(symptom) → (root cause) → (fix in `bootstrap_vesuvio.sh`)**.
 Commits referenced are on branch `vesuvio-bootstrap`.
@@ -385,6 +385,34 @@ needs its tmpdir co-located with its output on Linux. Default-`/tmp` tools
 either need `TMPDIR` overridden or an explicit `--tmpdir` flag. Other common
 offenders: `sort -T`, `sed --temp` (some builds), various bioinformatics
 tools' intermediates.
+
+---
+
+### 12. `gaftools find_path` flag renamed (run.sh step 11)
+
+**Symptom:**
+```
+=== 11 validate_gaf (n=2000) ===
+Running gaftools to get path sequences...
+Failed to run gaftools:
+  gaftools error: unrecognized arguments: --paths_file yeast...gfa
+```
+
+**Root cause:** `scripts/validate_gaf_v2.py` calls
+`gaftools find_path --paths_file ...`. Current gaftools (1.3.x as installed by
+pip into our venv) renamed that to `--paths-file` (underscore → dash). The
+Mac's gaftools install happens to be an older version that still accepts the
+underscore form.
+
+**Fix:** One-character change in `validate_gaf_v2.py:105` —
+`--paths_file` → `--paths-file`.
+
+**Lesson:** Pip-installed Python tools floating to their latest version on
+fresh installs can introduce surface API drift. Pinning gaftools to a specific
+version in the bootstrap (`pip install gaftools==X.Y.Z`) would prevent this,
+but at the cost of locking out upstream fixes. The trade-off here was to
+accept the drift and patch our script — both call sites use the same flag, so
+the change is trivial.
 
 ---
 
