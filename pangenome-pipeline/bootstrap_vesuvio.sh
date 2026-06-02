@@ -293,8 +293,14 @@ fi
 # directory name run.sh expects so $PI_BIN works without further overrides.
 if [ ! -x "$ROOT/$PI_DIR_NAME/bin/find_mems" ]; then
     if [ ! -d "$ROOT/$PI_DIR_NAME/.git" ]; then
-        log "git clone $PI_REPO (branch: $PI_BRANCH) -> $PI_DIR_NAME"
-        git clone --branch "$PI_BRANCH" --single-branch "$PI_REPO" "$ROOT/$PI_DIR_NAME"
+        # --recursive is REQUIRED per docs/getting-started/install-and-build.md.
+        # pangenome-index has a submodule at deps/grlBWT, and its makefile
+        # links against deps/grlBWT/build/libgrlbwt.a (the embedded build),
+        # NOT the top-level ~/grlBWT we built for grlbwt-cli. Without --recursive
+        # the submodule is empty and the make `grlbwt` target fails with
+        # "deps/grlBWT/build: No such file or directory" or similar.
+        log "git clone --recursive $PI_REPO (branch: $PI_BRANCH) -> $PI_DIR_NAME"
+        git clone --recursive --branch "$PI_BRANCH" --single-branch "$PI_REPO" "$ROOT/$PI_DIR_NAME"
     else
         log "git fetch + checkout $PI_DIR_NAME (branch: $PI_BRANCH)"
         git -C "$ROOT/$PI_DIR_NAME" fetch --all --prune
@@ -302,6 +308,10 @@ if [ ! -x "$ROOT/$PI_DIR_NAME/bin/find_mems" ]; then
             || git -C "$ROOT/$PI_DIR_NAME" checkout -b "$PI_BRANCH" "origin/$PI_BRANCH"
         git -C "$ROOT/$PI_DIR_NAME" pull --ff-only origin "$PI_BRANCH" \
             || warn "pull failed on $PI_DIR_NAME/$PI_BRANCH; continuing"
+        # Ensure submodules track the branch's pinned commits (handles the
+        # case where the bootstrap was previously run before --recursive was
+        # added, or where pulling brought in submodule pointer updates).
+        git -C "$ROOT/$PI_DIR_NAME" submodule update --init --recursive
     fi
     ok "$PI_DIR_NAME @ $(git -C "$ROOT/$PI_DIR_NAME" rev-parse --abbrev-ref HEAD) ($(git -C "$ROOT/$PI_DIR_NAME" rev-parse --short HEAD))"
     log "build pangenome-index-latest (slow; pulls deps/grlBWT internally)"
