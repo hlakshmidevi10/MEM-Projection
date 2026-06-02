@@ -313,11 +313,17 @@ fi
 # Only grlbwt-cli is consumed by the pipeline (run.sh step 03). The auxiliary
 # tools (bwt_stats, grlbwt2rle, reverse_bwt, split_runs, grl2plain) are not
 # used. bwt_stats.cpp has a real upstream bug — calls std::sort without
-# #include <algorithm> — that newer libstdc++ (gcc 13+) refuses to fix
-# transitively. Rather than patch the source, we treat the overall `make`
-# failure as non-fatal as long as grlbwt-cli itself got built.
+# #include <algorithm> — not fixed at HEAD. We patch it here so the whole
+# build succeeds cleanly (rather than relying on || true tolerance, which
+# doesn't compose well with downstream consumers that re-invoke make).
 if [ ! -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
     clone_or_update "$GRLBWT_REPO" "grlBWT"
+    # Apply gcc 15 transitive-include patch to bwt_stats.cpp (idempotent).
+    bwt="$ROOT/grlBWT/scripts/bwt_stats.cpp"
+    if [ -f "$bwt" ] && ! grep -q '#include <algorithm>' "$bwt"; then
+        sed -i '1i #include <algorithm>' "$bwt"
+        ok "patched grlBWT/scripts/bwt_stats.cpp: added #include <algorithm>"
+    fi
     log "build grlBWT"
     mkdir -p "$ROOT/grlBWT/build"
     # grlBWT's CMake uses find_package(LibSDSL). FindLibSDSL.cmake hardcodes
@@ -328,15 +334,11 @@ if [ ! -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
     (cd "$ROOT/grlBWT/build" \
         && cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..) \
         || die "grlBWT cmake configure failed"
-    # Don't fail the whole bootstrap if an aux tool's source doesn't compile
-    # under newer gcc; only the grlbwt-cli binary is required downstream.
     (cd "$ROOT/grlBWT/build" && make -j"$JOBS") \
-        || warn "grlBWT make returned non-zero — checking for grlbwt-cli"
-    if [ -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
-        ok "grlBWT built; grlbwt-cli at $ROOT/grlBWT/build/grlbwt-cli (aux tools may be missing — harmless)"
-    else
-        die "grlBWT build failed: grlbwt-cli was not produced (see make output above)"
-    fi
+        || die "grlBWT make failed (see output above)"
+    [ -x "$ROOT/grlBWT/build/grlbwt-cli" ] \
+        || die "grlBWT build did not produce grlbwt-cli"
+    ok "grlBWT built; grlbwt-cli at $ROOT/grlBWT/build/grlbwt-cli"
 else
     ok "grlBWT already built"
 fi
@@ -368,28 +370,48 @@ if [ ! -x "$ROOT/$PI_DIR_NAME/bin/find_mems" ]; then
     fi
     ok "$PI_DIR_NAME @ $(git -C "$ROOT/$PI_DIR_NAME" rev-parse --abbrev-ref HEAD) ($(git -C "$ROOT/$PI_DIR_NAME" rev-parse --short HEAD))"
 
-    # Pre-build the embedded deps/grlBWT. Reason: pangenome-index's makefile
-    # target is literally
+    # Patch the embedded deps/grlBWT for gcc 15 transitive-include strictness.
+    # These bugs are latent on Clang/libc++ (your Mac) because libc++ pulls
+    # the relevant headers in via other includes; libstdc++ stopped doing
+    # that around gcc 13, so each missing #include becomes a hard error.
+    #
+    # Strategy:
+    # (a) bump the cdt submodule pointer from the pin (f09e7fa) to
+    #     dca13c4 "missing header for uint8_t" — upstream fix for
+    #     external/cdt/include/cdt_common.hpp.
+    # (b) sed-patch deps/grlBWT/scripts/bwt_stats.cpp to add <algorithm> —
+    #     not fixed upstream yet.
+    #
+    # Why patch the source instead of tolerating the failure: pangenome-index's
+    # makefile target is literally
     #     grlbwt:
     #         cd deps/grlBWT/build && cmake .. && make
-    # The `cmake ..` part works because deps/grlBWT/cmake/Modules/FindLibSDSL.cmake
-    # hardcodes $HOME/include and $HOME/lib as search paths (which is why we
-    # set PREFIX=$HOME at the top of this script). But the `make` part will
-    # fail on the bwt_stats aux tool under gcc 15 (missing <algorithm>
-    # include), aborting the whole pangenome-index build before find_mems
-    # gets linked. So we run the steps ourselves and tolerate aux-tool
-    # failures as long as libgrlbwt.a is produced.
-    if [ ! -f "$ROOT/$PI_DIR_NAME/deps/grlBWT/build/libgrlbwt.a" ]; then
-        log "pre-build embedded deps/grlBWT (tolerating aux-tool gcc 15 failures)"
-        mkdir -p "$ROOT/$PI_DIR_NAME/deps/grlBWT/build"
-        (cd "$ROOT/$PI_DIR_NAME/deps/grlBWT/build" \
-            && cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..) \
-            || die "embedded deps/grlBWT cmake configure failed"
-        (cd "$ROOT/$PI_DIR_NAME/deps/grlBWT/build" && make -j"$JOBS") \
-            || warn "embedded deps/grlBWT make returned non-zero — checking libgrlbwt.a"
-        [ -f "$ROOT/$PI_DIR_NAME/deps/grlBWT/build/libgrlbwt.a" ] \
-            || die "embedded deps/grlBWT build failed: libgrlbwt.a not produced"
-        ok "embedded deps/grlBWT: libgrlbwt.a built"
+    # It re-runs `make` on every invocation, has no failure tolerance, and
+    # aborts the whole pangenome-index build before find_mems gets linked.
+    # We can't wrap it; we have to make it actually succeed.
+    log "apply gcc 15 transitive-include patches to deps/grlBWT"
+    (
+        cd "$ROOT/$PI_DIR_NAME/deps/grlBWT"
+        # (a) Submodule pointer bump: only if HEAD predates dca13c4.
+        if ! git merge-base --is-ancestor dca13c4 HEAD 2>/dev/null; then
+            git fetch --quiet origin
+            git checkout dca13c4 2>/dev/null \
+                || warn "could not check out dca13c4 in deps/grlBWT — proceeding"
+        fi
+        # (b) Source patch: idempotent (skips if already present).
+        bwt="scripts/bwt_stats.cpp"
+        if [ -f "$bwt" ] && ! grep -q '#include <algorithm>' "$bwt"; then
+            sed -i '1i #include <algorithm>' "$bwt"
+            ok "patched $bwt: added #include <algorithm>"
+        fi
+    )
+
+    # Nuke any stale build dir from a previous failed run — cmake caches
+    # the partial config and won't pick up the source patches above.
+    if [ -d "$ROOT/$PI_DIR_NAME/deps/grlBWT/build" ] \
+       && [ ! -f "$ROOT/$PI_DIR_NAME/deps/grlBWT/build/libgrlbwt.a" ]; then
+        log "remove stale deps/grlBWT/build from prior failed run"
+        rm -rf "$ROOT/$PI_DIR_NAME/deps/grlBWT/build"
     fi
 
     log "build pangenome-index-latest"
