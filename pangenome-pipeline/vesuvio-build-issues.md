@@ -27,7 +27,7 @@ goes sideways.
 The pipeline itself (`run.sh`, the binaries, the configs) is identical across
 both hosts. The divergences are all in the toolchain *around* the pipeline.
 
-## The 9 hurdles, in order encountered
+## The 10 hurdles, in order encountered
 
 Each entry: **(symptom) → (root cause) → (fix in `bootstrap_vesuvio.sh`)**.
 Commits referenced are on branch `vesuvio-bootstrap`.
@@ -320,6 +320,38 @@ shared libs (openssl, libgomp, lz4, etc).
 Any pip-installed wheel or build-from-source binary that links a Guix-provided
 .so at install time will need this. The fix is universal — always add
 `~/.guix-profile/lib` to LD_LIBRARY_PATH on Guix-based hosts.
+
+---
+
+### 10. `/usr/bin/time` doesn't exist (run.sh step 01)
+
+**Symptom:**
+```
+=== 01 gbz_stats ===
+>>> [01_gbz_stats] .../bin/gbz_stats -i .../yeast235...gbz
+    FAIL (exit 127) — see .../logs/01_gbz_stats.time
+./run.sh: line 118: /usr/bin/time: No such file or directory
+```
+
+**Root cause:** `run.sh` profiles every step with `time(1)` to capture wall +
+RSS into `logs/NN_*.time`. It tried `gtime` first (macOS Homebrew), fell back
+to `/usr/bin/time`. On bare Debian without `build-essential`, `/usr/bin/time`
+doesn't exist — it's part of the `time` Debian package which isn't installed
+by default.
+
+**Fix:**
+1. `guix install time` provides `~/.guix-profile/bin/time` (GNU time, supports `-v`).
+2. Patched `run.sh` to search candidates by absolute path:
+   ```
+   gtime  →  $HOME/.guix-profile/bin/time  →  /usr/bin/time  →  /usr/local/bin/time
+   ```
+   and probe each for `-v` support. Avoids `command -v time` because bash's
+   built-in `time` keyword shadows it. Aborts with a clear "install GNU time"
+   message if none found.
+
+**Lesson:** "Standard" Unix binaries (`time`, `bc`, `dc`, `xargs`, `column`)
+aren't always present on minimal Debian. Probe by absolute path candidates,
+not `command -v`, since shell built-ins can mask them.
 
 ---
 

@@ -166,7 +166,7 @@ EOF
     libomp-dev libzstd-dev libssl-dev libbz2-dev liblzma-dev liblz4-dev \
     zlib1g-dev \
     autoconf automake libtool gettext m4 \
-    python3 python3-pip curl cargo
+    python3 python3-pip curl cargo time
 EOF
     echo
     echo "--- If you have guix (per-user, no sudo): ---"
@@ -176,7 +176,8 @@ EOF
     autoconf automake libtool gettext m4 \
     zstd zstd:lib openssl bzip2 xz lz4 zlib \
     python python-pip rust rust:cargo \
-    nss-certs                            # CA bundle for cargo's HTTPS fetches
+    nss-certs                          \  # CA bundle for cargo's HTTPS fetches
+    time                                  # GNU time(1), used by run.sh profiling
 
   # Then re-source profile (sets SSL_CERT_FILE/SSL_CERT_DIR after nss-certs):
   GUIX_PROFILE="$HOME/.guix-profile"; . "$GUIX_PROFILE/etc/profile"

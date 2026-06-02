@@ -26,18 +26,40 @@ GBZ_EXTRACT="${GBZ_EXTRACT:-gbz_extract}"
 VG="${VG:-/Users/hlakshmidevi/personal/vg/bin/vg}"
 VALIDATE_GAF="${VALIDATE_GAF:-$MEM_PROJ/scripts/validate_gaf_v2.py}"
 
-# /usr/bin/time -l on some macOS hosts fails with
-#   "time: sysctl kern.clockrate: Operation not permitted"
-# and always exits 1 -- which would make every pipeline step look failed.
-# Prefer GNU time (`gtime`, brew install gnu-time) which reports wall + RSS
-# reliably; fall back to `/usr/bin/time` without -l (no RSS).
-if command -v gtime >/dev/null 2>&1; then
-    TIME="gtime -v"
-    TIME_FLAVOR="gtime"
-else
-    TIME="/usr/bin/time"
+# Pick a `time` binary that supports -v (GNU format) and exposes RSS.
+# macOS:   /usr/bin/time -l unreliable (kern.clockrate sysctl denied on some
+#          hosts); prefer brew's `gtime`.
+# Linux:   /usr/bin/time IS GNU time and supports -v.
+# Guix-on-Debian: /usr/bin/time may not exist at all (no build-essential);
+#                 `guix install time` provides ~/.guix-profile/bin/time.
+# bash's built-in `time` keyword shadows command lookups for "time", so we
+# search by absolute path candidates instead of `command -v time`.
+TIME=""
+TIME_FLAVOR=""
+for candidate in \
+    "$(command -v gtime 2>/dev/null || true)" \
+    "$HOME/.guix-profile/bin/time" \
+    /usr/bin/time \
+    /usr/local/bin/time
+do
+    [ -n "$candidate" ] && [ -x "$candidate" ] || continue
+    # Probe: does it support `-v`?
+    if "$candidate" -v true >/dev/null 2>&1; then
+        TIME="$candidate -v"
+        TIME_FLAVOR="gtime"   # GNU format ("Maximum resident set size (kbytes): N")
+        break
+    fi
+    # Falls through to BSD-style if -v unsupported (last resort, no RSS in output).
+    TIME="$candidate"
     TIME_FLAVOR="bsd"
-fi
+done
+[ -n "$TIME" ] || {
+    echo "ERROR: no usable time(1) binary found. Install GNU time:"
+    echo "  Debian/Ubuntu:  sudo apt-get install time"
+    echo "  Guix:           guix install time"
+    echo "  macOS (Homebrew): brew install gnu-time"
+    exit 1
+}
 
 # ---- Args ------------------------------------------------------------------
 [ $# -ge 1 ] || { echo "Usage: $0 <config.env> [run-tag]"; exit 2; }
