@@ -28,7 +28,14 @@ set -euo pipefail
 
 # ---- Config ----------------------------------------------------------------
 ROOT="${ROOT:-$HOME}"
-PREFIX="${PREFIX:-$HOME/.local}"
+# PREFIX=$HOME (NOT $HOME/.local). This is unusual but required: the embedded
+# deps/grlBWT/cmake/Modules/FindLibSDSL.cmake hardcodes its sdsl search to
+# only "$ENV{HOME}/include" and "$ENV{HOME}/usr/include" — it does NOT honor
+# CMAKE_PREFIX_PATH. Installing sdsl to $HOME/.local works for libhandlegraph
+# (which honors the flag) but breaks pangenome-index's embedded grlBWT build.
+# The working Mac dev env installs to $HOME directly and everything Just
+# Works; we match that. Side effect: ~/include and ~/lib get populated.
+PREFIX="${PREFIX:-$HOME}"
 JOBS="${JOBS:-$(nproc 2>/dev/null || echo 4)}"
 
 # Git remotes (your private forks; SSH would be ssh://git@github.com/…)
@@ -313,14 +320,13 @@ if [ ! -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
     clone_or_update "$GRLBWT_REPO" "grlBWT"
     log "build grlBWT"
     mkdir -p "$ROOT/grlBWT/build"
-    # grlBWT's CMake uses find_package(LibSDSL) — point it at $PREFIX where
-    # we installed sdsl. CMAKE_POLICY_VERSION_MINIMUM=3.5 defends against
-    # CMake 4.x dropping pre-3.5 policy compatibility; harmless for projects
-    # already on ≥3.5.
+    # grlBWT's CMake uses find_package(LibSDSL). FindLibSDSL.cmake hardcodes
+    # $HOME/{include,lib} as a search path (no respect for CMAKE_PREFIX_PATH),
+    # which is why we set PREFIX=$HOME so sdsl ends up where it can be found.
+    # CMAKE_POLICY_VERSION_MINIMUM=3.5 defends against CMake 4.x dropping
+    # pre-3.5 policy compatibility; harmless for projects already on ≥3.5.
     (cd "$ROOT/grlBWT/build" \
-        && cmake -DCMAKE_PREFIX_PATH="$PREFIX" \
-                 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-                 ..) \
+        && cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..) \
         || die "grlBWT cmake configure failed"
     # Don't fail the whole bootstrap if an aux tool's source doesn't compile
     # under newer gcc; only the grlbwt-cli binary is required downstream.
@@ -361,11 +367,36 @@ if [ ! -x "$ROOT/$PI_DIR_NAME/bin/find_mems" ]; then
         git -C "$ROOT/$PI_DIR_NAME" submodule update --init --recursive
     fi
     ok "$PI_DIR_NAME @ $(git -C "$ROOT/$PI_DIR_NAME" rev-parse --abbrev-ref HEAD) ($(git -C "$ROOT/$PI_DIR_NAME" rev-parse --short HEAD))"
-    log "build pangenome-index-latest (slow; pulls deps/grlBWT internally)"
-    # Makefile's INCLUDES uses $(INC_DIR) from sdsl-lite/Make.helper, which
-    # points at $PREFIX/include — where we've already installed gbwt,
-    # gbwtgraph, libhandlegraph, and sdsl. SDSL_DIR is passed explicitly
-    # because the Makefile defaults to ../sdsl-lite (relative path, fragile).
+
+    # Pre-build the embedded deps/grlBWT. Reason: pangenome-index's makefile
+    # target is literally
+    #     grlbwt:
+    #         cd deps/grlBWT/build && cmake .. && make
+    # The `cmake ..` part works because deps/grlBWT/cmake/Modules/FindLibSDSL.cmake
+    # hardcodes $HOME/include and $HOME/lib as search paths (which is why we
+    # set PREFIX=$HOME at the top of this script). But the `make` part will
+    # fail on the bwt_stats aux tool under gcc 15 (missing <algorithm>
+    # include), aborting the whole pangenome-index build before find_mems
+    # gets linked. So we run the steps ourselves and tolerate aux-tool
+    # failures as long as libgrlbwt.a is produced.
+    if [ ! -f "$ROOT/$PI_DIR_NAME/deps/grlBWT/build/libgrlbwt.a" ]; then
+        log "pre-build embedded deps/grlBWT (tolerating aux-tool gcc 15 failures)"
+        mkdir -p "$ROOT/$PI_DIR_NAME/deps/grlBWT/build"
+        (cd "$ROOT/$PI_DIR_NAME/deps/grlBWT/build" \
+            && cmake -DCMAKE_POLICY_VERSION_MINIMUM=3.5 ..) \
+            || die "embedded deps/grlBWT cmake configure failed"
+        (cd "$ROOT/$PI_DIR_NAME/deps/grlBWT/build" && make -j"$JOBS") \
+            || warn "embedded deps/grlBWT make returned non-zero — checking libgrlbwt.a"
+        [ -f "$ROOT/$PI_DIR_NAME/deps/grlBWT/build/libgrlbwt.a" ] \
+            || die "embedded deps/grlBWT build failed: libgrlbwt.a not produced"
+        ok "embedded deps/grlBWT: libgrlbwt.a built"
+    fi
+
+    log "build pangenome-index-latest"
+    # SDSL_DIR points at the sdsl-lite source tree (where Make.helper lives,
+    # which has INC_DIR=$PREFIX/include + LIB_DIR=$PREFIX/lib written by
+    # install.sh). The makefile defaults to ../sdsl-lite (relative path),
+    # which only works if you happen to run make from $ROOT — fragile.
     (cd "$ROOT/$PI_DIR_NAME" && make -j"$JOBS" SDSL_DIR="$ROOT/sdsl-lite")
     ok "pangenome-index-latest built; binaries in $ROOT/$PI_DIR_NAME/bin"
 else
