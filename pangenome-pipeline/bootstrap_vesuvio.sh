@@ -213,7 +213,20 @@ clone_or_update() {
 if [ ! -f "$ROOT/sdsl-lite/lib/libsdsl.a" ]; then
     clone_or_update "$SDSL_REPO" "sdsl-lite"
     log "build sdsl-lite (this is slow, ~5 min)"
-    (cd "$ROOT/sdsl-lite" && ./install.sh "$ROOT/sdsl-lite")
+    # NB: sdsl-lite's CMakeLists.txt declares cmake_minimum_required(2.8.7),
+    # which CMake 4.x refuses to honour ("Compatibility with CMake <3.5 has
+    # been removed"). The escape hatch is -DCMAKE_POLICY_VERSION_MINIMUM=3.5,
+    # which tells cmake "pretend this project asked for 3.5 policies". We
+    # bypass install.sh (3 lines of cmake wrapping) so we can pass that flag.
+    # External_GTest is also pre-3.5 — same flag handles both via
+    # CMAKE_PROJECT_<n>_INCLUDE inheritance.
+    mkdir -p "$ROOT/sdsl-lite/build"
+    (cd "$ROOT/sdsl-lite/build" \
+        && cmake -DCMAKE_INSTALL_PREFIX="$ROOT/sdsl-lite" \
+                 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+                 .. \
+        && make -j"$JOBS" \
+        && make install)
     ok "sdsl-lite installed in-tree at $ROOT/sdsl-lite"
 else
     ok "sdsl-lite already built (lib/libsdsl.a present)"
@@ -235,7 +248,9 @@ if [ ! -f "$PREFIX/lib/libhandlegraph.a" ] && [ ! -f "$PREFIX/lib/libhandlegraph
     log "build + install libhandlegraph to $PREFIX"
     mkdir -p "$ROOT/libhandlegraph/build"
     (cd "$ROOT/libhandlegraph/build" \
-        && cmake -DCMAKE_INSTALL_PREFIX="$PREFIX" .. \
+        && cmake -DCMAKE_INSTALL_PREFIX="$PREFIX" \
+                 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+                 .. \
         && make -j"$JOBS" \
         && make install)
     ok "libhandlegraph installed to $PREFIX"
@@ -265,8 +280,12 @@ if [ ! -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
     log "build grlBWT"
     mkdir -p "$ROOT/grlBWT/build"
     # grlBWT's CMake uses find_package(LibSDSL); point it at our sibling sdsl.
+    # CMAKE_POLICY_VERSION_MINIMUM=3.5 defends against CMake 4.x dropping
+    # pre-3.5 policy compatibility; harmless for projects already on ≥3.5.
     (cd "$ROOT/grlBWT/build" \
-        && cmake -DCMAKE_PREFIX_PATH="$ROOT/sdsl-lite;$PREFIX" .. \
+        && cmake -DCMAKE_PREFIX_PATH="$ROOT/sdsl-lite;$PREFIX" \
+                 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
+                 .. \
         && make -j"$JOBS")
     ok "grlBWT built; grlbwt-cli at $ROOT/grlBWT/build/grlbwt-cli"
 else
