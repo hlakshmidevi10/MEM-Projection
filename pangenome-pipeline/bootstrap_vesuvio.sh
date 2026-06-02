@@ -303,11 +303,16 @@ else
 fi
 
 # ---- 5. grlBWT (provides grlbwt-cli) ---------------------------------------
+# Only grlbwt-cli is consumed by the pipeline (run.sh step 03). The auxiliary
+# tools (bwt_stats, grlbwt2rle, reverse_bwt, split_runs, grl2plain) are not
+# used. bwt_stats.cpp has a real upstream bug — calls std::sort without
+# #include <algorithm> — that newer libstdc++ (gcc 13+) refuses to fix
+# transitively. Rather than patch the source, we treat the overall `make`
+# failure as non-fatal as long as grlbwt-cli itself got built.
 if [ ! -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
     clone_or_update "$GRLBWT_REPO" "grlBWT"
     log "build grlBWT"
     mkdir -p "$ROOT/grlBWT/build"
-    # grlBWT's CMake uses find_package(LibSDSL); point it at our sibling sdsl.
     # grlBWT's CMake uses find_package(LibSDSL) — point it at $PREFIX where
     # we installed sdsl. CMAKE_POLICY_VERSION_MINIMUM=3.5 defends against
     # CMake 4.x dropping pre-3.5 policy compatibility; harmless for projects
@@ -315,9 +320,17 @@ if [ ! -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
     (cd "$ROOT/grlBWT/build" \
         && cmake -DCMAKE_PREFIX_PATH="$PREFIX" \
                  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-                 .. \
-        && make -j"$JOBS")
-    ok "grlBWT built; grlbwt-cli at $ROOT/grlBWT/build/grlbwt-cli"
+                 ..) \
+        || die "grlBWT cmake configure failed"
+    # Don't fail the whole bootstrap if an aux tool's source doesn't compile
+    # under newer gcc; only the grlbwt-cli binary is required downstream.
+    (cd "$ROOT/grlBWT/build" && make -j"$JOBS") \
+        || warn "grlBWT make returned non-zero — checking for grlbwt-cli"
+    if [ -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
+        ok "grlBWT built; grlbwt-cli at $ROOT/grlBWT/build/grlbwt-cli (aux tools may be missing — harmless)"
+    else
+        die "grlBWT build failed: grlbwt-cli was not produced (see make output above)"
+    fi
 else
     ok "grlBWT already built"
 fi
