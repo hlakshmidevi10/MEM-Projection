@@ -514,7 +514,12 @@ cat > "$ENVFILE" <<EOF
 export PREFIX="$PREFIX"
 export CPATH="\$PREFIX/include:\${CPATH:-}"
 export LIBRARY_PATH="\$PREFIX/lib:\${LIBRARY_PATH:-}"
-export LD_LIBRARY_PATH="\$PREFIX/lib:\${LD_LIBRARY_PATH:-}"
+# LD_LIBRARY_PATH includes BOTH \$PREFIX/lib (our installed libhandlegraph.so)
+# AND \$HOME/.guix-profile/lib (zlib, openssl, libgomp, ... that pip-compiled
+# Python extensions and our binaries link against at runtime). The Guix
+# profile lib dir is NOT on the default loader path on Debian-with-Guix,
+# only its bin dir is added to PATH by etc/profile.
+export LD_LIBRARY_PATH="\$PREFIX/lib:\$HOME/.guix-profile/lib:\${LD_LIBRARY_PATH:-}"
 export PKG_CONFIG_PATH="\$PREFIX/lib/pkgconfig:\${PKG_CONFIG_PATH:-}"
 
 # Tool dirs on PATH (mirrors the Mac dev setup's zshrc).

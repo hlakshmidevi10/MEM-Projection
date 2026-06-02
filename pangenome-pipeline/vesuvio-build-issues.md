@@ -27,7 +27,7 @@ goes sideways.
 The pipeline itself (`run.sh`, the binaries, the configs) is identical across
 both hosts. The divergences are all in the toolchain *around* the pipeline.
 
-## The 8 hurdles, in order encountered
+## The 9 hurdles, in order encountered
 
 Each entry: **(symptom) → (root cause) → (fix in `bootstrap_vesuvio.sh`)**.
 Commits referenced are on branch `vesuvio-bootstrap`.
@@ -287,6 +287,42 @@ discover an implicit dependency at every layer.
 
 ---
 
+### 9. `gaftools` (Python venv) couldn't find `libz.so.1` at runtime
+
+**Symptom:**
+```
+$ gaftools
+ImportError: libz.so.1: cannot open shared object file: No such file or directory
+  File ".../site-packages/pysam/__init__.py", line 4, in <module>
+    from pysam.libchtslib import *
+```
+
+**Root cause:** `gaftools` depends on `pysam`, which ships compiled C extensions
+(`libchtslib.so`) linked against zlib's `libz.so.1`. On vesuvio:
+
+- Guix's zlib lives at `~/.guix-profile/lib/libz.so.1`
+- Debian-with-Guix puts `~/.guix-profile/bin` on PATH automatically (via the
+  profile's `etc/profile`) but does NOT add `~/.guix-profile/lib` to the
+  loader's search path
+- pip-installed pysam's `libchtslib.so` has soname dependency on `libz.so.1`
+  with no RPATH, so the dynamic loader can't find it
+
+**Fix:** Extend `LD_LIBRARY_PATH` in the generated `~/.pangenome_env.sh` to
+include `$HOME/.guix-profile/lib` alongside `$PREFIX/lib`:
+```bash
+export LD_LIBRARY_PATH="$PREFIX/lib:$HOME/.guix-profile/lib:$LD_LIBRARY_PATH"
+```
+
+This also defensively covers any future runtime dependencies on Guix-provided
+shared libs (openssl, libgomp, lz4, etc).
+
+**Lesson:** Guix's profile activation script handles PATH but not LD_LIBRARY_PATH.
+Any pip-installed wheel or build-from-source binary that links a Guix-provided
+.so at install time will need this. The fix is universal — always add
+`~/.guix-profile/lib` to LD_LIBRARY_PATH on Guix-based hosts.
+
+---
+
 ## Layout on vesuvio after successful bootstrap
 
 ```
@@ -347,7 +383,7 @@ Most likely culprits, in order of probability on a Guix/Debian host:
 2. **CMake "Compatibility with CMake <X has been removed"** — add `-DCMAKE_POLICY_VERSION_MINIMUM=3.5` to the cmake invocation.
 3. **`find_package(...) NOT found`** — check what paths the `cmake/Modules/Find*.cmake` actually probes (often hardcoded); install into one of those, not `$PREFIX`.
 4. **`fatal error: <some-header>.h: No such file or directory`** — check if that lib's headers actually got installed to `$HOME/include/` (the `cp -r` step in the bootstrap might have missed a subdir).
-5. **`error while loading shared libraries`** — `LD_LIBRARY_PATH=$HOME/lib` and source `~/.pangenome_env.sh`.
+5. **`error while loading shared libraries`** — source `~/.pangenome_env.sh` (sets `LD_LIBRARY_PATH` to include both `$HOME/lib` and `$HOME/.guix-profile/lib`). If still missing, check `find ~/.guix-profile -name 'libNAME.so*'` and prepend that dir.
 6. **Cargo TLS / CA failure** — `guix install nss-certs` and re-source profile.
 7. **Cargo `ToolNotFound: cc`** — `export CC=gcc CXX=g++`.
 8. **`pip: externally-managed-environment`** — use a venv (`python3 -m venv ~/.venvs/<name>`), don't fight PEP 668.
