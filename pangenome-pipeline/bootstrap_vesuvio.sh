@@ -78,19 +78,24 @@ preflight() {
     log "Preflight: checking system tools and headers"
     local missing_bins=() missing_libs=() missing_headers=()
 
-    # Binaries that must be on PATH
+    # Binaries that must be on PATH.
+    # protoc / jansson were on this list when we planned to build vg from source;
+    # vg is now provided externally (apt, conda, or guix) so neither is required.
+    # autopoint is part of gettext on Debian but a separate concept on Guix;
+    # it's only needed by autotools-using deps (none in this script), so dropped.
     local need_bins=(
         gcc g++ make cmake pkg-config git curl tar
-        autoconf automake autopoint libtool m4
+        autoconf automake libtool m4
         python3 pip3
-        protoc           # protobuf-compiler (only needed once we add vg; harmless to require now)
+        cargo            # rust toolchain (Guix: install `rust:cargo`; apt: install rustup)
     )
     for b in "${need_bins[@]}"; do
         command -v "$b" >/dev/null 2>&1 || missing_bins+=("$b")
     done
 
-    # pkg-config libraries (provide --cflags / --libs)
-    local need_pc=(libzstd libcrypto libssl jansson protobuf)
+    # pkg-config libraries (provide --cflags / --libs).
+    # libcrypto/libssl come from openssl; jansson/protobuf dropped (see above).
+    local need_pc=(libzstd libcrypto libssl zlib)
     for p in "${need_pc[@]}"; do
         pkg-config --exists "$p" 2>/dev/null || missing_libs+=("$p")
     done
@@ -101,7 +106,7 @@ preflight() {
 int main(void){return omp_get_max_threads();}
 EOF
     if ! gcc -fopenmp /tmp/_pf_omp.c -o /tmp/_pf_omp 2>/dev/null; then
-        missing_headers+=("OpenMP (libomp-dev or libgomp)")
+        missing_headers+=("OpenMP (libomp-dev on apt; bundled in gcc-toolchain on Guix)")
     fi
     rm -f /tmp/_pf_omp /tmp/_pf_omp.c
 
@@ -132,14 +137,28 @@ EOF
     [ ${#missing_libs[@]}    -gt 0 ] && echo "  Missing .pc libs:  ${missing_libs[*]}"
     [ ${#missing_headers[@]} -gt 0 ] && echo "  Missing headers:   ${missing_headers[*]}"
     echo
-    echo "On Debian 13, ask an admin to:"
+    echo "Pick the install path that matches your environment:"
+    echo
+    echo "--- If you have sudo + apt (Debian/Ubuntu): ---"
     cat <<'EOF'
   sudo apt-get install -y \
     build-essential git cmake pkg-config \
     libomp-dev libzstd-dev libssl-dev libbz2-dev liblzma-dev liblz4-dev \
-    libjansson-dev protobuf-compiler libprotoc-dev libprotobuf-dev \
-    autoconf automake autopoint libtool gettext m4 \
-    python3 python3-pip curl
+    zlib1g-dev \
+    autoconf automake libtool gettext m4 \
+    python3 python3-pip curl cargo
+EOF
+    echo
+    echo "--- If you have guix (per-user, no sudo): ---"
+    cat <<'EOF'
+  guix install \
+    gcc-toolchain make cmake pkg-config coreutils \
+    autoconf automake libtool gettext m4 \
+    zstd zstd:lib openssl bzip2 xz lz4 zlib \
+    python python-pip rust rust:cargo
+
+  # Then re-source profile and retry:
+  GUIX_PROFILE="$HOME/.guix-profile"; . "$GUIX_PROFILE/etc/profile"
 EOF
     exit 1
 }
@@ -312,10 +331,20 @@ else
 fi
 
 # ---- 10. gaftools (Python) -------------------------------------------------
+# On Debian 13 + Python 3.13 (incl. Guix's python), `pip install --user` hits
+# PEP 668 "externally managed environment". The clean answer is a per-tool
+# venv at $HOME/.venvs/gaftools — fully isolated, no system mutation, and the
+# script symlinks its entrypoint into $PREFIX/bin so $PATH discovery still works.
 if ! command -v gaftools >/dev/null 2>&1; then
-    log "pip install --user gaftools"
-    pip3 install --user gaftools
-    ok "gaftools installed: $(command -v gaftools)"
+    GAFTOOLS_VENV="$HOME/.venvs/gaftools"
+    if [ ! -x "$GAFTOOLS_VENV/bin/gaftools" ]; then
+        log "create venv at $GAFTOOLS_VENV and install gaftools"
+        python3 -m venv "$GAFTOOLS_VENV"
+        "$GAFTOOLS_VENV/bin/pip" install --upgrade pip
+        "$GAFTOOLS_VENV/bin/pip" install gaftools
+    fi
+    ln -sf "$GAFTOOLS_VENV/bin/gaftools" "$PREFIX/bin/gaftools"
+    ok "gaftools installed via venv: $PREFIX/bin/gaftools -> $GAFTOOLS_VENV/bin/gaftools"
 else
     ok "gaftools already on PATH: $(command -v gaftools)"
 fi
@@ -340,8 +369,9 @@ export GAFPACK="$ROOT/$GAFPACK_DIR_NAME/target/release/gafpack"
 export GRLBWT="$ROOT/grlBWT/build/grlbwt-cli"
 export GBZ_STATS="$ROOT/gbwtgraph/bin/gbz_stats"
 export GBZ_EXTRACT="$ROOT/gbwtgraph/bin/gbz_extract"
-# VG intentionally unset for now; set after vg is built:
-#   export VG="$ROOT/vg/bin/vg"
+# vg: use whatever's on PATH (Guix profile / apt / source-built).
+# If multiple installs exist, override here with an absolute path.
+export VG="\$(command -v vg)"
 EOF
 
 if ! grep -qs '.pangenome_env.sh' "$HOME/.bashrc" 2>/dev/null; then
