@@ -47,7 +47,13 @@ GAFPACK_REPO="${GAFPACK_REPO:-https://github.com/hlakshmidevi10/gafpack-pvt.git}
 GAFPACK_BRANCH="${GAFPACK_BRANCH:-path-walker}"
 GAFPACK_DIR_NAME="gafpack"
 
-SDSL_REPO="https://github.com/simongog/sdsl-lite.git"
+# vgteam's maintained fork. Matters because (a) simongog/sdsl-lite is
+# abandoned and its libdivsufsort submodule has cmake_minimum_required(2.8.7)
+# which CMake 4.x refuses to build, and (b) the vg ecosystem (gbwtgraph,
+# pangenome-index-latest) is developed/tested against this fork's headers.
+# CMakeLists.txt here declares 3.13, so no -DCMAKE_POLICY_VERSION_MINIMUM
+# escape hatch is needed.
+SDSL_REPO="https://github.com/vgteam/sdsl-lite.git"
 GBWT_REPO="https://github.com/jltsiren/gbwt.git"
 LIBHG_REPO="https://github.com/vgteam/libhandlegraph.git"
 GBWTGRAPH_REPO="https://github.com/jltsiren/gbwtgraph.git"
@@ -213,20 +219,10 @@ clone_or_update() {
 if [ ! -f "$ROOT/sdsl-lite/lib/libsdsl.a" ]; then
     clone_or_update "$SDSL_REPO" "sdsl-lite"
     log "build sdsl-lite (this is slow, ~5 min)"
-    # NB: sdsl-lite's CMakeLists.txt declares cmake_minimum_required(2.8.7),
-    # which CMake 4.x refuses to honour ("Compatibility with CMake <3.5 has
-    # been removed"). The escape hatch is -DCMAKE_POLICY_VERSION_MINIMUM=3.5,
-    # which tells cmake "pretend this project asked for 3.5 policies". We
-    # bypass install.sh (3 lines of cmake wrapping) so we can pass that flag.
-    # External_GTest is also pre-3.5 — same flag handles both via
-    # CMAKE_PROJECT_<n>_INCLUDE inheritance.
-    mkdir -p "$ROOT/sdsl-lite/build"
-    (cd "$ROOT/sdsl-lite/build" \
-        && cmake -DCMAKE_INSTALL_PREFIX="$ROOT/sdsl-lite" \
-                 -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
-                 .. \
-        && make -j"$JOBS" \
-        && make install)
+    # vgteam fork ships install.sh that handles modern CMake; the prior fork
+    # (simongog) required -DCMAKE_POLICY_VERSION_MINIMUM=3.5 because of a
+    # libdivsufsort cmake_minimum_required(2.8.7). vgteam already patched that.
+    (cd "$ROOT/sdsl-lite" && ./install.sh "$ROOT/sdsl-lite")
     ok "sdsl-lite installed in-tree at $ROOT/sdsl-lite"
 else
     ok "sdsl-lite already built (lib/libsdsl.a present)"
@@ -380,6 +376,14 @@ export CPATH="\$PREFIX/include:\${CPATH:-}"
 export LIBRARY_PATH="\$PREFIX/lib:\${LIBRARY_PATH:-}"
 export LD_LIBRARY_PATH="\$PREFIX/lib:\${LD_LIBRARY_PATH:-}"
 export PKG_CONFIG_PATH="\$PREFIX/lib/pkgconfig:\${PKG_CONFIG_PATH:-}"
+
+# Tool dirs on PATH (mirrors the Mac dev setup's zshrc).
+# Lets you call find_mems, gafpack, gbz_stats, grlbwt-cli, vg directly
+# instead of via \$PI_BIN / \$GAFPACK etc.
+export PATH="$ROOT/$PI_DIR_NAME/bin:\$PATH"
+export PATH="$ROOT/$GAFPACK_DIR_NAME/target/release:\$PATH"
+export PATH="$ROOT/grlBWT/build:\$PATH"
+export PATH="$ROOT/gbwtgraph/bin:\$PATH"
 export PATH="\$PREFIX/bin:\$HOME/.local/bin:\$HOME/.cargo/bin:\$PATH"
 
 # Pipeline tool locations (consumed by mem-projection/pangenome-pipeline/run.sh)
