@@ -211,34 +211,65 @@ clone_or_update() {
     fi
 }
 
+# =============================================================================
+# Shared-prefix install layout
+# =============================================================================
+# sdsl-lite, gbwt, gbwtgraph, libhandlegraph all install their headers + .a
+# files into a single prefix ($PREFIX = ~/.local by default). This mirrors how
+# the working Mac dev env is set up (everything under ~/include and ~/lib).
+#
+# Why this matters: gbwtgraph's Makefile sets INCLUDES=-Iinclude -I$(INC_DIR),
+# where $(INC_DIR) comes from sdsl-lite/Make.helper. If gbwt's headers aren't
+# alongside sdsl's in $(INC_DIR), gbwtgraph's compile fails with
+#   fatal error: gbwt/gbwt.h: No such file or directory
+# pangenome-index-latest's Makefile has the same shape.
+#
+# sdsl-lite's install.sh sets INC_DIR=<prefix>/include + LIB_DIR=<prefix>/lib
+# in Make.helper, then every other project that includes Make.helper inherits
+# them. So passing $PREFIX to install.sh wires up the entire chain.
+#
+# gbwt and gbwtgraph have NO `make install` target — we copy include/ + lib/
+# into $PREFIX manually.
+
 # ---- 1. sdsl-lite ----------------------------------------------------------
-# Header-only-ish; install into ~/sdsl-lite itself (its install.sh deposits
-# include/ and lib/ next to the source). pangenome-index-latest and gbwtgraph
-# expect SDSL_DIR=../sdsl-lite (sibling layout), which is what we get because
-# everything lives under $ROOT.
-if [ ! -f "$ROOT/sdsl-lite/lib/libsdsl.a" ]; then
+# install.sh <prefix>:
+#   - builds sdsl + libdivsufsort
+#   - copies headers     -> <prefix>/include/sdsl, <prefix>/include/divsufsort*.h
+#   - copies static libs -> <prefix>/lib/libsdsl.a, libdivsufsort*.a
+#   - writes Make.helper with INC_DIR=<prefix>/include, LIB_DIR=<prefix>/lib
+if [ ! -f "$PREFIX/lib/libsdsl.a" ]; then
     clone_or_update "$SDSL_REPO" "sdsl-lite"
-    log "build sdsl-lite (this is slow, ~5 min)"
-    # vgteam fork ships install.sh that handles modern CMake; the prior fork
-    # (simongog) required -DCMAKE_POLICY_VERSION_MINIMUM=3.5 because of a
-    # libdivsufsort cmake_minimum_required(2.8.7). vgteam already patched that.
-    (cd "$ROOT/sdsl-lite" && ./install.sh "$ROOT/sdsl-lite")
-    ok "sdsl-lite installed in-tree at $ROOT/sdsl-lite"
+    log "build + install sdsl-lite into $PREFIX (this is slow, ~5 min)"
+    # vgteam fork already handles CMake 4.x; no -DCMAKE_POLICY_VERSION_MINIMUM
+    # escape hatch needed (their CMakeLists.txt declares 3.13).
+    (cd "$ROOT/sdsl-lite" && ./install.sh "$PREFIX")
+    ok "sdsl-lite installed to $PREFIX (libsdsl.a, headers, Make.helper)"
 else
-    ok "sdsl-lite already built (lib/libsdsl.a present)"
+    ok "sdsl-lite already installed in $PREFIX"
 fi
 
 # ---- 2. gbwt ---------------------------------------------------------------
-if [ ! -f "$ROOT/gbwt/lib/libgbwt.a" ]; then
+# gbwt has no `install` target. Build with SDSL_DIR pointing at our $PREFIX
+# (it reads Make.helper from there to find INC_DIR/LIB_DIR), then manually
+# copy headers + lib into $PREFIX.
+if [ ! -f "$PREFIX/lib/libgbwt.a" ]; then
     clone_or_update "$GBWT_REPO" "gbwt"
-    log "build gbwt"
-    make -C "$ROOT/gbwt" -j"$JOBS"
-    ok "gbwt built"
+    log "build gbwt (SDSL_DIR=$PREFIX/include/sdsl from Make.helper)"
+    # Trick: sdsl's install.sh dropped Make.helper next to its headers, but
+    # gbwt expects SDSL_DIR to be a *source* tree (it includes Make.helper
+    # via $(SDSL_DIR)/Make.helper). The simplest fix is to keep SDSL_DIR
+    # pointing at the source clone, where Make.helper still lives.
+    make -C "$ROOT/gbwt" -j"$JOBS" SDSL_DIR="$ROOT/sdsl-lite"
+    log "install gbwt headers + lib into $PREFIX"
+    mkdir -p "$PREFIX/include/gbwt" "$PREFIX/lib"
+    cp -r "$ROOT/gbwt/include/gbwt/." "$PREFIX/include/gbwt/"
+    cp    "$ROOT/gbwt/lib/libgbwt.a"  "$PREFIX/lib/"
+    ok "gbwt installed to $PREFIX (libgbwt.a, gbwt/*.h)"
 else
-    ok "gbwt already built"
+    ok "gbwt already installed in $PREFIX"
 fi
 
-# ---- 3. libhandlegraph (installs to $PREFIX) -------------------------------
+# ---- 3. libhandlegraph (cmake-based, has proper install target) ------------
 if [ ! -f "$PREFIX/lib/libhandlegraph.a" ] && [ ! -f "$PREFIX/lib/libhandlegraph.so" ]; then
     clone_or_update "$LIBHG_REPO" "libhandlegraph"
     log "build + install libhandlegraph to $PREFIX"
@@ -254,18 +285,19 @@ else
     ok "libhandlegraph already installed at $PREFIX"
 fi
 
-# Also drop a symlink so things expecting sibling layout (../libhandlegraph)
-# find headers — gbwtgraph & pangenome-index-latest link against the version
-# we just installed, so this is belt-and-suspenders.
-
 # ---- 4. gbwtgraph (provides gbz_stats, gbz_extract, gfa2gbwt) --------------
+# Same no-install-target pattern as gbwt. Build with SDSL_DIR pointing at
+# sdsl source, then copy headers + lib into $PREFIX so pangenome-index-latest
+# can link against them.
 if [ ! -x "$ROOT/gbwtgraph/bin/gbz_stats" ]; then
     clone_or_update "$GBWTGRAPH_REPO" "gbwtgraph"
-    log "build gbwtgraph"
-    # gbwtgraph's Makefile picks up SDSL via ../sdsl-lite/Make.helper and
-    # libgbwt/libhandlegraph via -L../gbwt/lib + $LIBRARY_PATH (for $PREFIX).
-    make -C "$ROOT/gbwtgraph" -j"$JOBS"
-    ok "gbwtgraph built; binaries in $ROOT/gbwtgraph/bin"
+    log "build gbwtgraph (SDSL_DIR=$ROOT/sdsl-lite, gbwt/handlegraph via \$PREFIX)"
+    make -C "$ROOT/gbwtgraph" -j"$JOBS" SDSL_DIR="$ROOT/sdsl-lite"
+    log "install gbwtgraph headers + lib into $PREFIX"
+    mkdir -p "$PREFIX/include/gbwtgraph"
+    cp -r "$ROOT/gbwtgraph/include/gbwtgraph/." "$PREFIX/include/gbwtgraph/"
+    cp    "$ROOT/gbwtgraph/lib/libgbwtgraph.a"  "$PREFIX/lib/"
+    ok "gbwtgraph built + installed; binaries in $ROOT/gbwtgraph/bin"
 else
     ok "gbwtgraph already built"
 fi
@@ -276,10 +308,12 @@ if [ ! -x "$ROOT/grlBWT/build/grlbwt-cli" ]; then
     log "build grlBWT"
     mkdir -p "$ROOT/grlBWT/build"
     # grlBWT's CMake uses find_package(LibSDSL); point it at our sibling sdsl.
-    # CMAKE_POLICY_VERSION_MINIMUM=3.5 defends against CMake 4.x dropping
-    # pre-3.5 policy compatibility; harmless for projects already on ≥3.5.
+    # grlBWT's CMake uses find_package(LibSDSL) — point it at $PREFIX where
+    # we installed sdsl. CMAKE_POLICY_VERSION_MINIMUM=3.5 defends against
+    # CMake 4.x dropping pre-3.5 policy compatibility; harmless for projects
+    # already on ≥3.5.
     (cd "$ROOT/grlBWT/build" \
-        && cmake -DCMAKE_PREFIX_PATH="$ROOT/sdsl-lite;$PREFIX" \
+        && cmake -DCMAKE_PREFIX_PATH="$PREFIX" \
                  -DCMAKE_POLICY_VERSION_MINIMUM=3.5 \
                  .. \
         && make -j"$JOBS")
@@ -315,12 +349,11 @@ if [ ! -x "$ROOT/$PI_DIR_NAME/bin/find_mems" ]; then
     fi
     ok "$PI_DIR_NAME @ $(git -C "$ROOT/$PI_DIR_NAME" rev-parse --abbrev-ref HEAD) ($(git -C "$ROOT/$PI_DIR_NAME" rev-parse --short HEAD))"
     log "build pangenome-index-latest (slow; pulls deps/grlBWT internally)"
-    # Makefile expects sibling sdsl-lite, gbwt (already at $ROOT). It also
-    # links -lgbwtgraph from $LIBRARY_PATH; export it explicitly for safety.
-    (cd "$ROOT/$PI_DIR_NAME" \
-        && LIBRARY_PATH="$ROOT/gbwtgraph/lib:$ROOT/gbwt/lib:$LIBRARY_PATH" \
-           CPATH="$ROOT/gbwtgraph/include:$ROOT/gbwt/include:$CPATH" \
-           make -j"$JOBS")
+    # Makefile's INCLUDES uses $(INC_DIR) from sdsl-lite/Make.helper, which
+    # points at $PREFIX/include — where we've already installed gbwt,
+    # gbwtgraph, libhandlegraph, and sdsl. SDSL_DIR is passed explicitly
+    # because the Makefile defaults to ../sdsl-lite (relative path, fragile).
+    (cd "$ROOT/$PI_DIR_NAME" && make -j"$JOBS" SDSL_DIR="$ROOT/sdsl-lite")
     ok "pangenome-index-latest built; binaries in $ROOT/$PI_DIR_NAME/bin"
 else
     ok "pangenome-index-latest already built"
