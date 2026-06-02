@@ -137,23 +137,12 @@ EOF
         || missing_headers+=("C++17 (g++ >=9)")
     rm -f /tmp/_pf_cxx /tmp/_pf_cxx.cpp
 
-    # TLS / CA certificates check: cargo fetches crates from crates.io over
-    # HTTPS during gafpack build. Guix doesn't bundle CA certs in the base
-    # profile — without `guix install nss-certs`, cargo fails with
-    # "server certificate verification failed. CAfile: none CRLfile: none".
-    # Probe by trying to hit a known-good HTTPS endpoint with curl.
-    if ! curl -sSf --max-time 5 https://crates.io/ -o /dev/null 2>/dev/null; then
-        # Try with explicit Debian CA bundle as a fallback test, to distinguish
-        # "no certs anywhere" from "certs exist but no env var pointing at them".
-        if [ -f /etc/ssl/certs/ca-certificates.crt ] \
-            && curl -sSf --max-time 5 \
-                --cacert /etc/ssl/certs/ca-certificates.crt \
-                https://crates.io/ -o /dev/null 2>/dev/null; then
-            missing_headers+=("CA certs (system bundle exists but SSL_CERT_FILE unset — see install hint)")
-        else
-            missing_headers+=("CA certificates (no working bundle — install nss-certs)")
-        fi
-    fi
+    # NB: CA certificate availability is only required for cargo's first-time
+    # crate fetch (gafpack step). It's checked inline in step 8 instead of
+    # here, because (a) the system-curl probe is unreliable when SSL_CERT_FILE
+    # is unset but openssl has a working compiled-in default, and (b) failing
+    # preflight on missing CA certs would block users re-running the bootstrap
+    # after gafpack is already built (when no further HTTPS fetches happen).
 
     if [ ${#missing_bins[@]}    -eq 0 ] \
     && [ ${#missing_libs[@]}    -eq 0 ] \
@@ -466,6 +455,21 @@ fi
 # hosts where /usr/bin/cc exists.
 if [ ! -x "$ROOT/$GAFPACK_DIR_NAME/target/release/gafpack" ]; then
     clone_or_update "$GAFPACK_REPO" "$GAFPACK_DIR_NAME" "$GAFPACK_BRANCH"
+
+    # CA cert check — cargo fetches from crates.io over HTTPS for first-time
+    # builds. Only checked here because subsequent re-runs (offline cache hit)
+    # don't need certs. cargo uses libgit2's TLS, which probes a different
+    # default cert location than curl, so the truest test is `cargo search`
+    # (lightweight — hits crates.io index without downloading anything).
+    log "verify TLS / CA bundle (cargo needs HTTPS to crates.io)"
+    if ! (cd "$ROOT/$GAFPACK_DIR_NAME" && cargo search --limit 1 anyhow >/dev/null 2>&1); then
+        echo "  cargo HTTPS fetch failed. Most likely cause on Guix: no CA bundle."
+        echo "  Fix: guix install nss-certs"
+        echo "       GUIX_PROFILE=\"\$HOME/.guix-profile\"; . \"\$GUIX_PROFILE/etc/profile\""
+        echo "       Then re-run the bootstrap."
+        die "no working CA bundle for cargo HTTPS"
+    fi
+
     log "cargo build --release gafpack (CC=gcc CXX=g++)"
     (cd "$ROOT/$GAFPACK_DIR_NAME" \
         && CC="${CC:-gcc}" CXX="${CXX:-g++}" cargo build --release)
