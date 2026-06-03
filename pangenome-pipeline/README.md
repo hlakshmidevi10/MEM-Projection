@@ -8,12 +8,16 @@ Reproducible, profiled runs of the `pangenome-index` → `gafpack` → `validate
 # Build the index once per dataset (slow: hours on HPRC scale)
 ./build_index.sh yeast235-chrII-normalized.env [index-tag]   # → runs/<index-tag>/
 
-# Query the index (fast: minutes), once per reads set. Default is coverage-only:
+# Query the index (fast: minutes). Default: lightweight pipeline, coverage-only.
 ./query.sh yeast235-chrII-normalized.env <index-tag> [query-name]
-                                                             # → runs/<index-tag>/queries/<query-name>/
+                                # → runs/<index-tag>/queries/<query-name>/lightweight/
 
-# Add --gaf to also produce alignment.gaf and run validate_gaf (test mode):
+# --gaf adds alignment.gaf and runs validate_gaf (test mode)
 ./query.sh yeast235-chrII-normalized.env <index-tag> [query-name] --gaf
+
+# --full-tag uses the non-lightweight pipeline (for A/B regression testing)
+./query.sh yeast235-chrII-normalized.env <index-tag> [query-name] --full-tag
+                                # → runs/<index-tag>/queries/<query-name>/full-tag/
 
 # Compare a query's outputs against a reference
 ./compare.sh yeast235-chrII-normalized.env <index-tag> <query-name> [ref-query-dir]
@@ -23,7 +27,7 @@ Both scripts use `[ -f <output> ]` resume guards — re-running skips any step
 whose output exists. Delete an output to force its step.
 
 See `BUILD_QUERY_LAYOUT.md` for the full directory layout, config contract,
-and the coverage-only vs --gaf mode semantics.
+and the coverage-only/--gaf and lightweight/--full-tag mode semantics.
 
 ## Layout
 
@@ -42,14 +46,17 @@ runs/<index-tag>/                  one dir per index build
   logs/                            01..08b *.log/*.time + timing_summary.txt
   <BASE>.{seq,rl_bwt,ri,tags,_compressed.tags,ltags,paths,gfa}    index artifacts
   queries/<query-name>/            one subdir per query.sh invocation
-    RUN_INFO.txt                   query provenance + index file mtimes
-    config.env -> ...              symlink to the query config
-    reads -> ...                   symlink to the reads file
-    logs/                          09..11 *.log/*.time + timing_summary.txt
-    mems_path_pos_v2.bin           find_mems output (step 09)
-    mems_seq_id_starts.out
-    alignment_coverage.csv         gafpack output (step 10, always)
-    alignment.gaf                  only present with query.sh --gaf
+    lightweight/                   created without --full-tag (default)
+      RUN_INFO.txt                 query provenance, modes, index file mtimes
+      config.env -> ...            symlink to the query config
+      reads -> ...                 symlink to the reads file
+      logs/                        09, 10, [11 with --gaf]; timing_summary.txt
+      mems_path_pos_v2.bin         find_mems output (step 09)
+      mems_seq_id_starts.out
+      alignment_coverage.csv       gafpack output (step 10, always)
+      alignment.gaf                only present with query.sh --gaf
+    full-tag/                      created with --full-tag (A/B / regression)
+      ...same structure, different tag index + gafpack flags...
   FINDINGS.md                      hand-written analysis (when there is one)
 perf/                              performance characterization
   perf_harness.sh                  N-trial timed harness; --compare-v1 for A/B

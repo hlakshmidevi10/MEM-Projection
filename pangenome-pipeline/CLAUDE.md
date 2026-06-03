@@ -5,7 +5,8 @@ Reusable driver for the `pangenome-index-latest` → `gafpack` → `validate_gaf
 
 ```
 build_index.sh               ./build_index.sh <config.env> <index-tag>          → runs/<index-tag>/
-query.sh                     ./query.sh <config.env> <index-tag> [query-name]   → runs/<index-tag>/queries/<query-name>/
+query.sh                     ./query.sh <config.env> <index-tag> [query-name] [--gaf] [--full-tag]
+                                 → runs/<index-tag>/queries/<query-name>/{lightweight,full-tag}/
 compare.sh                   ./compare.sh <config.env> <index-tag> <query-name> [ref-query-dir]
 bootstrap_vesuvio.sh         per-user install of all deps on a fresh Linux host
 configs/*.env                inputs + params (see yeast235-chrII-normalized.env for the contract)
@@ -35,18 +36,19 @@ cd mem-projection/pangenome-pipeline
 # Build the index once (slow)
 ./build_index.sh yeast235-chrII-normalized.env yeast-2026-06-03
 
-# Run queries (each lands in queries/<name>/ — multiple queries don't collide)
-./query.sh yeast235-chrII-normalized.env yeast-2026-06-03
-./query.sh yeast235-chrII-ref-reads.env  yeast-2026-06-03 ref-reads
-./query.sh yeast235-chrII-alt-reads.env  yeast-2026-06-03 alt-reads
+# Run queries (each lands in queries/<name>/<tag-mode>/ — modes don't collide)
+./query.sh yeast235-chrII-normalized.env yeast-2026-06-03                      # default: lightweight + coverage-only
+./query.sh yeast235-chrII-ref-reads.env  yeast-2026-06-03 ref-reads --gaf      # + alignment.gaf + validate
+./query.sh yeast235-chrII-ref-reads.env  yeast-2026-06-03 ref-reads --full-tag # full-tag mode (A/B vs lightweight)
 
 # Compare a query against a reference
 ./compare.sh yeast235-chrII-normalized.env yeast-2026-06-03 normalized
 ```
-- Every step is guarded by `[ -f <out> ]`, so re-invoking resumes after the last completed file. To force a step, delete its output.
-- Per-step `/usr/bin/time -v` → `logs/NN_*.time`; one-line summary in `logs/timing_summary.txt`. Build logs at `runs/<index-tag>/logs/`; query logs at `runs/<index-tag>/queries/<q>/logs/`.
-- `RUN_INFO.txt` at the index level records config, host, date, and pangenome-index commit. `RUN_INFO.txt` at the query level additionally records index file mtimes (so you can spot stale queries if the index was rebuilt).
+- Every step is guarded by `[ -f <out> ]`, so re-invoking resumes after the last completed file. To force a step, delete its output (or `rm -rf` the per-tag-mode subdir).
+- Per-step `/usr/bin/time -v` → `logs/NN_*.time`; one-line summary in `logs/timing_summary.txt`. Build logs at `runs/<index-tag>/logs/`; query logs at `runs/<index-tag>/queries/<q>/<tag-mode>/logs/`.
+- `RUN_INFO.txt` at the index level records config, host, date, and pangenome-index commit. `RUN_INFO.txt` at the query level additionally records tag mode, GAF mode, and index file mtimes (so you can spot stale queries if the index was rebuilt).
 - New dataset: copy a config under `configs/`, set `GBZ`, `BASE`, `READS`, and the pipeline parameters. `OUT` is no longer needed (per-query subdir name replaces it). `GFA` is deprecated (derived in step 01b).
+- Two query mode axes: `--gaf` controls output (coverage-only by default; `--gaf` adds alignment.gaf + step 11 validation), `--full-tag` controls the tag index (lightweight by default; `--full-tag` uses the older non-lite pipeline for A/B comparisons).
 
 ## Pipeline shape & file roles
 | Step | Tool | In | Out | Notes |

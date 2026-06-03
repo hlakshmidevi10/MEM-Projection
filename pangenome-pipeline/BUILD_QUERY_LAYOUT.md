@@ -4,18 +4,25 @@ The pipeline is split into two scripts so the expensive **index build** is
 separated from the cheap **per-query projection**:
 
 ```
-build_index.sh <config.env> <index-tag>                    → runs/<index-tag>/
-query.sh       <config.env> <index-tag> [query-name]       → runs/<index-tag>/queries/<query-name>/
-                                                             (coverage-only mode, prod-fast)
-query.sh       <config.env> <index-tag> [query-name] --gaf → same + alignment.gaf + validate_gaf
-                                                             (test mode, includes step 11)
+build_index.sh <config.env> <index-tag>                                    → runs/<index-tag>/
+query.sh       <config.env> <index-tag> [query-name] [--gaf] [--full-tag]
+               → runs/<index-tag>/queries/<query-name>/{lightweight,full-tag}/
 ```
 
 Multiple queries can run against the same index without colliding outputs.
-This document captures the directory layout, config contract, and migration
+Two orthogonal axes of query behavior, both opt-in:
+
+| Flag | Default | Effect |
+|---|---|---|
+| `--gaf` | off (coverage-only) | Add `alignment.gaf` to step 10 output + run step 11 (validate) |
+| `--full-tag` | off (lightweight) | Use `_compressed.tags` + non-deduped gafpack instead of `.ltags` + `--dedup-read-node` |
+
+This doc captures the directory layout, config contract, and migration
 notes from the old `run.sh` flat layout.
 
-## Query modes: coverage-only vs --gaf
+## Query modes
+
+### Coverage-only vs --gaf (output axis)
 
 `query.sh` defaults to **coverage-only** mode: gafpack runs with
 `--coverage-prefix` and produces only `alignment_coverage.csv`. No `.gaf`
@@ -36,6 +43,61 @@ Re-running a query that completed in coverage-only mode with `--gaf` re-runs
 step 10 (cheap — gafpack is fast) to produce the GAF, then runs step 11.
 Re-running with `--gaf` after a previous `--gaf` run is a no-op (both
 existence guards pass).
+
+### Lightweight vs full-tag (tag-index axis)
+
+`query.sh` defaults to the **lightweight** pipeline:
+- `find_mems --lightweight-tags` reads `<BASE>.ltags`
+- `gafpack --dedup-read-node` dedups graph positions per (read_id, read_st, node)
+
+Per `perf/yeast235-chrII/FINDINGS_PERF.md`, this is ~24% faster end-to-end
+than the older non-lightweight pipeline and produces correct results across
+yeast + HPRC chr6 ref + HPRC chr6 alt (all 100% valid).
+
+Pass `--full-tag` to use the older non-lightweight pipeline:
+- `find_mems` (no `--lightweight-tags`) reads `<BASE>_compressed.tags`
+- `gafpack` (no `--dedup-read-node`) treats every record as a distinct event
+
+Use `--full-tag` for:
+- A/B regression testing — run a query in both modes, compare results
+- Debugging when lightweight mode is suspect
+- Coverage semantics that count per-haplotype duplicates separately (full-tag's
+  `--dedup-read-node`-less mode preserves duplicates as multiple count events)
+
+### Outputs by mode combo
+
+Tag-mode and GAF-mode are orthogonal. Outputs live in `<TAG_MODE>` subdirs
+so the two tag modes never collide:
+
+```
+runs/<index-tag>/queries/<query-name>/
+├── lightweight/                    ← created without --full-tag
+│   ├── mems_path_pos_v2.bin        find_mems lite mode (always)
+│   ├── mems_seq_id_starts.out
+│   ├── alignment_coverage.csv      gafpack --dedup-read-node (always)
+│   ├── alignment.gaf               only with --gaf
+│   ├── logs/                       09, 10, optionally 11
+│   └── RUN_INFO.txt
+└── full-tag/                       ← created with --full-tag
+    ├── mems_path_pos_v2.bin        find_mems non-lite mode
+    ├── mems_seq_id_starts.out
+    ├── alignment_coverage.csv      gafpack without --dedup
+    ├── alignment.gaf               only with --gaf
+    ├── logs/
+    └── RUN_INFO.txt
+```
+
+Each tag-mode subdir is independent — the existence guards for one don't
+affect the other. To do a full A/B:
+
+```bash
+./query.sh hprcv1-chr6-ref-reads.env hprc-chr6-2026-06-02              # → lightweight/
+./query.sh hprcv1-chr6-ref-reads.env hprc-chr6-2026-06-02 --full-tag   # → full-tag/
+
+# Compare coverage CSVs:
+diff queries/ref-reads/lightweight/alignment_coverage.csv \
+     queries/ref-reads/full-tag/alignment_coverage.csv
+```
 
 ---
 
@@ -67,20 +129,22 @@ runs/<index-tag>/                            ← built by build_index.sh
 ├── <BASE>.gfa                               step 01b (DERIVED from GBZ)
 └── queries/                                 ← created by query.sh runs
     ├── <query-name-1>/
-    │   ├── RUN_INFO.txt                     query provenance + mode + index
-    │   │                                    file mtimes (so future-you can spot
-    │   │                                    if the index was rebuilt since)
-    │   ├── config.env -> ../../../../configs/<file>.env
-    │   ├── reads -> /path/to/reads.txt      symlink to the source reads
-    │   ├── logs/
-    │   │   ├── 09_find_mems.{log,time}
-    │   │   ├── 10_gafpack.{log,time}
-    │   │   ├── 11_validate_gaf.{log,time}   only present with --gaf
-    │   │   └── timing_summary.txt
-    │   ├── mems_path_pos_v2.bin             find_mems binary output (step 09)
-    │   ├── mems_seq_id_starts.out           find_mems sidecar (step 09)
-    │   ├── alignment_coverage.csv           gafpack per-node coverage (step 10)
-    │   └── alignment.gaf                    only present with --gaf
+    │   ├── lightweight/                     ← created without --full-tag (default)
+    │   │   ├── RUN_INFO.txt                 query provenance + modes + index
+    │   │   │                                file mtimes
+    │   │   ├── config.env -> ../../../../../configs/<file>.env
+    │   │   ├── reads -> /path/to/reads.txt
+    │   │   ├── logs/
+    │   │   │   ├── 09_find_mems.{log,time}
+    │   │   │   ├── 10_gafpack.{log,time}
+    │   │   │   ├── 11_validate_gaf.{log,time}   only present with --gaf
+    │   │   │   └── timing_summary.txt
+    │   │   ├── mems_path_pos_v2.bin         find_mems output (step 09)
+    │   │   ├── mems_seq_id_starts.out
+    │   │   ├── alignment_coverage.csv       gafpack per-node coverage (step 10)
+    │   │   └── alignment.gaf                only present with --gaf
+    │   └── full-tag/                        ← created with --full-tag
+    │       └── ...same structure, different tag index + gafpack flags...
     ├── <query-name-2>/                      another query, same layout
     └── ...
 ```

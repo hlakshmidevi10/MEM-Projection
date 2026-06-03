@@ -2,44 +2,52 @@
 # =============================================================================
 # pangenome-index — QUERY driver (steps 09–11)
 #
-# Usage:  ./query.sh <config.env> <index-tag> [query-name] [--gaf]
-#   config.env  — see configs/*.env for the variable contract.
-#                 Must set: BASE, READS, MEM_LEN, MIN_OCC.
-#                 Required only with --gaf: VALIDATE_SAMPLE.
-#                 Ignored:  GBZ (not needed at query time — index already built),
-#                           OUT  (per-query subdir name disambiguates outputs),
-#                           GFA  (uses the derived GFA from build_index.sh).
-#   index-tag   — name of an existing runs/<index-tag>/ produced by build_index.sh.
-#                 Must contain: <BASE>.{ri,ltags,paths,gfa} (last only with --gaf).
-#   query-name  — output subdir under runs/<index-tag>/queries/.
-#                 Default: config filename with `.env` stripped and any leading
-#                 `<dataset>-` prefix removed (e.g. `hprcv1-chr6-ref-reads.env`
-#                 → `ref-reads`). Override to anything if defaults collide.
-#   --gaf       — additionally produce alignment.gaf AND run validate_gaf.
-#                 Without --gaf: gafpack runs in coverage-only mode (default).
-#                 This matches the production deploy pattern where only
-#                 coverage is needed; .gaf + validation are test-only overhead.
+# Usage:  ./query.sh <config.env> <index-tag> [query-name] [--gaf] [--full-tag]
+#   config.env   — see configs/*.env for the variable contract.
+#                  Must set: BASE, READS, MEM_LEN, MIN_OCC.
+#                  Required only with --gaf: VALIDATE_SAMPLE.
+#                  Ignored:  GBZ (not needed at query time — index already built),
+#                            OUT  (per-query subdir name disambiguates outputs),
+#                            GFA  (uses the derived GFA from build_index.sh).
+#   index-tag    — name of an existing runs/<index-tag>/ produced by build_index.sh.
+#                  Default tag-index requirement: <BASE>.{ri,ltags,paths,gfa}.
+#                  With --full-tag:                <BASE>.{ri,_compressed.tags,paths,gfa}.
+#   query-name   — output subdir under runs/<index-tag>/queries/<query-name>/<tag-mode>/.
+#                  Default: config filename with `.env` stripped and any leading
+#                  `<dataset>-` prefix removed (e.g. `hprcv1-chr6-ref-reads.env`
+#                  → `ref-reads`).
+#   --gaf        — additionally produce alignment.gaf AND run validate_gaf.
+#                  Without --gaf: gafpack runs in coverage-only mode (default).
+#                  Production deploys only need coverage; .gaf + validation
+#                  are test-only overhead.
+#   --full-tag   — use the full compressed-tags index (.tags via convert_tags) +
+#                  gafpack without --dedup-read-node, i.e. the pre-lightweight
+#                  pipeline. Default is lightweight (.ltags + --dedup-read-node).
+#                  Outputs of the two modes are written to SEPARATE subdirs
+#                  (queries/<name>/lightweight/ vs queries/<name>/full-tag/) so
+#                  they never collide. Use --full-tag for A/B regression checks
+#                  against the lightweight default.
 #
-# Outputs (default = coverage-only mode, no --gaf):
+# Output layout:
 #   runs/<index-tag>/queries/<query-name>/
-#     mems_path_pos_v2.bin           (09: find_mems --lightweight-tags)
-#     mems_seq_id_starts.out         (09)
-#     alignment_coverage.csv         (10: gafpack --dedup-read-node, no GAF)
-#     logs/09_find_mems.{log,time}
-#     logs/10_gafpack.{log,time}
-#     logs/timing_summary.txt        rebuilt from this query's *.time files
-#     RUN_INFO.txt                   query provenance (incl. index file mtimes)
-#     config.env  -> $CONFIG
-#     reads       -> $READS
-#
-# Additional outputs with --gaf:
-#     alignment.gaf                  (10: gafpack also writes GAF)
-#     logs/11_validate_gaf.{log,time} (11: validate_gaf_v2.py --sample N)
+#   ├── lightweight/                     ← created without --full-tag (default)
+#   │   ├── mems_path_pos_v2.bin         (09: find_mems --lightweight-tags)
+#   │   ├── mems_seq_id_starts.out       (09)
+#   │   ├── alignment_coverage.csv       (10: gafpack --dedup-read-node)
+#   │   ├── alignment.gaf                (10: only with --gaf)
+#   │   ├── logs/09_find_mems.{log,time}
+#   │   ├── logs/10_gafpack.{log,time}
+#   │   ├── logs/11_validate_gaf.{log,time}  (only with --gaf)
+#   │   ├── logs/timing_summary.txt
+#   │   ├── RUN_INFO.txt
+#   │   ├── config.env -> $CONFIG
+#   │   └── reads      -> $READS
+#   └── full-tag/                        ← created with --full-tag
+#       └── ...same structure, different tag index + gafpack flags...
 #
 # Each step is guarded by [ -f <output> ]; re-invocation skips completed steps.
-# Switching modes mid-query (e.g. re-running with --gaf after a coverage-only
-# run) re-runs step 10 to produce the .gaf (gafpack is fast). To force a full
-# re-run: rm the query subdir.
+# Adding --gaf to a previously coverage-only run re-runs step 10 in the SAME
+# mode subdir (gafpack is fast) to produce alignment.gaf, then runs step 11.
 #
 # Validation (step 11, only with --gaf) requires gaftools==1.3.0; pinned by
 # bootstrap_vesuvio.sh.
@@ -78,20 +86,23 @@ done
 }
 
 # ---- Args ------------------------------------------------------------------
-# Accept --gaf anywhere in the arg list. Strip it out, leaving positional args.
+# Accept flags anywhere in the arg list. Strip them out, leaving positionals.
 EMIT_GAF=0
+TAG_MODE="lightweight"   # default; --full-tag flips to "full-tag"
 POSITIONAL=()
 for arg in "$@"; do
     case "$arg" in
-        --gaf) EMIT_GAF=1 ;;
+        --gaf)         EMIT_GAF=1 ;;
+        --full-tag)    TAG_MODE="full-tag" ;;
+        --lightweight) TAG_MODE="lightweight" ;;   # accept for symmetry / explicitness
         --help|-h)
-            sed -n '2,46p' "$0"; exit 0 ;;
+            sed -n '2,56p' "$0"; exit 0 ;;
         *) POSITIONAL+=("$arg") ;;
     esac
 done
 set -- "${POSITIONAL[@]}"
 
-[ $# -ge 2 ] || { echo "Usage: $0 <config.env> <index-tag> [query-name] [--gaf]"; exit 2; }
+[ $# -ge 2 ] || { echo "Usage: $0 <config.env> <index-tag> [query-name] [--gaf] [--full-tag]"; exit 2; }
 CONFIG="$1"
 INDEX_TAG="$2"
 [ -f "$CONFIG" ] || CONFIG="$PIPE_DIR/configs/$CONFIG"
@@ -130,12 +141,21 @@ fi
 # ---- Locate + validate the index dir --------------------------------------
 INDEX_DIR="$PIPE_DIR/runs/$INDEX_TAG"
 [ -d "$INDEX_DIR" ] || { echo "ERROR: index dir not found: $INDEX_DIR (run build_index.sh first)"; exit 1; }
-for f in "${BASE}.ri" "${BASE}.ltags" "${BASE}.paths" "${BASE}.gfa"; do
-    [ -f "$INDEX_DIR/$f" ] || { echo "ERROR: missing index artifact: $INDEX_DIR/$f"; exit 1; }
+
+# Required index files differ by tag mode.
+REQUIRED_INDEX_FILES=("${BASE}.ri" "${BASE}.paths" "${BASE}.gfa")
+case "$TAG_MODE" in
+    lightweight) REQUIRED_INDEX_FILES+=("${BASE}.ltags") ;;
+    full-tag)    REQUIRED_INDEX_FILES+=("${BASE}_compressed.tags") ;;
+esac
+for f in "${REQUIRED_INDEX_FILES[@]}"; do
+    [ -f "$INDEX_DIR/$f" ] || { echo "ERROR: missing index artifact for $TAG_MODE mode: $INDEX_DIR/$f"; exit 1; }
 done
 
 # ---- Set up the per-query dir ---------------------------------------------
-QUERY_DIR="$INDEX_DIR/queries/$QUERY_NAME"
+# Outputs of the two tag modes go to separate subdirs so they never collide.
+# queries/<name>/lightweight/  vs  queries/<name>/full-tag/
+QUERY_DIR="$INDEX_DIR/queries/$QUERY_NAME/$TAG_MODE"
 LOGS="$QUERY_DIR/logs"
 mkdir -p "$LOGS"
 cd "$QUERY_DIR"
@@ -151,11 +171,16 @@ cd "$QUERY_DIR"
     echo "BASE:          $BASE"
     echo "MEM_LEN:       $MEM_LEN"
     echo "MIN_OCC:       $MIN_OCC"
+    if [ "$TAG_MODE" = "lightweight" ]; then
+        echo "Tag mode:      lightweight (find_mems --lightweight-tags, gafpack --dedup-read-node)"
+    else
+        echo "Tag mode:      full-tag (find_mems w/o lightweight, gafpack w/o dedup-read-node)"
+    fi
     if [ "$EMIT_GAF" = "1" ]; then
-        echo "Mode:          --gaf (alignment.gaf produced; validate_gaf runs)"
+        echo "GAF mode:      --gaf (alignment.gaf produced; validate_gaf runs)"
         echo "VALIDATE_SAMPLE: $VALIDATE_SAMPLE"
     else
-        echo "Mode:          coverage-only (no .gaf, no validation)"
+        echo "GAF mode:      coverage-only (no .gaf, no validation)"
     fi
     echo "Started:       $(date)"
     echo "Host:          $(hostname)"
@@ -228,56 +253,79 @@ profile() {
 
 # ---- Index file paths (we cd-ed into QUERY_DIR; reference the INDEX_DIR) --
 RI="$INDEX_DIR/${BASE}.ri"
-LTAGS="$INDEX_DIR/${BASE}.ltags"
 PATHS="$INDEX_DIR/${BASE}.paths"
 GFA="$INDEX_DIR/${BASE}.gfa"
+# Tag index varies by mode: .ltags for lightweight, _compressed.tags for full-tag.
+case "$TAG_MODE" in
+    lightweight) TAG_INDEX="$INDEX_DIR/${BASE}.ltags" ;;
+    full-tag)    TAG_INDEX="$INDEX_DIR/${BASE}_compressed.tags" ;;
+esac
 
 echo "=== Query setup ==="
 echo "  Index:     $INDEX_DIR"
+echo "  Tag mode:  $TAG_MODE  ($(basename "$TAG_INDEX"))"
 echo "  Reads:     $READS ($(du -h "$READS" | cut -f1))"
 echo "  Output:    $QUERY_DIR"
 if [ "$EMIT_GAF" = "1" ]; then
-    echo "  Mode:      --gaf (gafpack writes alignment.gaf; validate_gaf runs)"
+    echo "  GAF mode:  --gaf (gafpack writes alignment.gaf; validate_gaf runs)"
 else
-    echo "  Mode:      coverage-only (no .gaf, no validate; pass --gaf to enable)"
+    echo "  GAF mode:  coverage-only (no .gaf, no validate; pass --gaf to enable)"
 fi
 echo
 
 # === 09 find_mems ===========================================================
-echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, --lightweight-tags) ==="
+# Lightweight mode: passes --lightweight-tags so find_mems reads .ltags and
+# emits one entry per tag run intersecting each MEM (no graph-pos dedup;
+# offloaded to gafpack via --dedup-read-node in step 10).
+# Full-tag mode: omits --lightweight-tags; find_mems reads _compressed.tags
+# and dedups internally (per-haplotype duplicates still counted separately).
+if [ "$TAG_MODE" = "lightweight" ]; then
+    FIND_MEMS_FLAGS=(--lightweight-tags)
+    echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, --lightweight-tags) ==="
+else
+    FIND_MEMS_FLAGS=()
+    echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, full-tag mode) ==="
+fi
 # find_mems writes <prefix>_path_pos_v2.bin and <prefix>_seq_id_starts.out.
 # Using "mems" as the prefix → mems_path_pos_v2.bin, mems_seq_id_starts.out.
 [ -f "mems_path_pos_v2.bin" ] || profile 09_find_mems "$PI_BIN/find_mems" \
-    "$RI" "$LTAGS" "$READS" "$MEM_LEN" "$MIN_OCC" "mems" \
-    --lightweight-tags
+    "$RI" "$TAG_INDEX" "$READS" "$MEM_LEN" "$MIN_OCC" "mems" \
+    "${FIND_MEMS_FLAGS[@]}"
 
 # === 10 gafpack =============================================================
-# Two output modes:
-#   default:  --coverage-prefix alignment   → alignment_coverage.csv only
-#   --gaf:    --gaf-file-prefix alignment   → alignment_coverage.csv + alignment.gaf
+# Two orthogonal axes:
+#   tag mode:  lightweight → gafpack needs --dedup-read-node (find_mems' lite
+#              output contains per-MEM same-node duplicates that gafpack must
+#              dedup; without the flag, coverage counts get inflated)
+#              full-tag   → no --dedup-read-node (find_mems already dedups;
+#              gafpack treats every record as a distinct event)
+#   gaf mode:  --gaf       → --gaf-file-prefix alignment (writes .gaf + cov.csv)
+#              default     → --coverage-prefix alignment (writes cov.csv only)
 #
-# The resume guard differs by mode: coverage-only mode keys on
-# alignment_coverage.csv; --gaf mode keys on alignment.gaf. Switching from
-# coverage-only to --gaf re-runs step 10 (gafpack is fast); switching the
-# other way is a no-op (the .gaf stays put but we don't use it).
+# Resume guards key on the artifact each invocation produces:
+#   coverage-only → alignment_coverage.csv
+#   --gaf         → alignment.gaf
+# Adding --gaf to a previously coverage-only run re-runs step 10 (cheap).
+GAFPACK_FLAGS=(
+    --gfa "$GFA"
+    --path-pos "mems_path_pos_v2.bin"
+    --seq-id-starts "mems_seq_id_starts.out"
+    --path-names "$PATHS"
+)
+if [ "$TAG_MODE" = "lightweight" ]; then
+    GAFPACK_FLAGS+=(--dedup-read-node)
+fi
+
 if [ "$EMIT_GAF" = "1" ]; then
-    echo "=== 10 gafpack (--dedup-read-node + --gaf-file-prefix, with GAF) ==="
+    echo "=== 10 gafpack ($TAG_MODE mode, --gaf-file-prefix) ==="
     [ -f "alignment.gaf" ] || profile 10_gafpack "$GAFPACK" \
-        --gfa "$GFA" \
-        --path-pos "mems_path_pos_v2.bin" \
-        --seq-id-starts "mems_seq_id_starts.out" \
-        --path-names "$PATHS" \
-        --gaf-file-prefix "alignment" \
-        --dedup-read-node
+        "${GAFPACK_FLAGS[@]}" \
+        --gaf-file-prefix "alignment"
 else
-    echo "=== 10 gafpack (--dedup-read-node, coverage-only mode) ==="
+    echo "=== 10 gafpack ($TAG_MODE mode, --coverage-prefix only) ==="
     [ -f "alignment_coverage.csv" ] || profile 10_gafpack "$GAFPACK" \
-        --gfa "$GFA" \
-        --path-pos "mems_path_pos_v2.bin" \
-        --seq-id-starts "mems_seq_id_starts.out" \
-        --path-names "$PATHS" \
-        --coverage-prefix "alignment" \
-        --dedup-read-node
+        "${GAFPACK_FLAGS[@]}" \
+        --coverage-prefix "alignment"
 fi
 
 # === 11 validate_gaf (only with --gaf) ======================================
@@ -299,7 +347,7 @@ ls -lh mems_*.bin mems_*.out alignment.gaf alignment_coverage.csv 2>/dev/null \
     | awk '{printf "  %-40s %8s\n", $NF, $5}'
 if [ "$EMIT_GAF" = "0" ]; then
     echo
-    echo "Coverage-only mode — no .gaf, no validation."
+    echo "Coverage-only mode (tag=$TAG_MODE) — no .gaf, no validation."
     echo "To get the .gaf and validate: re-run with --gaf"
 fi
 echo
