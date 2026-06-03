@@ -24,10 +24,17 @@ goes sideways.
 | Python pip | tolerates `pip install --user` | PEP 668: must use a venv |
 | CMake | older 3.x (whatever was installed) | Guix CMake 4.1.3 (dropped pre-3.5 policies) |
 
-The pipeline itself (`run.sh`, the binaries, the configs) is identical across
+The pipeline itself (`build_index.sh` + `query.sh`, the binaries, the configs) is identical across
 both hosts. The divergences are all in the toolchain *around* the pipeline.
 
 ## The 12 hurdles, in order encountered
+
+> **Note for future readers:** Hurdles 10-12 reference `run.sh`, which was the
+> monolithic pipeline driver in use when these issues were debugged. Since
+> superseded by `build_index.sh` + `query.sh` (see `BUILD_QUERY_LAYOUT.md`).
+> The fixes applied to `run.sh` carry over to both new scripts verbatim — the
+> `time(1)` detection, `grlbwt-cli -T` tmpdir, and gaftools-1.3.0 pin all live
+> in both `build_index.sh` and `query.sh` now.
 
 Each entry: **(symptom) → (root cause) → (fix in `bootstrap_vesuvio.sh`)**.
 Commits referenced are on branch `vesuvio-bootstrap`.
@@ -454,10 +461,10 @@ fast, pin and bump deliberately.
 ├── grlBWT/                             → build/grlbwt-cli
 ├── pangenome-index-latest/             → bin/{find_mems, build_tags, ...}  (14 binaries)
 ├── gafpack/                            → target/release/gafpack
-└── mem-projection/                     → the pipeline repo (run.sh lives here)
+└── mem-projection/                     → the pipeline repo (build_index.sh + query.sh)
 ```
 
-`run.sh` requires no edits; the env vars in `~/.pangenome_env.sh` override
+`build_index.sh` and `query.sh` require no edits; the env vars in `~/.pangenome_env.sh` override
 its Mac-path defaults.
 
 ## Commits implementing all fixes

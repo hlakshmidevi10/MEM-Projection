@@ -1,33 +1,43 @@
 # pangenome-pipeline — agent guide
 
 ## What this directory is
-Reusable driver for the `pangenome-index-latest` → `gafpack` → `validate_gaf` workflow. One config file per input dataset; one subdir under `runs/` per execution.
+Reusable driver for the `pangenome-index-latest` → `gafpack` → `validate_gaf` workflow. Bifurcated into expensive **index build** (steps 01–08b) and cheap **per-query projection** (steps 09–11), with per-query subdirs under one shared index.
 
 ```
-run.sh                       ./run.sh <config.env> [tag]   → runs/<tag>/
-compare.sh                   ./compare.sh <config.env> <tag> [ref-dir]
+build_index.sh               ./build_index.sh <config.env> <index-tag>          → runs/<index-tag>/
+query.sh                     ./query.sh <config.env> <index-tag> [query-name]   → runs/<index-tag>/queries/<query-name>/
+compare.sh                   ./compare.sh <config.env> <index-tag> <query-name> [ref-query-dir]
 bootstrap_vesuvio.sh         per-user install of all deps on a fresh Linux host
 configs/*.env                inputs + params (see yeast235-chrII-normalized.env for the contract)
-runs/<tag>/                  all artifacts + logs/ + RUN_INFO.txt + FINDINGS.md
+runs/<index-tag>/            one shared index per build; queries/<q>/ per query
+BUILD_QUERY_LAYOUT.md        full directory + config contract documentation
 vesuvio-build-issues.md      field notes on porting to Guix-on-Debian — read before debugging build failures on a non-Mac host
 ```
 
 ## Correctness criterion
-**A run is correct iff its sorted `.gaf` line set matches a known-good reference, and `validate_gaf_v2.py` reports ≥99.9% valid on the sample.** The yeast-235 baseline carries ~0.02% pre-existing invalid entries (gafpack path-walk edge cases), so a random 2000-sample will occasionally show 0–3 invalid on a correct run; treat that as noise unless the rate climbs.
+**A query is correct iff its sorted `.gaf` line set matches a known-good reference, and `validate_gaf_v2.py` reports ≥99.9% valid on the sample.** The yeast-235 baseline carries ~0.02% pre-existing invalid entries (gafpack path-walk edge cases), so a random 2000-sample will occasionally show 0–3 invalid on a correct run; treat that as noise unless the rate climbs.
 
-`.ri` / `_compressed.tags` / `_path_pos_v2.bin` / `.gaf` / `_coverage.csv` will NOT md5-match `final_output2/` — encoding and row order have changed (and the binary record format itself differs from the v1 24-byte layout that `final_output2` was built against). Only `.seq` / `.rl_bwt` / `.tags` / `.paths` / `_seq_id_starts.out` are byte-stable. `compare.sh` does a sorted line-set diff for `.gaf` / `_coverage.csv`; SET-EQUAL there is the pass signal.
+Index files (`.ri` / `_compressed.tags` / `.ltags` / `.gfa`) and query outputs (`mems_path_pos_v2.bin` / `alignment.gaf` / `alignment_coverage.csv`) will NOT md5-match `final_output2/` — encoding and row order have changed (and the binary record format itself differs from the v1 24-byte layout that `final_output2` was built against). Only `.seq` / `.rl_bwt` / `.tags` / `.paths` / `mems_seq_id_starts.out` are byte-stable. `compare.sh` does a sorted line-set diff for `alignment.gaf` / `alignment_coverage.csv`; SET-EQUAL there is the pass signal.
 
 ## Running
 ```bash
 cd mem-projection/pangenome-pipeline
-./run.sh yeast235-chrII-normalized.env            # → runs/<today>/
-./run.sh yeast235-chrII-normalized.env my-tag     # → runs/my-tag/
-./compare.sh yeast235-chrII-normalized.env my-tag # md5/size vs $REF_DIR
+
+# Build the index once (slow)
+./build_index.sh yeast235-chrII-normalized.env yeast-2026-06-03
+
+# Run queries (each lands in queries/<name>/ — multiple queries don't collide)
+./query.sh yeast235-chrII-normalized.env yeast-2026-06-03
+./query.sh yeast235-chrII-ref-reads.env  yeast-2026-06-03 ref-reads
+./query.sh yeast235-chrII-alt-reads.env  yeast-2026-06-03 alt-reads
+
+# Compare a query against a reference
+./compare.sh yeast235-chrII-normalized.env yeast-2026-06-03 normalized
 ```
-- Every build step is guarded by `[ -f <out> ]`, so re-invoking resumes after the last completed file. To force a step, delete its output.
-- Per-step `/usr/bin/time -l` → `runs/<tag>/logs/NN_*.time`; one-line summary in `logs/timing_summary.txt`.
-- `runs/<tag>/RUN_INFO.txt` records config path, host, date, and `pangenome-index-latest` commit.
-- New dataset: copy a config under `configs/`, point `GBZ/GFA/READS`, adjust `BASE/OUT`.
+- Every step is guarded by `[ -f <out> ]`, so re-invoking resumes after the last completed file. To force a step, delete its output.
+- Per-step `/usr/bin/time -v` → `logs/NN_*.time`; one-line summary in `logs/timing_summary.txt`. Build logs at `runs/<index-tag>/logs/`; query logs at `runs/<index-tag>/queries/<q>/logs/`.
+- `RUN_INFO.txt` at the index level records config, host, date, and pangenome-index commit. `RUN_INFO.txt` at the query level additionally records index file mtimes (so you can spot stale queries if the index was rebuilt).
+- New dataset: copy a config under `configs/`, set `GBZ`, `BASE`, `READS`, and the pipeline parameters. `OUT` is no longer needed (per-query subdir name replaces it). `GFA` is deprecated (derived in step 01b).
 
 ## Pipeline shape & file roles
 | Step | Tool | In | Out | Notes |
@@ -65,10 +75,10 @@ See `PLAN_find_mems_binary_io_v2.md` for the design + correctness gates; `runs/v
 Baseline numbers for comparison live in `$REF_DIR/PERFORMANCE_COMPARISON.md` (use the *normalized-graph* column).
 
 ## Known footguns
-- **`convert_tags` without `--num-seq` silently produces a misaligned index.** It always strips endmarker runs (`Skipping pure endmarker run` in the log) and only re-prepends them if `--num-seq` is given. Without it, `bwt_intervals` is short by `NUM_SEQ`, every BWT-position→tag-run lookup is offset, and `find_mems` emits `(seq_id, node_id)` pairs where the node isn't on that seq's path. `run.sh` derives `NUM_SEQ` from `gbz_stats` output. Sanity check: `convert_tags` log should report `bwt_intervals size == n+1` where `n` = `.seq` byte length.
+- **`convert_tags` without `--num-seq` silently produces a misaligned index.** It always strips endmarker runs (`Skipping pure endmarker run` in the log) and only re-prepends them if `--num-seq` is given. Without it, `bwt_intervals` is short by `NUM_SEQ`, every BWT-position→tag-run lookup is offset, and `find_mems` emits `(seq_id, node_id)` pairs where the node isn't on that seq's path. `build_index.sh` derives `NUM_SEQ` from `gbz_stats` output. Sanity check: `convert_tags` log should report `bwt_intervals size == n+1` where `n` = `.seq` byte length.
 - **`gafpack` v1 infinite-loops on bad input.** `process_path_matches` on the `path-walker` branch had a `loop {}` that only exits when every record's `node_id` is found on its path's step list. v2 replaces this with a monotonic step cursor — no implicit unbounded loop possible. Footgun is **gone** as of v2.
 - **`build_tags` k-mer arg is `-k K`**, not positional. The legacy `final_output2` script passed it positionally; the current binary silently ignores trailing args.
-- **macOS `/usr/bin/time -l`** fails on some hosts with `sysctl kern.clockrate: Operation not permitted` and always exits 1. `run.sh` auto-detects and prefers `gtime` (brew install gnu-time) which is reliable. Without either, RSS metrics will be 0 in the summary but the pipeline still runs.
+- **macOS `/usr/bin/time -l`** fails on some hosts with `sysctl kern.clockrate: Operation not permitted` and always exits 1. `build_index.sh` and `query.sh` auto-detect and prefer `gtime` (brew install gnu-time) which is reliable. Without either, RSS metrics will be 0 in the summary but the pipeline still runs.
 - **GAF set-equality (not just validate_gaf percentage) is the first thing to check after any find_mems/gafpack change.** `validate_gaf_v2.py --sample N` counts how many *present* GAF rows are valid; it cannot detect silently *dropped* rows. v2 plan iteration 0 had this exact bug — 100% validate but 1.4M missing rows. Always run `diff <(sort old.gaf) <(sort new.gaf) | wc -l` against a known-good baseline before declaring success.
 
 ## Quick triage when validation fails
