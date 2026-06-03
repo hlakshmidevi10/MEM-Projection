@@ -15,7 +15,16 @@ vesuvio-build-issues.md      field notes on porting to Guix-on-Debian — read b
 ```
 
 ## Correctness criterion
-**A query is correct iff its sorted `.gaf` line set matches a known-good reference, and `validate_gaf_v2.py` reports ≥99.9% valid on the sample.** The yeast-235 baseline carries ~0.02% pre-existing invalid entries (gafpack path-walk edge cases), so a random 2000-sample will occasionally show 0–3 invalid on a correct run; treat that as noise unless the rate climbs.
+**A query is correct iff its sorted `.gaf` line set matches a known-good reference, and `validate_gaf_v2.py` reports 100% valid on the sample.** `validate_gaf_v2.py` checks that every sampled GAF entry's `(read_id, read_st, match_len, node_id, offset)` actually corresponds to a real substring match between the read and the path the GAF claims — there is no biological reason for a correctly-built pipeline to ever produce an invalid entry. Any `Invalid > 0` indicates a real bug somewhere in the build_index/query chain (commonly: stale tag index, GBZ ↔ GFA node-ID mismatch, off-by-one in convert_tags), NOT noise.
+
+Verified clean runs:
+- yeast-235 chrII normalized: **2000/2000 valid** (100%)
+- HPRC chr6 ref (grch38#1#chr6#0 reads): **2000/2000 valid** (100%)
+- HPRC chr6 alt (HG00438#2#JAHBCA010000010.1#0 reads): **2000/2000 valid** (100%)
+
+> Earlier (pre-lightweight-tags) runs occasionally showed 1–3 invalid in a 2000-sample, attributed at the time to gafpack v1 path-walker edge cases. That tolerance is obsolete now — the lightweight pipeline (build_lightweight_tags + find_mems --lightweight-tags + gafpack --dedup-read-node) has zero observed false-positive entries across all our HPRC-scale runs. Anything <100% is now a bug signal.
+
+> **Note on out-of-graph reads:** the 100% target applies to the *emitted* GAF entries, regardless of where the reads came from. Even when reads come from a haplotype NOT represented in the graph (e.g. HPRCv2 HG002 reads queried against the HPRCv1 graph), find_mems should only emit MEMs that are genuine exact matches — so the validation should still hit 100%. What changes for out-of-graph reads is how *many* entries get emitted (fewer, since fewer ≥MEM_LEN matches exist), and how many reads contribute zero entries at all. Coverage will be sparser, but every reported entry should still be valid.
 
 Index files (`.ri` / `_compressed.tags` / `.ltags` / `.gfa`) and query outputs (`mems_path_pos_v2.bin` / `alignment.gaf` / `alignment_coverage.csv`) will NOT md5-match `final_output2/` — encoding and row order have changed (and the binary record format itself differs from the v1 24-byte layout that `final_output2` was built against). Only `.seq` / `.rl_bwt` / `.tags` / `.paths` / `mems_seq_id_starts.out` are byte-stable. `compare.sh` does a sorted line-set diff for `alignment.gaf` / `alignment_coverage.csv`; SET-EQUAL there is the pass signal.
 
@@ -70,7 +79,9 @@ See `PLAN_find_mems_binary_io_v2.md` for the design + correctness gates; `runs/v
 `validate_gaf_v2.py <gaf> <reads> <gfa> --sample N`:
 1. Loads all GAF entries and reads.
 2. Samples N entries; for each, reconstructs the path sequence via `gaftools` and the GFA, then checks the read substring `[read_st, read_st+match_len)` matches the path sequence at the GAF-specified offset.
-3. Prints `Valid / Invalid / Total`. Anything <100% means a wrong `(seq_id, node_id, offset)` somewhere upstream.
+3. Prints `Valid / Invalid / Total`. **Anything <100% means a wrong `(seq_id, node_id, offset)` somewhere upstream — investigate, don't tolerate.**
+
+Validation is gated behind `query.sh --gaf`; the default (coverage-only) mode skips both GAF generation and validation. Before deploying any new index/binary combination to prod, run a query with `--gaf` at least once and confirm 100% valid.
 
 Baseline numbers for comparison live in `$REF_DIR/PERFORMANCE_COMPARISON.md` (use the *normalized-graph* column).
 
