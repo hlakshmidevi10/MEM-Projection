@@ -19,7 +19,7 @@
 # Expects:
 #   - find_mems with --lightweight-tags support (lightweight-tags branch)
 #   - gafpack  with --dedup-read-node support  (dedup-read-node branch)
-#   - INDEX_DIR contains <BASE>.ltags built via build_lightweight_tags
+#   - INDEX_DIR contains <BASE>.{ri,ltags,paths,gfa} built via build_index.sh
 #
 # Output: same shape as perf_harness.sh (per-trial dirs, SUMMARY.tsv,
 # PROVENANCE.txt, DATASET.md) so summarize.py and table tooling Just Work.
@@ -48,14 +48,33 @@ source "$CONFIG"
 for b in "$PI_BIN/find_mems" "$GAFPACK" "$PI_BIN/build_lightweight_tags"; do
     [ -x "$b" ] || { echo "Missing or non-executable: $b"; exit 1; }
 done
-command -v gtime >/dev/null 2>&1 || { echo "gtime required (brew install gnu-time)"; exit 1; }
+command -v gtime >/dev/null 2>&1 || {
+    if [ -x "$HOME/.guix-profile/bin/time" ]; then
+        gtime() { "$HOME/.guix-profile/bin/time" "$@"; }
+    elif /usr/bin/time -v true 2>/dev/null; then
+        gtime() { /usr/bin/time "$@"; }
+    else
+        echo "gtime required (brew install gnu-time | guix install time | apt-get install time)"
+        exit 1
+    fi
+}
 
-# Pre-built indexes (we don't rebuild; pull from a prior run)
+# Cross-platform helpers
+fsize() { stat -Lc%s "$1" 2>/dev/null || stat -Lf%z "$1" 2>/dev/null; }
+fmd5() {
+    if command -v md5sum >/dev/null 2>&1; then md5sum "$1" | awk '{print $1}'
+    else md5 -q "$1"; fi
+}
+
+# Pre-built index from build_index.sh (we don't rebuild here).
 INDEX_DIR="${INDEX_DIR:-$PIPE_DIR/runs/v1-current}"
-for f in "$INDEX_DIR/${BASE}.ri" "$INDEX_DIR/${BASE}_compressed.tags" "$INDEX_DIR/${BASE}.paths" "$INDEX_DIR/${BASE}.ltags"; do
-    [ -f "$f" ] || { echo "Missing index file: $f"; \
-                     echo "Tip: $PI_BIN/build_lightweight_tags <BASE>_compressed.tags <BASE>.ltags"; \
-                     exit 1; }
+for f in "$INDEX_DIR/${BASE}.ri" "$INDEX_DIR/${BASE}.ltags" "$INDEX_DIR/${BASE}.paths" "$INDEX_DIR/${BASE}.gfa"; do
+    [ -f "$f" ] || {
+        echo "Missing index file: $f"
+        echo "Build the index first: ./build_index.sh <config> $(basename "$INDEX_DIR")"
+        echo "(or set INDEX_DIR to point at a different runs/<index-tag>/)"
+        exit 1
+    }
 done
 
 PERF_DIR="$PIPE_DIR/perf/$TAG"
@@ -85,86 +104,83 @@ gtime_field() {
 run_one_trial() {
     local fmt="$1" trial="$2" tdir="$3" skip_sum="${4:-}"
     mkdir -p "$tdir"
+    cd "$tdir"
 
-    local path_pos_file="${OUT}_path_pos_v2.bin"
+    local path_pos_file="mems_path_pos_v2.bin"
     local rec_size=16
 
-    rm -f "$INDEX_DIR/$path_pos_file" \
-          "$INDEX_DIR/${OUT}_seq_id_starts.out" \
-          "$INDEX_DIR/${OUT}.gaf" \
-          "$INDEX_DIR/${OUT}_coverage.csv"
+    # All outputs land in $tdir; no cross-trial pollution.
+    rm -f "$path_pos_file" mems_seq_id_starts.out alignment.gaf \
+          alignment_coverage.csv raw_coverage.csv
 
     # ---- Phase 1: find_mems --lightweight-tags ----
     echo ">>> [$fmt trial=$trial] find_mems --lightweight-tags"
-    ( cd "$INDEX_DIR" && \
-      gtime -v -o "$tdir/find_mems.time" \
+    gtime -v -o "$tdir/find_mems.time" \
         "$PI_BIN/find_mems" \
-            "${BASE}.ri" "${BASE}.ltags" "$READS" \
-            "$MEM_LEN" "$MIN_OCC" "$OUT" \
+            "$INDEX_DIR/${BASE}.ri" "$INDEX_DIR/${BASE}.ltags" "$READS" \
+            "$MEM_LEN" "$MIN_OCC" "mems" \
             --lightweight-tags \
-        > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr" )
+        > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr"
 
     # ---- Phase 2: gafpack coverage-only WITHOUT dedup (raw lite) ----
-    rm -f "$INDEX_DIR/${OUT}_coverage.csv"
+    rm -f alignment_coverage.csv raw_coverage.csv
     echo ">>> [$fmt trial=$trial] gafpack cov-only (no dedup, RAW LITE)"
-    ( cd "$INDEX_DIR" && \
-      gtime -v -o "$tdir/gafpack_cov_raw.time" \
+    gtime -v -o "$tdir/gafpack_cov_raw.time" \
         "$GAFPACK" \
-            --gfa "$GFA" \
+            --gfa "$INDEX_DIR/${BASE}.gfa" \
             --path-pos "$path_pos_file" \
-            --seq-id-starts "${OUT}_seq_id_starts.out" \
-            --path-names "${BASE}.paths" \
-            --coverage-prefix "${OUT}_raw" \
-        > "$tdir/gafpack_cov_raw.stdout" 2> "$tdir/gafpack_cov_raw.stderr" )
+            --seq-id-starts "mems_seq_id_starts.out" \
+            --path-names "$INDEX_DIR/${BASE}.paths" \
+            --coverage-prefix "raw" \
+        > "$tdir/gafpack_cov_raw.stdout" 2> "$tdir/gafpack_cov_raw.stderr"
 
     # ---- Phase 3: gafpack coverage-only WITH --dedup-read-node ----
-    rm -f "$INDEX_DIR/${OUT}_coverage.csv"
+    rm -f alignment_coverage.csv
     echo ">>> [$fmt trial=$trial] gafpack cov-only (--dedup-read-node)"
-    ( cd "$INDEX_DIR" && \
-      gtime -v -o "$tdir/gafpack_cov_only.time" \
+    gtime -v -o "$tdir/gafpack_cov_only.time" \
         "$GAFPACK" \
-            --gfa "$GFA" \
+            --gfa "$INDEX_DIR/${BASE}.gfa" \
             --path-pos "$path_pos_file" \
-            --seq-id-starts "${OUT}_seq_id_starts.out" \
-            --path-names "${BASE}.paths" \
-            --coverage-prefix "$OUT" \
+            --seq-id-starts "mems_seq_id_starts.out" \
+            --path-names "$INDEX_DIR/${BASE}.paths" \
+            --coverage-prefix "alignment" \
             --dedup-read-node \
-        > "$tdir/gafpack_cov_only.stdout" 2> "$tdir/gafpack_cov_only.stderr" )
+        > "$tdir/gafpack_cov_only.stdout" 2> "$tdir/gafpack_cov_only.stderr"
 
     # ---- Phase 4: gafpack coverage + GAF WITH --dedup-read-node ----
-    rm -f "$INDEX_DIR/${OUT}_coverage.csv" "$INDEX_DIR/${OUT}.gaf"
+    rm -f alignment_coverage.csv alignment.gaf
     echo ">>> [$fmt trial=$trial] gafpack cov+gaf (--dedup-read-node)"
-    ( cd "$INDEX_DIR" && \
-      gtime -v -o "$tdir/gafpack_cov_gaf.time" \
+    gtime -v -o "$tdir/gafpack_cov_gaf.time" \
         "$GAFPACK" \
-            --gfa "$GFA" \
+            --gfa "$INDEX_DIR/${BASE}.gfa" \
             --path-pos "$path_pos_file" \
-            --seq-id-starts "${OUT}_seq_id_starts.out" \
-            --path-names "${BASE}.paths" \
-            --gaf-file-prefix "$OUT" \
+            --seq-id-starts "mems_seq_id_starts.out" \
+            --path-names "$INDEX_DIR/${BASE}.paths" \
+            --gaf-file-prefix "alignment" \
             --dedup-read-node \
-        > "$tdir/gafpack_cov_gaf.stdout" 2> "$tdir/gafpack_cov_gaf.stderr" )
+        > "$tdir/gafpack_cov_gaf.stdout" 2> "$tdir/gafpack_cov_gaf.stderr"
 
     # Per-trial OUTPUT artifact sizes
     {
         echo "# Output sizes after $fmt trial=$trial"
-        for f in "$path_pos_file" "${OUT}_seq_id_starts.out" "${OUT}.gaf" "${OUT}_coverage.csv" "${OUT}_raw_coverage.csv"; do
-            if [ -f "$INDEX_DIR/$f" ]; then
-                printf "%-50s %15s bytes\n" "$f" "$(stat -f%z "$INDEX_DIR/$f")"
+        for f in "$path_pos_file" mems_seq_id_starts.out alignment.gaf \
+                 alignment_coverage.csv raw_coverage.csv; do
+            if [ -f "$f" ]; then
+                printf "%-50s %15s bytes\n" "$f" "$(fsize "$f")"
             fi
         done
-        echo "# .gaf line count:";       wc -l "$INDEX_DIR/${OUT}.gaf"  2>/dev/null
-        echo "# coverage CSV md5:";      md5 -q "$INDEX_DIR/${OUT}_coverage.csv"  2>/dev/null
-        echo "# raw coverage CSV md5:";  md5 -q "$INDEX_DIR/${OUT}_raw_coverage.csv" 2>/dev/null
+        echo "# alignment.gaf line count:";  wc -l alignment.gaf 2>/dev/null
+        echo "# alignment coverage md5:";    fmd5 alignment_coverage.csv 2>/dev/null
+        echo "# raw coverage md5:";          fmd5 raw_coverage.csv 2>/dev/null
     } > "$tdir/sizes.txt"
 
     [ "$skip_sum" = "skip_summary" ] && return 0
 
     local gaf_lines bin_bytes bin_recs cov_md5
-    gaf_lines=$(wc -l < "$INDEX_DIR/${OUT}.gaf" | tr -d ' ')
-    bin_bytes=$(stat -f%z "$INDEX_DIR/$path_pos_file")
+    gaf_lines=$(wc -l < alignment.gaf | tr -d ' ')
+    bin_bytes=$(fsize "$path_pos_file")
     bin_recs=$((bin_bytes / rec_size))
-    cov_md5=$(md5 -q "$INDEX_DIR/${OUT}_coverage.csv")
+    cov_md5=$(fmd5 alignment_coverage.csv)
 
     append_phase_row() {
         local phase="$1" tfile="$2" sfile="$3"
@@ -228,21 +244,21 @@ run_one_trial() {
     echo "  THREADS:    ${THREADS:-?}"
     echo
     echo "Binaries:"
-    printf "  %-8s %s  md5=%s\n" "PI_lite"        "$PI_BIN/find_mems"              "$(md5 -q "$PI_BIN/find_mems")"
-    printf "  %-8s %s  md5=%s\n" "build_ltags"    "$PI_BIN/build_lightweight_tags" "$(md5 -q "$PI_BIN/build_lightweight_tags")"
-    printf "  %-8s %s  md5=%s\n" "GP_dedup"       "$GAFPACK"                       "$(md5 -q "$GAFPACK")"
+    printf "  %-8s %s  md5=%s\n" "PI_lite"        "$PI_BIN/find_mems"              "$(fmd5 "$PI_BIN/find_mems")"
+    printf "  %-8s %s  md5=%s\n" "build_ltags"    "$PI_BIN/build_lightweight_tags" "$(fmd5 "$PI_BIN/build_lightweight_tags")"
+    printf "  %-8s %s  md5=%s\n" "GP_dedup"       "$GAFPACK"                       "$(fmd5 "$GAFPACK")"
     echo
     echo "Input files (sizes captured once; invariant across trials):"
-    for f in "$GBZ" "$GFA" "$READS"; do
-        if [ -f "$f" ]; then
-            printf "  %-32s %15s bytes  %s\n" "$(basename "$f"):" "$(stat -f%z "$f")" "$f"
+    for f in "${GBZ:-}" "${READS:-}"; do
+        if [ -n "$f" ] && [ -f "$f" ]; then
+            printf "  %-32s %15s bytes  %s\n" "$(basename "$f"):" "$(fsize "$f")" "$f"
         fi
     done
     echo
-    echo "Index files in INDEX_DIR (built once via run.sh + build_lightweight_tags):"
-    for f in "${BASE}.seq" "${BASE}.rl_bwt" "${BASE}.ri" "${BASE}.tags" "${BASE}_compressed.tags" "${BASE}.ltags" "${BASE}.paths"; do
+    echo "Index files in INDEX_DIR (built once via build_index.sh):"
+    for f in "${BASE}.seq" "${BASE}.rl_bwt" "${BASE}.ri" "${BASE}.tags" "${BASE}_compressed.tags" "${BASE}.ltags" "${BASE}.paths" "${BASE}.gfa"; do
         if [ -f "$INDEX_DIR/$f" ]; then
-            printf "  %-32s %15s bytes\n" "$f:" "$(stat -f%z "$INDEX_DIR/$f")"
+            printf "  %-32s %15s bytes\n" "$f:" "$(fsize "$INDEX_DIR/$f")"
         fi
     done
 } > "$PERF_DIR/PROVENANCE.txt"

@@ -6,10 +6,13 @@
 # cache. Captures wall, RSS, find_mems' internal phase breakdown, and
 # gafpack's stderr stats per trial. Aggregate with `summarize.py`.
 #
-# Default: profiles the canonical v2 binaries.
+# Default: profiles the canonical v2 binaries (lightweight pipeline matching
+#          query.sh: find_mems --lightweight-tags + gafpack --dedup-read-node).
 # With --compare-v1: also runs the legacy v1 binaries (interleaved v1/v2)
 #                    for A/B regression checks. Requires the v1 binaries to
 #                    have been built and placed at PI_BIN_V1 / GAFPACK_V1.
+#                    v1 binaries use the OLD compressed-tags + no-dedup
+#                    pipeline (non-lightweight).
 #
 # Outputs:
 #   perf/<tag>/<fmt>/trial-{0..N}/
@@ -45,7 +48,7 @@ for arg in "$@"; do
     case "$arg" in
         --compare-v1) COMPARE_V1=1 ;;
         --help|-h)
-            sed -n '2,30p' "$0"; exit 0 ;;
+            sed -n '2,33p' "$0"; exit 0 ;;
         *) POSITIONAL+=("$arg") ;;
     esac
 done
@@ -73,13 +76,40 @@ if [ "$COMPARE_V1" = "1" ]; then
     done
 fi
 
-command -v gtime >/dev/null 2>&1 || { echo "gtime required (brew install gnu-time)"; exit 1; }
+# gtime required for consistent -v output (Linux's /usr/bin/time also works
+# but the existing parser assumes GNU format; gtime is the cross-platform
+# answer that works on macOS without conflict).
+command -v gtime >/dev/null 2>&1 || {
+    if [ -x "$HOME/.guix-profile/bin/time" ]; then
+        gtime() { "$HOME/.guix-profile/bin/time" "$@"; }
+    elif /usr/bin/time -v true 2>/dev/null; then
+        gtime() { /usr/bin/time "$@"; }
+    else
+        echo "gtime required (brew install gnu-time | guix install time | apt-get install time)"
+        exit 1
+    fi
+}
 
-# Pre-built indexes (we don't rebuild; pull from a prior run)
+# Pre-built index — point at the runs/<index-tag>/ from build_index.sh.
+# All required files: BASE.ri, BASE.ltags, BASE.paths, BASE.gfa
 INDEX_DIR="${INDEX_DIR:-$PIPE_DIR/runs/v1-current}"
-for f in "$INDEX_DIR/${BASE}.ri" "$INDEX_DIR/${BASE}_compressed.tags" "$INDEX_DIR/${BASE}.paths"; do
-    [ -f "$f" ] || { echo "Missing index file: $f"; echo "Run ./run.sh <config> v1-current first, or set INDEX_DIR."; exit 1; }
+for f in "$INDEX_DIR/${BASE}.ri" "$INDEX_DIR/${BASE}.ltags" "$INDEX_DIR/${BASE}.paths" "$INDEX_DIR/${BASE}.gfa"; do
+    [ -f "$f" ] || {
+        echo "Missing index file: $f"
+        echo "Build the index first:"
+        echo "  ./build_index.sh <config> $(basename "$INDEX_DIR")"
+        echo "or set INDEX_DIR to a different runs/<index-tag>/"
+        exit 1
+    }
 done
+
+# v1 mode needs the legacy (non-lightweight) tags index too
+if [ "$COMPARE_V1" = "1" ]; then
+    [ -f "$INDEX_DIR/${BASE}_compressed.tags" ] || {
+        echo "Missing $INDEX_DIR/${BASE}_compressed.tags (required by --compare-v1)"
+        exit 1
+    }
+fi
 
 PERF_DIR="$PIPE_DIR/perf/$TAG"
 SUMMARY="$PERF_DIR/SUMMARY.tsv"
@@ -88,6 +118,13 @@ mkdir -p "$PERF_DIR"
 if [ ! -f "$SUMMARY" ]; then
     printf '%s\n' "format	trial	step	wall_s	maxrss_mb	gaf_lines	bin_bytes	bin_records	cov_md5	stderr_warns	gafpack_total_entries" > "$SUMMARY"
 fi
+
+# ---- cross-platform helpers ------------------------------------------------
+fsize() { stat -Lc%s "$1" 2>/dev/null || stat -Lf%z "$1" 2>/dev/null; }
+fmd5() {
+    if command -v md5sum >/dev/null 2>&1; then md5sum "$1" | awk '{print $1}'
+    else md5 -q "$1"; fi
+}
 
 # ---- helpers ----------------------------------------------------------------
 
@@ -99,50 +136,56 @@ fi
 run_one_trial() {
     local fmt="$1" trial="$2" tdir="$3" skip_sum="${4:-}"
     mkdir -p "$tdir"
+    cd "$tdir"
 
-    local pi_bin gafpack_bin path_pos_file rec_size
+    local pi_bin gafpack_bin tag_index path_pos_file rec_size find_mems_extra gafpack_extra
     case "$fmt" in
         v1) pi_bin="$PI_BIN_V1"; gafpack_bin="$GAFPACK_V1"
-            path_pos_file="${OUT}_path_pos.bin";    rec_size=24 ;;
+            tag_index="$INDEX_DIR/${BASE}_compressed.tags"
+            path_pos_file="mems_path_pos.bin"; rec_size=24
+            find_mems_extra=""
+            gafpack_extra="" ;;
         v2) pi_bin="$PI_BIN";    gafpack_bin="$GAFPACK"
-            path_pos_file="${OUT}_path_pos_v2.bin"; rec_size=16 ;;
+            tag_index="$INDEX_DIR/${BASE}.ltags"
+            path_pos_file="mems_path_pos_v2.bin"; rec_size=16
+            find_mems_extra="--lightweight-tags"
+            gafpack_extra="--dedup-read-node" ;;
     esac
 
-    # Delete prior step-09/10 outputs for a clean measurement
-    rm -f "$INDEX_DIR/$path_pos_file" \
-          "$INDEX_DIR/${OUT}_seq_id_starts.out" \
-          "$INDEX_DIR/${OUT}.gaf" \
-          "$INDEX_DIR/${OUT}_coverage.csv"
+    # Clean any prior step-09/10 outputs in this trial dir for a fresh measurement
+    rm -f "$path_pos_file" mems_seq_id_starts.out alignment.gaf alignment_coverage.csv
 
     echo ">>> [$fmt trial=$trial] find_mems"
-    ( cd "$INDEX_DIR" && \
-      gtime -v -o "$tdir/find_mems.time" \
+    # NB: find_mems writes <prefix>_path_pos*.bin and <prefix>_seq_id_starts.out.
+    # We pass "mems" so outputs land at mems_path_pos*.bin / mems_seq_id_starts.out.
+    gtime -v -o "$tdir/find_mems.time" \
         "$pi_bin/find_mems" \
-            "${BASE}.ri" "${BASE}_compressed.tags" "$READS" \
-            "$MEM_LEN" "$MIN_OCC" "$OUT" \
-        > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr" )
+            "$INDEX_DIR/${BASE}.ri" "$tag_index" "$READS" \
+            "$MEM_LEN" "$MIN_OCC" "mems" \
+            $find_mems_extra \
+        > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr"
 
     echo ">>> [$fmt trial=$trial] gafpack"
-    ( cd "$INDEX_DIR" && \
-      gtime -v -o "$tdir/gafpack.time" \
+    gtime -v -o "$tdir/gafpack.time" \
         "$gafpack_bin" \
-            --gfa "$GFA" \
+            --gfa "$INDEX_DIR/${BASE}.gfa" \
             --path-pos "$path_pos_file" \
-            --seq-id-starts "${OUT}_seq_id_starts.out" \
-            --path-names "${BASE}.paths" \
-            --gaf-file-prefix "$OUT" \
-        > "$tdir/gafpack.stdout" 2> "$tdir/gafpack.stderr" )
+            --seq-id-starts "mems_seq_id_starts.out" \
+            --path-names "$INDEX_DIR/${BASE}.paths" \
+            --gaf-file-prefix "alignment" \
+            $gafpack_extra \
+        > "$tdir/gafpack.stdout" 2> "$tdir/gafpack.stderr"
 
     # Capture output sizes for posterity
     {
         echo "# Sizes after $fmt trial=$trial"
-        for f in "$path_pos_file" "${OUT}_seq_id_starts.out" "${OUT}.gaf" "${OUT}_coverage.csv"; do
-            if [ -f "$INDEX_DIR/$f" ]; then
-                printf "%-50s %15s bytes\n" "$f" "$(stat -f%z "$INDEX_DIR/$f")"
+        for f in "$path_pos_file" mems_seq_id_starts.out alignment.gaf alignment_coverage.csv; do
+            if [ -f "$f" ]; then
+                printf "%-50s %15s bytes\n" "$f" "$(fsize "$f")"
             fi
         done
-        echo "# .gaf line count:"; wc -l "$INDEX_DIR/${OUT}.gaf" 2>/dev/null
-        echo "# coverage CSV md5:"; md5 -q "$INDEX_DIR/${OUT}_coverage.csv" 2>/dev/null
+        echo "# alignment.gaf line count:"; wc -l alignment.gaf 2>/dev/null
+        echo "# alignment_coverage.csv md5:"; fmd5 alignment_coverage.csv 2>/dev/null
     } > "$tdir/sizes.txt"
 
     [ "$skip_sum" = "skip_summary" ] && return 0
@@ -158,10 +201,10 @@ run_one_trial() {
     gp_rss=$(awk -F': ' '/Maximum resident set size/{print int($2/1024)}' "$tdir/gafpack.time")
 
     local gaf_lines bin_bytes bin_recs cov_md5 gp_total gp_warns
-    gaf_lines=$(wc -l < "$INDEX_DIR/${OUT}.gaf" | tr -d ' ')
-    bin_bytes=$(stat -f%z "$INDEX_DIR/$path_pos_file")
+    gaf_lines=$(wc -l < alignment.gaf | tr -d ' ')
+    bin_bytes=$(fsize "$path_pos_file")
     bin_recs=$((bin_bytes / rec_size))
-    cov_md5=$(md5 -q "$INDEX_DIR/${OUT}_coverage.csv")
+    cov_md5=$(fmd5 alignment_coverage.csv)
     gp_total=$(awk -F': ' '/Total GAF entries/{print $2}' "$tdir/gafpack.stderr" | tr -d ' ')
     gp_warns=$(grep -cE '^(ERROR|WARN)' "$tdir/gafpack.stderr" 2>/dev/null || true)
     [ -z "$gp_warns" ] && gp_warns=0
@@ -174,17 +217,17 @@ run_one_trial() {
             "$gaf_lines" "$bin_bytes" "$bin_recs" "$cov_md5" "$gp_warns" "$gp_total"
     } >> "$SUMMARY"
 
-    echo "    find_mems: ${fm_wall}s / ${fm_rss}MB   gafpack: ${gp_wall}s / ${gp_rss}MB   .gaf: ${gaf_lines} lines"
+    echo "    find_mems: ${fm_wall}s / ${fm_rss}MB   gafpack: ${gp_wall}s / ${gp_rss}MB   alignment.gaf: ${gaf_lines} lines"
 }
 
 # ---- Provenance + execution -------------------------------------------------
 
 if [ "$COMPARE_V1" = "1" ]; then
     formats=(v1 v2)
-    mode_desc="v1 + v2 (interleaved A/B)"
+    mode_desc="v1 (compressed-tags, no-dedup) + v2 (lightweight + dedup-read-node) (interleaved A/B)"
 else
     formats=(v2)
-    mode_desc="v2 only (default)"
+    mode_desc="v2 (lightweight + dedup-read-node, default)"
 fi
 
 echo "==============================================="
@@ -213,11 +256,11 @@ echo "==============================================="
     echo "Trials:       $N_TRIALS"
     echo
     echo "Binaries:"
-    printf "  %-8s %s  md5=%s\n" "PI_v2"  "$PI_BIN/find_mems" "$(md5 -q "$PI_BIN/find_mems")"
-    printf "  %-8s %s  md5=%s\n" "GP_v2"  "$GAFPACK"           "$(md5 -q "$GAFPACK")"
+    printf "  %-8s %s  md5=%s\n" "PI_v2"  "$PI_BIN/find_mems" "$(fmd5 "$PI_BIN/find_mems")"
+    printf "  %-8s %s  md5=%s\n" "GP_v2"  "$GAFPACK"           "$(fmd5 "$GAFPACK")"
     if [ "$COMPARE_V1" = "1" ]; then
-        printf "  %-8s %s  md5=%s\n" "PI_v1" "$PI_BIN_V1/find_mems" "$(md5 -q "$PI_BIN_V1/find_mems")"
-        printf "  %-8s %s  md5=%s\n" "GP_v1" "$GAFPACK_V1"          "$(md5 -q "$GAFPACK_V1")"
+        printf "  %-8s %s  md5=%s\n" "PI_v1" "$PI_BIN_V1/find_mems" "$(fmd5 "$PI_BIN_V1/find_mems")"
+        printf "  %-8s %s  md5=%s\n" "GP_v1" "$GAFPACK_V1"          "$(fmd5 "$GAFPACK_V1")"
     fi
 } > "$PERF_DIR/PROVENANCE.txt"
 
