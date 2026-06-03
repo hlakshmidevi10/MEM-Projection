@@ -8,9 +8,12 @@ Reproducible, profiled runs of the `pangenome-index` → `gafpack` → `validate
 # Build the index once per dataset (slow: hours on HPRC scale)
 ./build_index.sh yeast235-chrII-normalized.env [index-tag]   # → runs/<index-tag>/
 
-# Query the index (fast: minutes), once per reads set
+# Query the index (fast: minutes), once per reads set. Default is coverage-only:
 ./query.sh yeast235-chrII-normalized.env <index-tag> [query-name]
                                                              # → runs/<index-tag>/queries/<query-name>/
+
+# Add --gaf to also produce alignment.gaf and run validate_gaf (test mode):
+./query.sh yeast235-chrII-normalized.env <index-tag> [query-name] --gaf
 
 # Compare a query's outputs against a reference
 ./compare.sh yeast235-chrII-normalized.env <index-tag> <query-name> [ref-query-dir]
@@ -19,14 +22,15 @@ Reproducible, profiled runs of the `pangenome-index` → `gafpack` → `validate
 Both scripts use `[ -f <output> ]` resume guards — re-running skips any step
 whose output exists. Delete an output to force its step.
 
-See `BUILD_QUERY_LAYOUT.md` for the full directory layout and config contract.
+See `BUILD_QUERY_LAYOUT.md` for the full directory layout, config contract,
+and the coverage-only vs --gaf mode semantics.
 
 ## Layout
 
 ```
 configs/<name>.env                 inputs ($GBZ, $READS), params, reference dir
 build_index.sh                     steps 01–08b (gbz_stats → ... → build_lightweight_tags)
-query.sh                           steps 09–11 (find_mems → gafpack → validate_gaf)
+query.sh                           steps 09–10 (find_mems → gafpack); --gaf adds step 11
 compare.sh                         md5/size + set-equality diff vs a reference query
 bootstrap_vesuvio.sh               per-user install of all deps on a fresh Linux host
 BUILD_QUERY_LAYOUT.md              full directory + config contract documentation
@@ -44,8 +48,8 @@ runs/<index-tag>/                  one dir per index build
     logs/                          09..11 *.log/*.time + timing_summary.txt
     mems_path_pos_v2.bin           find_mems output (step 09)
     mems_seq_id_starts.out
-    alignment.gaf                  gafpack output (step 10)
-    alignment_coverage.csv
+    alignment_coverage.csv         gafpack output (step 10, always)
+    alignment.gaf                  only present with query.sh --gaf
   FINDINGS.md                      hand-written analysis (when there is one)
 perf/                              performance characterization
   perf_harness.sh                  N-trial timed harness; --compare-v1 for A/B
@@ -78,7 +82,11 @@ step 01b) and `OUT` is obsolete (per-query subdir name replaces it).
 
 ## Correctness
 
-A query passes iff step 11 (`validate_gaf_v2.py`) reports ≥99.9% valid on
-the random sample. Index files won't byte-match `final_output2/` because
-that was built pre-refactor — see `CLAUDE.md` for the full validation
-contract and known footguns (notably `convert_tags --num-seq`).
+Run `query.sh ... --gaf` to enable step 11 (`validate_gaf_v2.py`). A query
+passes iff step 11 reports ≥99.9% valid on the random sample. Coverage-only
+mode (the default) does NOT validate — assume the index was already validated
+end-to-end at least once before deploying to prod.
+
+Index files won't byte-match `final_output2/` because that was built
+pre-refactor — see `CLAUDE.md` for the full validation contract and known
+footguns (notably `convert_tags --num-seq`).

@@ -2,37 +2,47 @@
 # =============================================================================
 # pangenome-index — QUERY driver (steps 09–11)
 #
-# Usage:  ./query.sh <config.env> <index-tag> [query-name]
+# Usage:  ./query.sh <config.env> <index-tag> [query-name] [--gaf]
 #   config.env  — see configs/*.env for the variable contract.
-#                 Must set: BASE, READS, MEM_LEN, MIN_OCC, VALIDATE_SAMPLE.
+#                 Must set: BASE, READS, MEM_LEN, MIN_OCC.
+#                 Required only with --gaf: VALIDATE_SAMPLE.
 #                 Ignored:  GBZ (not needed at query time — index already built),
 #                           OUT  (per-query subdir name disambiguates outputs),
 #                           GFA  (uses the derived GFA from build_index.sh).
 #   index-tag   — name of an existing runs/<index-tag>/ produced by build_index.sh.
-#                 Must contain: <BASE>.{ri,ltags,paths,gfa}.
+#                 Must contain: <BASE>.{ri,ltags,paths,gfa} (last only with --gaf).
 #   query-name  — output subdir under runs/<index-tag>/queries/.
 #                 Default: config filename with `.env` stripped and any leading
 #                 `<dataset>-` prefix removed (e.g. `hprcv1-chr6-ref-reads.env`
 #                 → `ref-reads`). Override to anything if defaults collide.
+#   --gaf       — additionally produce alignment.gaf AND run validate_gaf.
+#                 Without --gaf: gafpack runs in coverage-only mode (default).
+#                 This matches the production deploy pattern where only
+#                 coverage is needed; .gaf + validation are test-only overhead.
 #
-# Outputs:
+# Outputs (default = coverage-only mode, no --gaf):
 #   runs/<index-tag>/queries/<query-name>/
 #     mems_path_pos_v2.bin           (09: find_mems --lightweight-tags)
 #     mems_seq_id_starts.out         (09)
-#     alignment.gaf                  (10: gafpack --dedup-read-node)
-#     alignment_coverage.csv         (10)
+#     alignment_coverage.csv         (10: gafpack --dedup-read-node, no GAF)
 #     logs/09_find_mems.{log,time}
 #     logs/10_gafpack.{log,time}
-#     logs/11_validate_gaf.{log,time}
 #     logs/timing_summary.txt        rebuilt from this query's *.time files
 #     RUN_INFO.txt                   query provenance (incl. index file mtimes)
 #     config.env  -> $CONFIG
 #     reads       -> $READS
 #
-# Each step is guarded by [ -f <output> ]; re-invocation skips completed steps.
-# To force re-run (e.g. after index rebuild): rm the query subdir and re-run.
+# Additional outputs with --gaf:
+#     alignment.gaf                  (10: gafpack also writes GAF)
+#     logs/11_validate_gaf.{log,time} (11: validate_gaf_v2.py --sample N)
 #
-# Validation (step 11) requires gaftools==1.3.0; bootstrap_vesuvio.sh pins it.
+# Each step is guarded by [ -f <output> ]; re-invocation skips completed steps.
+# Switching modes mid-query (e.g. re-running with --gaf after a coverage-only
+# run) re-runs step 10 to produce the .gaf (gafpack is fast). To force a full
+# re-run: rm the query subdir.
+#
+# Validation (step 11, only with --gaf) requires gaftools==1.3.0; pinned by
+# bootstrap_vesuvio.sh.
 # =============================================================================
 set -euo pipefail
 
@@ -68,7 +78,20 @@ done
 }
 
 # ---- Args ------------------------------------------------------------------
-[ $# -ge 2 ] || { echo "Usage: $0 <config.env> <index-tag> [query-name]"; exit 2; }
+# Accept --gaf anywhere in the arg list. Strip it out, leaving positional args.
+EMIT_GAF=0
+POSITIONAL=()
+for arg in "$@"; do
+    case "$arg" in
+        --gaf) EMIT_GAF=1 ;;
+        --help|-h)
+            sed -n '2,46p' "$0"; exit 0 ;;
+        *) POSITIONAL+=("$arg") ;;
+    esac
+done
+set -- "${POSITIONAL[@]}"
+
+[ $# -ge 2 ] || { echo "Usage: $0 <config.env> <index-tag> [query-name] [--gaf]"; exit 2; }
 CONFIG="$1"
 INDEX_TAG="$2"
 [ -f "$CONFIG" ] || CONFIG="$PIPE_DIR/configs/$CONFIG"
@@ -94,9 +117,14 @@ esac
 source "$CONFIG"
 
 # ---- Required config variables --------------------------------------------
-for v in BASE READS MEM_LEN MIN_OCC VALIDATE_SAMPLE; do
+for v in BASE READS MEM_LEN MIN_OCC; do
     [ -n "${!v:-}" ] || { echo "ERROR: config $CONFIG missing required variable: $v"; exit 2; }
 done
+# VALIDATE_SAMPLE only required with --gaf (validation runs only then)
+if [ "$EMIT_GAF" = "1" ] && [ -z "${VALIDATE_SAMPLE:-}" ]; then
+    echo "ERROR: --gaf was passed but config $CONFIG missing VALIDATE_SAMPLE"
+    exit 2
+fi
 [ -e "$READS" ] || { echo "ERROR: READS file not found: $READS"; exit 1; }
 
 # ---- Locate + validate the index dir --------------------------------------
@@ -123,7 +151,12 @@ cd "$QUERY_DIR"
     echo "BASE:          $BASE"
     echo "MEM_LEN:       $MEM_LEN"
     echo "MIN_OCC:       $MIN_OCC"
-    echo "VALIDATE_SAMPLE: $VALIDATE_SAMPLE"
+    if [ "$EMIT_GAF" = "1" ]; then
+        echo "Mode:          --gaf (alignment.gaf produced; validate_gaf runs)"
+        echo "VALIDATE_SAMPLE: $VALIDATE_SAMPLE"
+    else
+        echo "Mode:          coverage-only (no .gaf, no validation)"
+    fi
     echo "Started:       $(date)"
     echo "Host:          $(hostname)"
     echo "PI_BIN:        $PI_BIN"
@@ -203,6 +236,11 @@ echo "=== Query setup ==="
 echo "  Index:     $INDEX_DIR"
 echo "  Reads:     $READS ($(du -h "$READS" | cut -f1))"
 echo "  Output:    $QUERY_DIR"
+if [ "$EMIT_GAF" = "1" ]; then
+    echo "  Mode:      --gaf (gafpack writes alignment.gaf; validate_gaf runs)"
+else
+    echo "  Mode:      coverage-only (no .gaf, no validate; pass --gaf to enable)"
+fi
 echo
 
 # === 09 find_mems ===========================================================
@@ -214,23 +252,40 @@ echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, --lightweight-tags) ==="
     --lightweight-tags
 
 # === 10 gafpack =============================================================
-echo "=== 10 gafpack (--dedup-read-node, lightweight pipeline) ==="
-# Uses the derived GFA from build_index.sh step 01b.
-# --dedup-read-node required for correctness with --lightweight-tags upstream.
-# gafpack writes <prefix>.gaf + <prefix>_coverage.csv; using "alignment" prefix
-# → alignment.gaf + alignment_coverage.csv.
-[ -f "alignment.gaf" ] || profile 10_gafpack "$GAFPACK" \
-    --gfa "$GFA" \
-    --path-pos "mems_path_pos_v2.bin" \
-    --seq-id-starts "mems_seq_id_starts.out" \
-    --path-names "$PATHS" \
-    --gaf-file-prefix "alignment" \
-    --dedup-read-node
+# Two output modes:
+#   default:  --coverage-prefix alignment   → alignment_coverage.csv only
+#   --gaf:    --gaf-file-prefix alignment   → alignment_coverage.csv + alignment.gaf
+#
+# The resume guard differs by mode: coverage-only mode keys on
+# alignment_coverage.csv; --gaf mode keys on alignment.gaf. Switching from
+# coverage-only to --gaf re-runs step 10 (gafpack is fast); switching the
+# other way is a no-op (the .gaf stays put but we don't use it).
+if [ "$EMIT_GAF" = "1" ]; then
+    echo "=== 10 gafpack (--dedup-read-node + --gaf-file-prefix, with GAF) ==="
+    [ -f "alignment.gaf" ] || profile 10_gafpack "$GAFPACK" \
+        --gfa "$GFA" \
+        --path-pos "mems_path_pos_v2.bin" \
+        --seq-id-starts "mems_seq_id_starts.out" \
+        --path-names "$PATHS" \
+        --gaf-file-prefix "alignment" \
+        --dedup-read-node
+else
+    echo "=== 10 gafpack (--dedup-read-node, coverage-only mode) ==="
+    [ -f "alignment_coverage.csv" ] || profile 10_gafpack "$GAFPACK" \
+        --gfa "$GFA" \
+        --path-pos "mems_path_pos_v2.bin" \
+        --seq-id-starts "mems_seq_id_starts.out" \
+        --path-names "$PATHS" \
+        --coverage-prefix "alignment" \
+        --dedup-read-node
+fi
 
-# === 11 validate_gaf ========================================================
-echo "=== 11 validate_gaf (n=$VALIDATE_SAMPLE) ==="
-# validate_gaf reconstructs path sequences against the same GFA gafpack walked.
-profile 11_validate_gaf python3 "$VALIDATE_GAF" "alignment.gaf" "$READS" "$GFA" --sample "$VALIDATE_SAMPLE"
+# === 11 validate_gaf (only with --gaf) ======================================
+if [ "$EMIT_GAF" = "1" ]; then
+    echo "=== 11 validate_gaf (n=$VALIDATE_SAMPLE) ==="
+    # validate_gaf reconstructs path sequences against the same GFA gafpack walked.
+    profile 11_validate_gaf python3 "$VALIDATE_GAF" "alignment.gaf" "$READS" "$GFA" --sample "$VALIDATE_SAMPLE"
+fi
 
 # === Summary ================================================================
 echo
@@ -242,5 +297,12 @@ echo
 echo "=== OUTPUTS ($QUERY_DIR/) ==="
 ls -lh mems_*.bin mems_*.out alignment.gaf alignment_coverage.csv 2>/dev/null \
     | awk '{printf "  %-40s %8s\n", $NF, $5}'
+if [ "$EMIT_GAF" = "0" ]; then
+    echo
+    echo "Coverage-only mode — no .gaf, no validation."
+    echo "To get the .gaf and validate: re-run with --gaf"
+fi
 echo
-grep -E '^(Valid|Invalid|Total) entries' "$LOGS/11_validate_gaf.log" || true
+if [ "$EMIT_GAF" = "1" ]; then
+    grep -E '^(Valid|Invalid|Total) entries' "$LOGS/11_validate_gaf.log" || true
+fi

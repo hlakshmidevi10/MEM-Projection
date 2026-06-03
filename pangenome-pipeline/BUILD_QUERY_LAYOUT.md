@@ -4,14 +4,38 @@ The pipeline is split into two scripts so the expensive **index build** is
 separated from the cheap **per-query projection**:
 
 ```
-build_index.sh <config.env> <index-tag>          → runs/<index-tag>/
-query.sh       <config.env> <index-tag> [query-name]
-                                                 → runs/<index-tag>/queries/<query-name>/
+build_index.sh <config.env> <index-tag>                    → runs/<index-tag>/
+query.sh       <config.env> <index-tag> [query-name]       → runs/<index-tag>/queries/<query-name>/
+                                                             (coverage-only mode, prod-fast)
+query.sh       <config.env> <index-tag> [query-name] --gaf → same + alignment.gaf + validate_gaf
+                                                             (test mode, includes step 11)
 ```
 
 Multiple queries can run against the same index without colliding outputs.
 This document captures the directory layout, config contract, and migration
 notes from the old `run.sh` flat layout.
+
+## Query modes: coverage-only vs --gaf
+
+`query.sh` defaults to **coverage-only** mode: gafpack runs with
+`--coverage-prefix` and produces only `alignment_coverage.csv`. No `.gaf`
+is generated; `validate_gaf_v2.py` (step 11) does not run. This matches the
+production deployment pattern — the coverage CSV is the only artifact that
+downstream consumers need.
+
+Pass `--gaf` to additionally:
+1. Have gafpack write `alignment.gaf` (~10× larger than the coverage CSV)
+2. Run step 11 (`validate_gaf_v2.py`) to spot-check projection correctness
+
+`--gaf` is useful for:
+- First-run validation on a new dataset (confirm pipeline correctness end-to-end)
+- Debugging mis-projection symptoms
+- Producing the GAF for tools downstream of gafpack that consume alignments
+
+Re-running a query that completed in coverage-only mode with `--gaf` re-runs
+step 10 (cheap — gafpack is fast) to produce the GAF, then runs step 11.
+Re-running with `--gaf` after a previous `--gaf` run is a no-op (both
+existence guards pass).
 
 ---
 
@@ -43,20 +67,20 @@ runs/<index-tag>/                            ← built by build_index.sh
 ├── <BASE>.gfa                               step 01b (DERIVED from GBZ)
 └── queries/                                 ← created by query.sh runs
     ├── <query-name-1>/
-    │   ├── RUN_INFO.txt                     query provenance + index file
-    │   │                                    mtimes (so future-you can spot
+    │   ├── RUN_INFO.txt                     query provenance + mode + index
+    │   │                                    file mtimes (so future-you can spot
     │   │                                    if the index was rebuilt since)
     │   ├── config.env -> ../../../../configs/<file>.env
     │   ├── reads -> /path/to/reads.txt      symlink to the source reads
     │   ├── logs/
     │   │   ├── 09_find_mems.{log,time}
     │   │   ├── 10_gafpack.{log,time}
-    │   │   ├── 11_validate_gaf.{log,time}
+    │   │   ├── 11_validate_gaf.{log,time}   only present with --gaf
     │   │   └── timing_summary.txt
     │   ├── mems_path_pos_v2.bin             find_mems binary output (step 09)
     │   ├── mems_seq_id_starts.out           find_mems sidecar (step 09)
-    │   ├── alignment.gaf                    gafpack GAF output (step 10)
-    │   └── alignment_coverage.csv           gafpack per-node coverage (step 10)
+    │   ├── alignment_coverage.csv           gafpack per-node coverage (step 10)
+    │   └── alignment.gaf                    only present with --gaf
     ├── <query-name-2>/                      another query, same layout
     └── ...
 ```
@@ -91,7 +115,7 @@ variables depend on which script you're running:
 | `READS` | ignored (warns) | **required** | Reads file (one sequence per line) |
 | `MEM_LEN` | ignored | **required** | `find_mems` minimum MEM length |
 | `MIN_OCC` | ignored | **required** | `find_mems` minimum occurrence count |
-| `VALIDATE_SAMPLE` | ignored | **required** | `validate_gaf_v2.py --sample` size |
+| `VALIDATE_SAMPLE` | ignored | required only with `--gaf` | `validate_gaf_v2.py --sample` size |
 | `GFA` | ignored (warns) | ignored | DEPRECATED — pipeline derives it from `$GBZ` |
 | `OUT` | ignored (warns) | ignored | DEPRECATED — per-query subdir name replaces it |
 
@@ -116,16 +140,21 @@ irrelevant) but not fatal. Common patterns:
 # Build once
 ./build_index.sh hprcv1-chr6.env hprc-chr6-2026-06-02
 
-# Query many times — each lands in queries/<name>/
+# Coverage-only queries (prod-fast — no .gaf, no validate)
 ./query.sh hprcv1-chr6-ref-reads.env       hprc-chr6-2026-06-02
 ./query.sh hprcv1-chr6-alt-reads.env       hprc-chr6-2026-06-02
 ./query.sh hprcv1-chr6-alt-noisy-reads.env hprc-chr6-2026-06-02
 
-# Final layout:
+# Validate a query end-to-end (slower; includes step 11)
+./query.sh hprcv1-chr6-ref-reads.env hprc-chr6-2026-06-02 --gaf
+
+# Final layout (coverage-only mode for all three):
 #   runs/hprc-chr6-2026-06-02/
 #   ├── <index files + logs>
 #   └── queries/
 #       ├── ref-reads/
+#       │   ├── mems_*, alignment_coverage.csv     ← always present
+#       │   └── alignment.gaf, logs/11_*           ← only with --gaf
 #       ├── alt-reads/
 #       └── alt-noisy-reads/
 ```
