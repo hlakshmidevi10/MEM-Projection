@@ -345,39 +345,46 @@ echo "Finished: $(date)" >> "$PERF_DIR/PROVENANCE.txt"
 # ---- Inline summary --------------------------------------------------------
 echo
 echo "===== Inline summary (mean ± stdev across trials) ====="
+# Per-mode mean ± stdev for find_mems + gafpack (wall, rss). Uses python3
+# for portability — gawk-style function-local syntax (extra spaces before
+# locals) is rejected by mawk / BSD awk, which are what some Debian/minimal
+# systems ship as /usr/bin/awk.
 for mode in "${MODE_ARRAY[@]}"; do
     echo
     echo "--- $mode ---"
-    # Per-mode means of find_mems wall, find_mems rss, gafpack wall, gafpack rss
-    # Warmups are never written to SUMMARY.tsv (skip_summary), so the only
-    # filter needed is the mode + step.
-    awk -F'\t' -v M="$mode" '
-        $1 == M {
-            if ($3 == "find_mems") { fm_wall[++fmc] = $4; fm_rss[fmc] = $5 }
-            if ($3 == "gafpack")   { gp_wall[++gpc] = $4; gp_rss[gpc] = $5 }
-        }
-        END {
-            function mean(arr, n,    s,i) { for(i=1;i<=n;i++) s+=arr[i]; return s/n }
-            function sd(arr, n, m,    s,i) {
-                if (n<2) return 0
-                for(i=1;i<=n;i++) s+=(arr[i]-m)^2; return sqrt(s/(n-1))
-            }
-            if (fmc > 0) {
-                m1=mean(fm_wall,fmc); s1=sd(fm_wall,fmc,m1)
-                m2=mean(fm_rss,fmc);  s2=sd(fm_rss,fmc,m2)
-                printf "  find_mems  wall %6.2f ± %4.2f s   peak %6.0f ± %4.0f MB   (n=%d)\n", m1, s1, m2, s2, fmc
-            }
-            if (gpc > 0) {
-                m1=mean(gp_wall,gpc); s1=sd(gp_wall,gpc,m1)
-                m2=mean(gp_rss,gpc);  s2=sd(gp_rss,gpc,m2)
-                printf "  gafpack    wall %6.2f ± %4.2f s   peak %6.0f ± %4.0f MB   (n=%d)\n", m1, s1, m2, s2, gpc
-            }
-            if (fmc > 0 && gpc > 0) {
-                tot = mean(fm_wall,fmc) + mean(gp_wall,gpc)
-                printf "  total 09+10 wall %6.2f s\n", tot
-            }
-        }
-    ' "$SUMMARY"
+    python3 - "$SUMMARY" "$mode" <<'PYEOF'
+import sys, statistics
+summary, mode = sys.argv[1], sys.argv[2]
+fm_wall, fm_rss, gp_wall, gp_rss = [], [], [], []
+with open(summary) as f:
+    next(f)  # header
+    for line in f:
+        cols = line.rstrip("\n").split("\t")
+        if len(cols) < 5 or cols[0] != mode:
+            continue
+        try:
+            wall, rss = float(cols[3]), float(cols[4])
+        except ValueError:
+            continue
+        if cols[2] == "find_mems":
+            fm_wall.append(wall); fm_rss.append(rss)
+        elif cols[2] == "gafpack":
+            gp_wall.append(wall); gp_rss.append(rss)
+
+def fmt(label, walls, rsss):
+    if not walls:
+        return
+    n = len(walls)
+    wm, wsd = statistics.mean(walls), (statistics.stdev(walls) if n > 1 else 0.0)
+    rm, rsd = statistics.mean(rsss),  (statistics.stdev(rsss)  if n > 1 else 0.0)
+    print(f"  {label:<10} wall {wm:6.2f} ± {wsd:4.2f} s   "
+          f"peak {rm:6.0f} ± {rsd:4.0f} MB   (n={n})")
+
+fmt("find_mems", fm_wall, fm_rss)
+fmt("gafpack",   gp_wall, gp_rss)
+if fm_wall and gp_wall:
+    print(f"  total 09+10 wall {statistics.mean(fm_wall) + statistics.mean(gp_wall):6.2f} s")
+PYEOF
 done
 
 echo
