@@ -553,6 +553,16 @@ export GBZ_EXTRACT="$ROOT/gbwtgraph/bin/gbz_extract"
 # vg: use whatever's on PATH (Guix profile / apt / source-built).
 # If multiple installs exist, override here with an absolute path.
 export VG="\$(command -v vg)"
+
+# Default C/C++ compiler aliases for cargo + cc-rs. Guix's gcc-toolchain
+# ships 'gcc'/'g++' but not a 'cc'/'c++' alias (Debian's build-essential
+# creates those symlinks; Guix doesn't). Without these, cargo build dies
+# in transitive C-FFI crates (bzip2-sys, liblzma-sys, zstd-sys) with
+# 'ToolNotFound: failed to find tool "cc"'. The :- form respects any
+# pre-existing setting (Mac/conda envs that already have CC set won't
+# be overridden).
+export CC="\${CC:-gcc}"
+export CXX="\${CXX:-g++}"
 EOF
 
 if ! grep -qs '.pangenome_env.sh' "$HOME/.bashrc" 2>/dev/null; then
