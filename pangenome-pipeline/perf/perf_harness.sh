@@ -1,122 +1,153 @@
 #!/bin/bash
 # =============================================================================
-# Performance harness for steps 09 (find_mems) + 10 (gafpack).
+# perf_harness.sh — query-side performance benchmark for find_mems + gafpack.
 #
-# Runs N timed trials after a single untimed warmup to stabilize OS disk
-# cache. Captures wall, RSS, find_mems' internal phase breakdown, and
-# gafpack's stderr stats per trial. Aggregate with `summarize.py`.
+# For each mode, runs 2 untimed warmups to reach warm-cache steady state,
+# then N timed trials contiguously (all of mode A, then all of mode B).
+# This matches production behavior — same mode called repeatedly against
+# the same index — and avoids cache thrash from mid-run mode switches.
+# Captures wall, RSS, find_mems' internal phase breakdown, gafpack's stderr
+# stats, and output artifact sizes per trial. Aggregate with
+# `summarize.py <perf-tag-dir>`.
 #
-# Default: profiles the canonical v2 binaries (lightweight pipeline matching
-#          query.sh: find_mems --lightweight-tags + gafpack --dedup-read-node).
-# With --compare-v1: also runs the legacy v1 binaries (interleaved v1/v2)
-#                    for A/B regression checks. Requires the v1 binaries to
-#                    have been built and placed at PI_BIN_V1 / GAFPACK_V1.
-#                    v1 binaries use the OLD compressed-tags + no-dedup
-#                    pipeline (non-lightweight).
+# Two modes benchmarked by default (matching query.sh's two tag modes):
+#   lightweight: find_mems --lightweight-tags + gafpack --dedup-read-node
+#                consumes <BASE>.ltags
+#   full-tag:    find_mems (no --lightweight-tags) + gafpack (no --dedup)
+#                consumes <BASE>_compressed.tags
+#
+# Both modes run in coverage-only mode (no .gaf, no validation) — matches the
+# production query path. To benchmark with .gaf, add --gaf (adds time + disk
+# per trial but no validation step).
 #
 # Outputs:
-#   perf/<tag>/<fmt>/trial-{0..N}/
+#   perf/<tag>/<mode>/trial-{0..N}/
 #     find_mems.{log,stderr,time}
 #     gafpack.{stdout,stderr,time}
 #     sizes.txt
-#   perf/<tag>/SUMMARY.tsv
-#   perf/<tag>/PROVENANCE.txt
+#   perf/<tag>/SUMMARY.tsv             machine-readable per-trial rows
+#   perf/<tag>/PROVENANCE.txt          host, date, binaries, index, modes
 #
 # Usage:
-#   ./perf/perf_harness.sh <config.env> <N> [tag] [--compare-v1]
+#   ./perf/perf_harness.sh <config.env> <N-trials> [tag] [--modes M1,M2,...] [--gaf]
 #
 # Examples:
-#   ./perf/perf_harness.sh yeast235-chrII-normalized.env 3
-#   ./perf/perf_harness.sh yeast235-chrII-normalized.env 5 nightly --compare-v1
+#   ./perf/perf_harness.sh hprcv2-chr6.env 5
+#   ./perf/perf_harness.sh hprcv2-chr6.env 5 hprcv2-noisy
+#   ./perf/perf_harness.sh hprcv2-chr6.env 3 quick --modes lightweight
+#   ./perf/perf_harness.sh yeast235-chrII-normalized.env 5 yeast --gaf
+#
+# Required:
+#   - $INDEX_DIR (env var or default runs/v1-current) contains <BASE>.ri,
+#     <BASE>.paths, <BASE>.gfa, and EITHER <BASE>.ltags (lightweight mode)
+#     OR <BASE>_compressed.tags (full-tag mode), depending on which modes
+#     are benchmarked.
+#   - $PI_BIN/find_mems built with --lightweight-tags support
+#   - $GAFPACK built with --dedup-read-node support
+#   - $READS file (one read per line, no FASTA headers)
+#   - GNU time (gtime / /usr/bin/time -v / ~/.guix-profile/bin/time)
 # =============================================================================
 set -euo pipefail
 
 PIPE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 MEM_PROJ="$(cd "$PIPE_DIR/.." && pwd)"
 
-# ---- Default tool locations -------------------------------------------------
+# ---- Tool locations --------------------------------------------------------
 PI_BIN="${PI_BIN:-/Users/hlakshmidevi/personal/pangenome-index-latest/bin}"
 GAFPACK="${GAFPACK:-/Users/hlakshmidevi/personal/gafpack/target/release/gafpack}"
-# v1 (only used with --compare-v1)
-PI_BIN_V1="${PI_BIN_V1:-/Users/hlakshmidevi/personal/pangenome-index-latest/bin-v1}"
-GAFPACK_V1="${GAFPACK_V1:-/Users/hlakshmidevi/personal/gafpack/target/v1/gafpack}"
 
-# ---- Args -------------------------------------------------------------------
-COMPARE_V1=0
+# ---- time(1) detection (mirrors build_index.sh / query.sh) -----------------
+TIME=""
+for candidate in \
+    "$(command -v gtime 2>/dev/null || true)" \
+    "$HOME/.guix-profile/bin/time" \
+    /usr/bin/time \
+    /usr/local/bin/time
+do
+    [ -n "$candidate" ] && [ -x "$candidate" ] || continue
+    if "$candidate" -v true >/dev/null 2>&1; then TIME="$candidate"; break; fi
+done
+[ -n "$TIME" ] || { echo "ERROR: no GNU time(1) found"; exit 1; }
+
+# ---- Arg parsing -----------------------------------------------------------
+EMIT_GAF=0
+MODES="lightweight,full-tag"
 POSITIONAL=()
 for arg in "$@"; do
     case "$arg" in
-        --compare-v1) COMPARE_V1=1 ;;
+        --gaf) EMIT_GAF=1 ;;
+        --modes=*) MODES="${arg#--modes=}" ;;
+        --modes)
+            echo "ERROR: --modes requires =value form (e.g. --modes=lightweight,full-tag)" >&2
+            exit 2 ;;
+        --modes\ *|--modes\=*) MODES="${arg#--modes=}"; MODES="${MODES#--modes }" ;;
         --help|-h)
-            sed -n '2,33p' "$0"; exit 0 ;;
+            sed -n '2,46p' "$0" | sed 's|^# \?||; $d'; exit 0 ;;
         *) POSITIONAL+=("$arg") ;;
     esac
 done
 set -- "${POSITIONAL[@]}"
 
-[ $# -ge 2 ] || { echo "Usage: $0 <config.env> <N-trials> [tag] [--compare-v1]"; exit 2; }
+[ $# -ge 2 ] || { echo "Usage: $0 <config.env> <N-trials> [tag] [--modes=M1,M2] [--gaf]"; exit 2; }
 CONFIG="$1"
 N_TRIALS="$2"
 [ -f "$CONFIG" ] || CONFIG="$PIPE_DIR/configs/$CONFIG"
 [ -f "$CONFIG" ] || { echo "Config not found: $1"; exit 2; }
 TAG="${3:-$(basename "$CONFIG" .env)}"
 
+case "$N_TRIALS" in
+    ''|*[!0-9]*) echo "ERROR: N-trials must be a positive integer: $N_TRIALS"; exit 2 ;;
+esac
+[ "$N_TRIALS" -ge 1 ] || { echo "ERROR: N-trials must be >= 1"; exit 2; }
+
+# Split MODES into array
+IFS=',' read -r -a MODE_ARRAY <<< "$MODES"
+for m in "${MODE_ARRAY[@]}"; do
+    case "$m" in
+        lightweight|full-tag) ;;
+        *) echo "ERROR: unknown mode '$m' (valid: lightweight, full-tag)"; exit 2 ;;
+    esac
+done
+
 # shellcheck source=/dev/null
 source "$CONFIG"
-
-# Always need v2 binaries
-for b in "$PI_BIN/find_mems" "$GAFPACK"; do
-    [ -x "$b" ] || { echo "Missing or non-executable: $b"; exit 1; }
+for v in BASE READS; do
+    [ -n "${!v:-}" ] || { echo "ERROR: config $CONFIG missing required: $v"; exit 2; }
 done
+[ -e "$READS" ] || { echo "ERROR: READS file not found: $READS"; exit 1; }
+[ -n "${MEM_LEN:-}" ] || MEM_LEN=30
+[ -n "${MIN_OCC:-}" ] || MIN_OCC=1
 
-# v1 binaries only required when comparing
-if [ "$COMPARE_V1" = "1" ]; then
-    for b in "$PI_BIN_V1/find_mems" "$GAFPACK_V1"; do
-        [ -x "$b" ] || { echo "Missing v1 binary: $b (required by --compare-v1)"; exit 1; }
-    done
-fi
+# Sanity-check binaries
+[ -x "$PI_BIN/find_mems" ] || { echo "Missing or non-executable: $PI_BIN/find_mems"; exit 1; }
+[ -x "$GAFPACK" ]          || { echo "Missing or non-executable: $GAFPACK"; exit 1; }
 
-# gtime required for consistent -v output (Linux's /usr/bin/time also works
-# but the existing parser assumes GNU format; gtime is the cross-platform
-# answer that works on macOS without conflict).
-command -v gtime >/dev/null 2>&1 || {
-    if [ -x "$HOME/.guix-profile/bin/time" ]; then
-        gtime() { "$HOME/.guix-profile/bin/time" "$@"; }
-    elif /usr/bin/time -v true 2>/dev/null; then
-        gtime() { /usr/bin/time "$@"; }
-    else
-        echo "gtime required (brew install gnu-time | guix install time | apt-get install time)"
-        exit 1
-    fi
-}
-
-# Pre-built index — point at the runs/<index-tag>/ from build_index.sh.
-# All required files: BASE.ri, BASE.ltags, BASE.paths, BASE.gfa
+# Locate index
 INDEX_DIR="${INDEX_DIR:-$PIPE_DIR/runs/v1-current}"
-for f in "$INDEX_DIR/${BASE}.ri" "$INDEX_DIR/${BASE}.ltags" "$INDEX_DIR/${BASE}.paths" "$INDEX_DIR/${BASE}.gfa"; do
-    [ -f "$f" ] || {
-        echo "Missing index file: $f"
-        echo "Build the index first:"
-        echo "  ./build_index.sh <config> $(basename "$INDEX_DIR")"
-        echo "or set INDEX_DIR to a different runs/<index-tag>/"
+REQUIRED_INDEX=("${BASE}.ri" "${BASE}.paths" "${BASE}.gfa")
+for m in "${MODE_ARRAY[@]}"; do
+    case "$m" in
+        lightweight) REQUIRED_INDEX+=("${BASE}.ltags") ;;
+        full-tag)    REQUIRED_INDEX+=("${BASE}_compressed.tags") ;;
+    esac
+done
+for f in "${REQUIRED_INDEX[@]}"; do
+    [ -f "$INDEX_DIR/$f" ] || {
+        echo "ERROR: missing index artifact: $INDEX_DIR/$f"
+        echo "Build the index first: ./build_index.sh <config> $(basename "$INDEX_DIR")"
         exit 1
     }
 done
-
-# v1 mode needs the legacy (non-lightweight) tags index too
-if [ "$COMPARE_V1" = "1" ]; then
-    [ -f "$INDEX_DIR/${BASE}_compressed.tags" ] || {
-        echo "Missing $INDEX_DIR/${BASE}_compressed.tags (required by --compare-v1)"
-        exit 1
-    }
-fi
 
 PERF_DIR="$PIPE_DIR/perf/$TAG"
 SUMMARY="$PERF_DIR/SUMMARY.tsv"
 mkdir -p "$PERF_DIR"
 
+# TSV header (if file new). Trial labels: "warmup-1", "warmup-2" (untimed,
+# not appended to SUMMARY.tsv at all), then "1".."N" for timed trials.
+# summarize.py only reads trial-* subdirs; warmup-* are ignored automatically.
 if [ ! -f "$SUMMARY" ]; then
-    printf '%s\n' "format	trial	step	wall_s	maxrss_mb	gaf_lines	bin_bytes	bin_records	cov_md5	stderr_warns	gafpack_total_entries" > "$SUMMARY"
+    printf '%s\n' "mode	trial	step	wall_s	maxrss_mb	gaf_lines	bin_bytes	bin_records	cov_md5	stderr_warns	gafpack_total_entries" > "$SUMMARY"
 fi
 
 # ---- cross-platform helpers ------------------------------------------------
@@ -126,70 +157,88 @@ fmd5() {
     else md5 -q "$1"; fi
 }
 
-# ---- helpers ----------------------------------------------------------------
-
-# Run one (find_mems, gafpack) pair. Args:
-#   $1 = format label (v1|v2; used for dir name + record-size math)
+# ---- run_one_trial: do one (find_mems, gafpack) pair under one mode -------
+# Args:
+#   $1 = mode label (lightweight | full-tag)
 #   $2 = trial label (1..N, or "warmup")
-#   $3 = output trial dir
+#   $3 = absolute path to the trial dir
 #   $4 = "skip_summary" if we shouldn't append to SUMMARY.tsv (warmups)
 run_one_trial() {
-    local fmt="$1" trial="$2" tdir="$3" skip_sum="${4:-}"
+    local mode="$1" trial="$2" tdir="$3" skip_sum="${4:-}"
     mkdir -p "$tdir"
     cd "$tdir"
 
-    local pi_bin gafpack_bin tag_index path_pos_file rec_size find_mems_extra gafpack_extra
-    case "$fmt" in
-        v1) pi_bin="$PI_BIN_V1"; gafpack_bin="$GAFPACK_V1"
-            tag_index="$INDEX_DIR/${BASE}_compressed.tags"
-            path_pos_file="mems_path_pos.bin"; rec_size=24
-            find_mems_extra=""
-            gafpack_extra="" ;;
-        v2) pi_bin="$PI_BIN";    gafpack_bin="$GAFPACK"
+    # Mode-dependent flags + tag index path
+    local tag_index find_mems_flags gafpack_flags
+    case "$mode" in
+        lightweight)
             tag_index="$INDEX_DIR/${BASE}.ltags"
-            path_pos_file="mems_path_pos_v2.bin"; rec_size=16
-            find_mems_extra="--lightweight-tags"
-            gafpack_extra="--dedup-read-node" ;;
+            find_mems_flags="--lightweight-tags"
+            gafpack_flags="--dedup-read-node" ;;
+        full-tag)
+            tag_index="$INDEX_DIR/${BASE}_compressed.tags"
+            find_mems_flags=""
+            gafpack_flags="" ;;
     esac
 
-    # Clean any prior step-09/10 outputs in this trial dir for a fresh measurement
-    rm -f "$path_pos_file" mems_seq_id_starts.out alignment.gaf alignment_coverage.csv
+    # Always-clean: remove any prior trial artifacts in this dir
+    rm -f mems_path_pos_v2.bin mems_seq_id_starts.out \
+          alignment.gaf alignment_coverage.csv
 
-    echo ">>> [$fmt trial=$trial] find_mems"
-    # NB: find_mems writes <prefix>_path_pos*.bin and <prefix>_seq_id_starts.out.
-    # We pass "mems" so outputs land at mems_path_pos*.bin / mems_seq_id_starts.out.
-    gtime -v -o "$tdir/find_mems.time" \
-        "$pi_bin/find_mems" \
-            "$INDEX_DIR/${BASE}.ri" "$tag_index" "$READS" \
-            "$MEM_LEN" "$MIN_OCC" "mems" \
-            $find_mems_extra \
-        > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr"
+    # ---- 09 find_mems ----
+    echo ">>> [$mode trial=$trial] find_mems"
+    # find_mems writes <prefix>_path_pos_v2.bin + <prefix>_seq_id_starts.out;
+    # using "mems" prefix.
+    if [ -n "$find_mems_flags" ]; then
+        "$TIME" -v -o "$tdir/find_mems.time" \
+            "$PI_BIN/find_mems" \
+                "$INDEX_DIR/${BASE}.ri" "$tag_index" "$READS" \
+                "$MEM_LEN" "$MIN_OCC" "mems" \
+                $find_mems_flags \
+            > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr"
+    else
+        "$TIME" -v -o "$tdir/find_mems.time" \
+            "$PI_BIN/find_mems" \
+                "$INDEX_DIR/${BASE}.ri" "$tag_index" "$READS" \
+                "$MEM_LEN" "$MIN_OCC" "mems" \
+            > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr"
+    fi
 
-    echo ">>> [$fmt trial=$trial] gafpack"
-    gtime -v -o "$tdir/gafpack.time" \
-        "$gafpack_bin" \
+    # ---- 10 gafpack ----
+    echo ">>> [$mode trial=$trial] gafpack ($([ $EMIT_GAF = 1 ] && echo with-gaf || echo coverage-only))"
+    local gafpack_out_flag
+    if [ "$EMIT_GAF" = "1" ]; then
+        gafpack_out_flag="--gaf-file-prefix alignment"
+    else
+        gafpack_out_flag="--coverage-prefix alignment"
+    fi
+    # Run, with no shell-quoting surprises around gafpack_flags (may be empty)
+    "$TIME" -v -o "$tdir/gafpack.time" \
+        "$GAFPACK" \
             --gfa "$INDEX_DIR/${BASE}.gfa" \
-            --path-pos "$path_pos_file" \
+            --path-pos "mems_path_pos_v2.bin" \
             --seq-id-starts "mems_seq_id_starts.out" \
             --path-names "$INDEX_DIR/${BASE}.paths" \
-            --gaf-file-prefix "alignment" \
-            $gafpack_extra \
+            $gafpack_out_flag \
+            $gafpack_flags \
         > "$tdir/gafpack.stdout" 2> "$tdir/gafpack.stderr"
 
-    # Capture output sizes for posterity
+    # ---- per-trial output artifact sizes ----
     {
-        echo "# Sizes after $fmt trial=$trial"
-        for f in "$path_pos_file" mems_seq_id_starts.out alignment.gaf alignment_coverage.csv; do
+        echo "# Sizes after $mode trial=$trial"
+        for f in mems_path_pos_v2.bin mems_seq_id_starts.out \
+                 alignment.gaf alignment_coverage.csv; do
             if [ -f "$f" ]; then
-                printf "%-50s %15s bytes\n" "$f" "$(fsize "$f")"
+                printf "%-40s %15s bytes\n" "$f" "$(fsize "$f")"
             fi
         done
-        echo "# alignment.gaf line count:"; wc -l alignment.gaf 2>/dev/null
-        echo "# alignment_coverage.csv md5:"; fmd5 alignment_coverage.csv 2>/dev/null
+        [ -f alignment.gaf ] && { echo "# alignment.gaf line count:"; wc -l alignment.gaf; }
+        [ -f alignment_coverage.csv ] && { echo "# coverage csv md5:"; fmd5 alignment_coverage.csv; }
     } > "$tdir/sizes.txt"
 
     [ "$skip_sum" = "skip_summary" ] && return 0
 
+    # ---- parse + append SUMMARY.tsv row ----
     local fm_wall fm_rss gp_wall gp_rss
     fm_wall=$(awk -F': ' '/Elapsed \(wall clock\)/{split($2,a,":"); n=length(a);
               if (n==2) print a[1]*60 + a[2]; else if (n==3) print a[1]*3600 + a[2]*60 + a[3]}' \
@@ -200,51 +249,33 @@ run_one_trial() {
               "$tdir/gafpack.time")
     gp_rss=$(awk -F': ' '/Maximum resident set size/{print int($2/1024)}' "$tdir/gafpack.time")
 
-    local gaf_lines bin_bytes bin_recs cov_md5 gp_total gp_warns
-    gaf_lines=$(wc -l < alignment.gaf | tr -d ' ')
-    bin_bytes=$(fsize "$path_pos_file")
-    bin_recs=$((bin_bytes / rec_size))
-    cov_md5=$(fmd5 alignment_coverage.csv)
-    gp_total=$(awk -F': ' '/Total GAF entries/{print $2}' "$tdir/gafpack.stderr" | tr -d ' ')
+    local bin_bytes=0 bin_recs=0 gaf_lines=0 cov_md5="-" gp_total="-" gp_warns
+    [ -f mems_path_pos_v2.bin ] && {
+        bin_bytes=$(fsize mems_path_pos_v2.bin)
+        bin_recs=$((bin_bytes / 16))
+    }
+    [ -f alignment.gaf ] && gaf_lines=$(wc -l < alignment.gaf | tr -d ' ')
+    [ -f alignment_coverage.csv ] && cov_md5=$(fmd5 alignment_coverage.csv)
+    gp_total=$(awk -F': ' '/Total GAF entries/{print $2}' "$tdir/gafpack.stderr" 2>/dev/null | tr -d ' ')
+    [ -z "$gp_total" ] && gp_total="-"
     gp_warns=$(grep -cE '^(ERROR|WARN)' "$tdir/gafpack.stderr" 2>/dev/null || true)
     [ -z "$gp_warns" ] && gp_warns=0
 
     {
         printf '%s\t%s\tfind_mems\t%s\t%s\t-\t-\t-\t-\t-\t-\n' \
-            "$fmt" "$trial" "$fm_wall" "$fm_rss"
+            "$mode" "$trial" "$fm_wall" "$fm_rss"
         printf '%s\t%s\tgafpack\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n' \
-            "$fmt" "$trial" "$gp_wall" "$gp_rss" \
+            "$mode" "$trial" "$gp_wall" "$gp_rss" \
             "$gaf_lines" "$bin_bytes" "$bin_recs" "$cov_md5" "$gp_warns" "$gp_total"
     } >> "$SUMMARY"
 
-    echo "    find_mems: ${fm_wall}s / ${fm_rss}MB   gafpack: ${gp_wall}s / ${gp_rss}MB   alignment.gaf: ${gaf_lines} lines"
+    printf '    find_mems: %ss / %sMB   gafpack: %ss / %sMB' \
+        "$fm_wall" "$fm_rss" "$gp_wall" "$gp_rss"
+    [ "$EMIT_GAF" = "1" ] && printf '   .gaf: %s lines' "$gaf_lines"
+    echo
 }
 
-# ---- Provenance + execution -------------------------------------------------
-
-if [ "$COMPARE_V1" = "1" ]; then
-    formats=(v1 v2)
-    mode_desc="v1 (compressed-tags, no-dedup) + v2 (lightweight + dedup-read-node) (interleaved A/B)"
-else
-    formats=(v2)
-    mode_desc="v2 (lightweight + dedup-read-node, default)"
-fi
-
-echo "==============================================="
-echo " Perf harness: $TAG"
-echo " Config:    $CONFIG"
-echo " Mode:      $mode_desc"
-echo " Trials:    $N_TRIALS per format"
-echo " Index dir: $INDEX_DIR"
-echo " PI v2:     $PI_BIN/find_mems"
-echo " GP v2:     $GAFPACK"
-[ "$COMPARE_V1" = "1" ] && {
-    echo " PI v1:     $PI_BIN_V1/find_mems"
-    echo " GP v1:     $GAFPACK_V1"
-}
-echo " Output:    $PERF_DIR"
-echo "==============================================="
-
+# ---- Provenance + run banner -----------------------------------------------
 {
     echo "Tag:          $TAG"
     echo "Started:      $(date)"
@@ -252,36 +283,104 @@ echo "==============================================="
     echo "OS:           $(uname -a)"
     echo "Config:       $CONFIG"
     echo "Index dir:    $INDEX_DIR"
-    echo "Mode:         $mode_desc"
-    echo "Trials:       $N_TRIALS"
+    echo "Modes:        ${MODE_ARRAY[*]}"
+    echo "Trials:       $N_TRIALS  (+2 warmups per mode, untimed)"
+    echo "Ordering:     contiguous (all of mode A, then all of mode B)"
+    echo "GAF output:   $([ $EMIT_GAF = 1 ] && echo enabled || echo coverage-only)"
+    echo "MEM_LEN:      $MEM_LEN     MIN_OCC: $MIN_OCC"
     echo
     echo "Binaries:"
-    printf "  %-8s %s  md5=%s\n" "PI_v2"  "$PI_BIN/find_mems" "$(fmd5 "$PI_BIN/find_mems")"
-    printf "  %-8s %s  md5=%s\n" "GP_v2"  "$GAFPACK"           "$(fmd5 "$GAFPACK")"
-    if [ "$COMPARE_V1" = "1" ]; then
-        printf "  %-8s %s  md5=%s\n" "PI_v1" "$PI_BIN_V1/find_mems" "$(fmd5 "$PI_BIN_V1/find_mems")"
-        printf "  %-8s %s  md5=%s\n" "GP_v1" "$GAFPACK_V1"          "$(fmd5 "$GAFPACK_V1")"
-    fi
+    printf "  %-12s %s  md5=%s\n" "find_mems" "$PI_BIN/find_mems" "$(fmd5 "$PI_BIN/find_mems")"
+    printf "  %-12s %s  md5=%s\n" "gafpack"   "$GAFPACK"          "$(fmd5 "$GAFPACK")"
+    echo
+    echo "Input files:"
+    [ -f "${GBZ:-}" ] && printf "  %-32s %15s bytes  %s\n" "$(basename "$GBZ"):" "$(fsize "$GBZ")" "$GBZ"
+    printf "  %-32s %15s bytes  %s\n" "$(basename "$READS"):" "$(fsize "$READS")" "$READS"
+    echo
+    echo "Index files in INDEX_DIR (built once via build_index.sh):"
+    for f in "${BASE}.seq" "${BASE}.rl_bwt" "${BASE}.ri" "${BASE}.tags" \
+             "${BASE}_compressed.tags" "${BASE}.ltags" "${BASE}.paths" "${BASE}.gfa"; do
+        if [ -f "$INDEX_DIR/$f" ]; then
+            printf "  %-40s %15s bytes\n" "$f:" "$(fsize "$INDEX_DIR/$f")"
+        fi
+    done
 } > "$PERF_DIR/PROVENANCE.txt"
 
-# Warmups
-echo
-echo "===== Warmup =====  (untimed, stabilizes OS disk cache)"
-for fmt in "${formats[@]}"; do
-    run_one_trial "$fmt" warmup "$PERF_DIR/$fmt/warmup" skip_summary
-done
+echo "==============================================="
+echo " Perf harness: $TAG"
+echo " Config:    $CONFIG"
+echo " Modes:     ${MODE_ARRAY[*]}"
+echo " Trials:    $N_TRIALS per mode (+2 warmups each, contiguous ordering)"
+echo " GAF:       $([ $EMIT_GAF = 1 ] && echo enabled || echo coverage-only)"
+echo " Index dir: $INDEX_DIR"
+echo " Output:    $PERF_DIR"
+echo "==============================================="
 
-# Timed trials (interleaved when COMPARE_V1 to balance host noise)
-echo
-echo "===== Timed trials =====  (N=$N_TRIALS)"
-for i in $(seq 1 "$N_TRIALS"); do
-    for fmt in "${formats[@]}"; do
-        run_one_trial "$fmt" "$i" "$PERF_DIR/$fmt/trial-$i"
+# ---- Per-mode contiguous: 2 warmups + N timed trials --------------------
+# Contiguous (not interleaved) so the OS page cache reaches steady-state
+# warm for each mode before timing. Mid-run mode switches would cause cache
+# thrash between .ltags (~3.6GB) and _compressed.tags (~19GB), polluting
+# the timed numbers. The 2-warmup design: warmup #1 brings the index pages
+# into cache; warmup #2 ensures any JIT, allocator-arena, or first-touch
+# overhead is amortized. Trade-off: lose protection against host drift
+# DURING the run (other users' jobs, thermal throttling). For HPRC scale
+# this is acceptable since each per-mode block is bounded (~33 min at
+# 5 trials × ~400s).
+for mode in "${MODE_ARRAY[@]}"; do
+    echo
+    echo "===== Mode: $mode ====="
+    echo "-- 2 warmups (untimed, stabilizes OS disk cache for this mode)"
+    for w in 1 2; do
+        run_one_trial "$mode" "warmup-$w" "$PERF_DIR/$mode/warmup-$w" skip_summary
+    done
+    echo "-- $N_TRIALS timed trials"
+    for i in $(seq 1 "$N_TRIALS"); do
+        run_one_trial "$mode" "$i" "$PERF_DIR/$mode/trial-$i"
     done
 done
 
 echo
 echo "Finished: $(date)" >> "$PERF_DIR/PROVENANCE.txt"
+
+# ---- Inline summary --------------------------------------------------------
+echo
+echo "===== Inline summary (mean ± stdev across trials) ====="
+for mode in "${MODE_ARRAY[@]}"; do
+    echo
+    echo "--- $mode ---"
+    # Per-mode means of find_mems wall, find_mems rss, gafpack wall, gafpack rss
+    # Warmups are never written to SUMMARY.tsv (skip_summary), so the only
+    # filter needed is the mode + step.
+    awk -F'\t' -v M="$mode" '
+        $1 == M {
+            if ($3 == "find_mems") { fm_wall[++fmc] = $4; fm_rss[fmc] = $5 }
+            if ($3 == "gafpack")   { gp_wall[++gpc] = $4; gp_rss[gpc] = $5 }
+        }
+        END {
+            function mean(arr, n,    s,i) { for(i=1;i<=n;i++) s+=arr[i]; return s/n }
+            function sd(arr, n, m,    s,i) {
+                if (n<2) return 0
+                for(i=1;i<=n;i++) s+=(arr[i]-m)^2; return sqrt(s/(n-1))
+            }
+            if (fmc > 0) {
+                m1=mean(fm_wall,fmc); s1=sd(fm_wall,fmc,m1)
+                m2=mean(fm_rss,fmc);  s2=sd(fm_rss,fmc,m2)
+                printf "  find_mems  wall %6.2f ± %4.2f s   peak %6.0f ± %4.0f MB   (n=%d)\n", m1, s1, m2, s2, fmc
+            }
+            if (gpc > 0) {
+                m1=mean(gp_wall,gpc); s1=sd(gp_wall,gpc,m1)
+                m2=mean(gp_rss,gpc);  s2=sd(gp_rss,gpc,m2)
+                printf "  gafpack    wall %6.2f ± %4.2f s   peak %6.0f ± %4.0f MB   (n=%d)\n", m1, s1, m2, s2, gpc
+            }
+            if (fmc > 0 && gpc > 0) {
+                tot = mean(fm_wall,fmc) + mean(gp_wall,gpc)
+                printf "  total 09+10 wall %6.2f s\n", tot
+            }
+        }
+    ' "$SUMMARY"
+done
+
 echo
 echo "===== Aggregate with: ====="
 echo "  python3 $PIPE_DIR/perf/summarize.py $PERF_DIR"
+echo "  (or read $SUMMARY directly as TSV)"

@@ -219,29 +219,64 @@ def single_format_report(trials, label, base):
     print("=" * 78)
 
 
+def find_mode_dirs(base):
+    """Return list of (mode_name, Path) for each subdir of base that contains
+    at least one trial-* dir. Sorted alphabetically by mode_name for stable
+    output. Mode names are the subdir basenames (e.g. 'lightweight', 'full-tag',
+    or the legacy 'v1', 'v2')."""
+    out = []
+    for sub in sorted(base.iterdir()):
+        if not sub.is_dir():
+            continue
+        if any(sub.glob("trial-*")):
+            out.append((sub.name, sub))
+    return out
+
+
 def main():
     if len(sys.argv) != 2:
         print(__doc__)
         sys.exit(2)
     base = Path(sys.argv[1])
-    v1_dir, v2_dir = base / "v1", base / "v2"
-    v1_trials = collect_trials(v1_dir) if v1_dir.is_dir() else []
-    v2_trials = collect_trials(v2_dir) if v2_dir.is_dir() else []
 
-    if not v1_trials and not v2_trials:
-        print(f"No trial data found under {base}/{{v1,v2}}/trial-*", file=sys.stderr)
+    mode_dirs = find_mode_dirs(base)
+    if not mode_dirs:
+        print(f"No trial data found under {base}/*/trial-*", file=sys.stderr)
         sys.exit(1)
-    if not v1_trials:
-        single_format_report(v2_trials, "v2", base); return
-    if not v2_trials:
-        single_format_report(v1_trials, "v1", base); return
 
-    assert len(v1_trials) == len(v2_trials), \
-        f"trial count mismatch: v1={len(v1_trials)} v2={len(v2_trials)}"
-    N = len(v1_trials)
+    # Per-mode trial collections
+    mode_trials = [(name, collect_trials(d)) for name, d in mode_dirs]
+    mode_trials = [(n, t) for n, t in mode_trials if t]
+
+    if len(mode_trials) == 0:
+        print(f"No trial data found under {base}/*/trial-*", file=sys.stderr)
+        sys.exit(1)
+    if len(mode_trials) == 1:
+        name, trials = mode_trials[0]
+        single_format_report(trials, name, base)
+        return
+
+    # Two or more modes — do pairwise comparison only between the first two
+    # (most A/B use cases). For 3+ modes, additional comparisons would need
+    # separate invocations.
+    (v1_name, v1_trials), (v2_name, v2_trials) = mode_trials[0], mode_trials[1]
+
+    if len(mode_trials) > 2:
+        extras = ", ".join(name for name, _ in mode_trials[2:])
+        print(f"NOTE: {len(mode_trials)} modes found; comparing only first two "
+              f"({v1_name} vs {v2_name}). Ignoring: {extras}", file=sys.stderr)
+        print(f"      (run summarize.py separately on those mode dirs if needed)",
+              file=sys.stderr)
+        print(file=sys.stderr)
+
+    if len(v1_trials) != len(v2_trials):
+        print(f"WARNING: trial count mismatch: {v1_name}={len(v1_trials)} "
+              f"{v2_name}={len(v2_trials)}", file=sys.stderr)
+    N = min(len(v1_trials), len(v2_trials))
 
     print("=" * 78)
-    print(f"  PERFORMANCE COMPARISON  v1 vs v2   (N={N} timed trials, warm cache)")
+    print(f"  PERFORMANCE COMPARISON  {v1_name} vs {v2_name}   "
+          f"(N={N} timed trials, warm cache)")
     print(f"  Source: {base}")
     print("=" * 78)
     print()
@@ -260,7 +295,7 @@ def main():
         cmp_table("vol ctx switches", "fm_voluntary_csw",  v1_trials, v2_trials, "",   "{:>6.0f}"),
         cmp_table("invol ctx switches", "fm_involuntary_csw", v1_trials, v2_trials, "", "{:>6.0f}"),
     ]
-    print(f"  {'metric':<22}  {'v1':<22}  {'v2':<22}  {'delta':>8}")
+    print(f"  {'metric':<22}  {v1_name:<22}  {v2_name:<22}  {'delta':>8}")
     for r in rows:
         if r: print(f"  {r[0]:<22}  {r[1]:<22}  {r[2]:<22}  {r[3]:>8}")
 
@@ -280,7 +315,7 @@ def main():
         cmp_table("        Locate next", "fm_locate_next_s",    v1_trials, v2_trials, " s", "{:6.2f}"),
         cmp_table("  Bucket sort+write", "fm_sorting_s",        v1_trials, v2_trials, " s", "{:6.3f}"),
     ]
-    print(f"  {'phase':<22}  {'v1':<22}  {'v2':<22}  {'delta':>8}")
+    print(f"  {'phase':<22}  {v1_name:<22}  {v2_name:<22}  {'delta':>8}")
     for r in rows:
         if r: print(f"  {r[0]:<22}  {r[1]:<22}  {r[2]:<22}  {r[3]:>8}")
 
@@ -298,7 +333,7 @@ def main():
         cmp_table("vol ctx switches", "gp_voluntary_csw",  v1_trials, v2_trials, "",   "{:>6.0f}"),
         cmp_table("invol ctx switches","gp_involuntary_csw",v1_trials, v2_trials, "",   "{:>6.0f}"),
     ]
-    print(f"  {'metric':<22}  {'v1':<22}  {'v2':<22}  {'delta':>8}")
+    print(f"  {'metric':<22}  {v1_name:<22}  {v2_name:<22}  {'delta':>8}")
     for r in rows:
         if r: print(f"  {r[0]:<22}  {r[1]:<22}  {r[2]:<22}  {r[3]:>8}")
 
@@ -313,7 +348,7 @@ def main():
         cmp_table("mean passes/path",   "gp_path_scan_mean",   v1_trials, v2_trials, "",   "{:5.2f}"),
         cmp_table("step-visits",        "gp_step_visits",      v1_trials, v2_trials, "",   "{:>15,.0f}"),
     ]
-    print(f"  {'metric':<22}  {'v1':<22}  {'v2':<22}  {'delta':>8}")
+    print(f"  {'metric':<22}  {v1_name:<22}  {v2_name:<22}  {'delta':>8}")
     for r in rows:
         if r: print(f"  {r[0]:<22}  {r[1]:<22}  {r[2]:<22}  {r[3]:>8}")
 
@@ -328,7 +363,7 @@ def main():
         ("_coverage.csv",      "cov_bytes"),
         ("_seq_id_starts.out", "starts_bytes"),
     ]
-    print(f"  {'artifact':<22}  {'v1':>17}  {'v2':>17}  {'delta':>8}")
+    print(f"  {'artifact':<22}  {v1_name:>17}  {v2_name:>17}  {'delta':>8}")
     for label, key in artifacts:
         if key in v1t and key in v2t:
             v1v, v2v = v1t[key], v2t[key]
@@ -344,8 +379,8 @@ def main():
     if sums_v1 and sums_v2:
         v1m = statistics.mean(sums_v1); v1sd = statistics.stdev(sums_v1) if len(sums_v1)>1 else 0
         v2m = statistics.mean(sums_v2); v2sd = statistics.stdev(sums_v2) if len(sums_v2)>1 else 0
-        print(f"  v1: {v1m:5.2f} +- {v1sd:4.2f} s")
-        print(f"  v2: {v2m:5.2f} +- {v2sd:4.2f} s")
+        print(f"  {v1_name}: {v1m:5.2f} +- {v1sd:4.2f} s")
+        print(f"  {v2_name}: {v2m:5.2f} +- {v2sd:4.2f} s")
         print(f"  delta: {relpct(v2m, v1m)}")
 
     print()
