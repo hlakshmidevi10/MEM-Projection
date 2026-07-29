@@ -189,18 +189,24 @@ run_one_trial() {
     echo ">>> [$mode trial=$trial] find_mems"
     # find_mems writes <prefix>_path_pos_v2.bin + <prefix>_seq_id_starts.out;
     # using "mems" prefix.
+    #
+    # Optional env var FIND_MEMS_EXTRA_FLAGS lets callers append extra flags
+    # (e.g. --use-flipped-mems, --debug-stats) without needing a new --modes
+    # value. Unset = current behavior. Word-splitting is deliberate so
+    # multiple flags can be passed as a single space-separated string.
     if [ -n "$find_mems_flags" ]; then
         "$TIME" -v -o "$tdir/find_mems.time" \
             "$PI_BIN/find_mems" \
                 "$INDEX_DIR/${BASE}.ri" "$tag_index" "$READS" \
                 "$MEM_LEN" "$MIN_OCC" "mems" \
-                $find_mems_flags \
+                $find_mems_flags ${FIND_MEMS_EXTRA_FLAGS:-} \
             > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr"
     else
         "$TIME" -v -o "$tdir/find_mems.time" \
             "$PI_BIN/find_mems" \
                 "$INDEX_DIR/${BASE}.ri" "$tag_index" "$READS" \
                 "$MEM_LEN" "$MIN_OCC" "mems" \
+                ${FIND_MEMS_EXTRA_FLAGS:-} \
             > "$tdir/find_mems.log" 2> "$tdir/find_mems.stderr"
     fi
 
@@ -288,6 +294,7 @@ run_one_trial() {
     echo "Ordering:     contiguous (all of mode A, then all of mode B)"
     echo "GAF output:   $([ $EMIT_GAF = 1 ] && echo enabled || echo coverage-only)"
     echo "MEM_LEN:      $MEM_LEN     MIN_OCC: $MIN_OCC"
+    echo "FIND_MEMS_EXTRA_FLAGS: ${FIND_MEMS_EXTRA_FLAGS:-(none)}"
     echo
     echo "Binaries:"
     printf "  %-12s %s  md5=%s\n" "find_mems" "$PI_BIN/find_mems" "$(fmd5 "$PI_BIN/find_mems")"
