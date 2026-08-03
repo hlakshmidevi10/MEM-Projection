@@ -2,7 +2,7 @@
 # =============================================================================
 # pangenome-index — QUERY driver (steps 09–11)
 #
-# Usage:  ./query.sh <config.env> <index-tag> [query-name] [--gaf] [--full-tag]
+# Usage:  ./query.sh <config.env> <index-tag> [query-name] [--gaf] [--full-tag|--all-positions]
 #   config.env   — see configs/*.env for the variable contract.
 #                  Must set: BASE, READS, MEM_LEN, MIN_OCC.
 #                  Required only with --gaf: VALIDATE_SAMPLE.
@@ -12,6 +12,7 @@
 #   index-tag    — name of an existing runs/<index-tag>/ produced by build_index.sh.
 #                  Default tag-index requirement: <BASE>.{ri,ltags,paths,gfa}.
 #                  With --full-tag:                <BASE>.{ri,_compressed.tags,paths,gfa}.
+#                  With --all-positions:           <BASE>.{ri,paths,gfa}  (no tag index).
 #   query-name   — output subdir under runs/<index-tag>/queries/<query-name>/<tag-mode>/.
 #                  Default: config filename with `.env` stripped and any leading
 #                  `<dataset>-` prefix removed (e.g. `hprcv1-chr6-ref-reads.env`
@@ -27,6 +28,14 @@
 #                  (queries/<name>/lightweight/ vs queries/<name>/full-tag/) so
 #                  they never collide. Use --full-tag for A/B regression checks
 #                  against the lightweight default.
+#   --all-positions — verification/POC mode. find_mems bypasses the tag array
+#                  and emits ONE entry per BWT position in each MEM (mem.size
+#                  entries per MEM); gafpack runs with --dedup-read-node. The
+#                  deduped result is the ground truth against which the
+#                  lightweight pipeline's dedup logic can be checked. Output
+#                  volume is large; intended for small reads sets only.
+#                  Lands in queries/<name>/all-positions/. Mutually exclusive
+#                  with --full-tag.
 #
 # Output layout:
 #   runs/<index-tag>/queries/<query-name>/
@@ -42,8 +51,10 @@
 #   │   ├── RUN_INFO.txt
 #   │   ├── config.env -> $CONFIG
 #   │   └── reads      -> $READS
-#   └── full-tag/                        ← created with --full-tag
-#       └── ...same structure, different tag index + gafpack flags...
+#   ├── full-tag/                        ← created with --full-tag
+#   │   └── ...same structure, different tag index + gafpack flags...
+#   └── all-positions/                   ← created with --all-positions
+#       └── ...same structure, find_mems w/o tag index + gafpack --dedup-read-node...
 #
 # Each step is guarded by [ -f <output> ]; re-invocation skips completed steps.
 # Adding --gaf to a previously coverage-only run re-runs step 10 in the SAME
@@ -88,21 +99,26 @@ done
 # ---- Args ------------------------------------------------------------------
 # Accept flags anywhere in the arg list. Strip them out, leaving positionals.
 EMIT_GAF=0
-TAG_MODE="lightweight"   # default; --full-tag flips to "full-tag"
+TAG_MODE="lightweight"   # default; --full-tag / --all-positions flip this
+TAG_MODE_EXPLICIT=0
 POSITIONAL=()
 for arg in "$@"; do
     case "$arg" in
-        --gaf)         EMIT_GAF=1 ;;
-        --full-tag)    TAG_MODE="full-tag" ;;
-        --lightweight) TAG_MODE="lightweight" ;;   # accept for symmetry / explicitness
+        --gaf)             EMIT_GAF=1 ;;
+        --full-tag)        TAG_MODE="full-tag";     TAG_MODE_EXPLICIT=$((TAG_MODE_EXPLICIT+1)) ;;
+        --lightweight)     TAG_MODE="lightweight";  TAG_MODE_EXPLICIT=$((TAG_MODE_EXPLICIT+1)) ;;
+        --all-positions)   TAG_MODE="all-positions";TAG_MODE_EXPLICIT=$((TAG_MODE_EXPLICIT+1)) ;;
         --help|-h)
             sed -n '2,56p' "$0"; exit 0 ;;
         *) POSITIONAL+=("$arg") ;;
     esac
 done
 set -- "${POSITIONAL[@]}"
+if [ "$TAG_MODE_EXPLICIT" -gt 1 ]; then
+    echo "ERROR: --lightweight, --full-tag, and --all-positions are mutually exclusive"; exit 2
+fi
 
-[ $# -ge 2 ] || { echo "Usage: $0 <config.env> <index-tag> [query-name] [--gaf] [--full-tag]"; exit 2; }
+[ $# -ge 2 ] || { echo "Usage: $0 <config.env> <index-tag> [query-name] [--gaf] [--full-tag|--all-positions]"; exit 2; }
 CONFIG="$1"
 INDEX_TAG="$2"
 [ -f "$CONFIG" ] || CONFIG="$PIPE_DIR/configs/$CONFIG"
@@ -145,8 +161,9 @@ INDEX_DIR="$PIPE_DIR/runs/$INDEX_TAG"
 # Required index files differ by tag mode.
 REQUIRED_INDEX_FILES=("${BASE}.ri" "${BASE}.paths" "${BASE}.gfa")
 case "$TAG_MODE" in
-    lightweight) REQUIRED_INDEX_FILES+=("${BASE}.ltags") ;;
-    full-tag)    REQUIRED_INDEX_FILES+=("${BASE}_compressed.tags") ;;
+    lightweight)   REQUIRED_INDEX_FILES+=("${BASE}.ltags") ;;
+    full-tag)      REQUIRED_INDEX_FILES+=("${BASE}_compressed.tags") ;;
+    all-positions) ;;  # tag array bypassed; no extra files required
 esac
 for f in "${REQUIRED_INDEX_FILES[@]}"; do
     [ -f "$INDEX_DIR/$f" ] || { echo "ERROR: missing index artifact for $TAG_MODE mode: $INDEX_DIR/$f"; exit 1; }
@@ -171,11 +188,11 @@ cd "$QUERY_DIR"
     echo "BASE:          $BASE"
     echo "MEM_LEN:       $MEM_LEN"
     echo "MIN_OCC:       $MIN_OCC"
-    if [ "$TAG_MODE" = "lightweight" ]; then
-        echo "Tag mode:      lightweight (find_mems --lightweight-tags, gafpack --dedup-read-node)"
-    else
-        echo "Tag mode:      full-tag (find_mems w/o lightweight, gafpack w/o dedup-read-node)"
-    fi
+    case "$TAG_MODE" in
+        lightweight)   echo "Tag mode:      lightweight (find_mems --lightweight-tags, gafpack --dedup-read-node)" ;;
+        full-tag)      echo "Tag mode:      full-tag (find_mems w/o lightweight, gafpack w/o dedup-read-node)" ;;
+        all-positions) echo "Tag mode:      all-positions (find_mems --all-positions [tag array bypassed], gafpack --dedup-read-node)" ;;
+    esac
     if [ "$EMIT_GAF" = "1" ]; then
         echo "GAF mode:      --gaf (alignment.gaf produced; validate_gaf runs)"
         echo "VALIDATE_SAMPLE: $VALIDATE_SAMPLE"
@@ -255,10 +272,12 @@ profile() {
 RI="$INDEX_DIR/${BASE}.ri"
 PATHS="$INDEX_DIR/${BASE}.paths"
 GFA="$INDEX_DIR/${BASE}.gfa"
-# Tag index varies by mode: .ltags for lightweight, _compressed.tags for full-tag.
+# Tag index varies by mode: .ltags for lightweight, _compressed.tags for full-tag,
+# /dev/null for all-positions (find_mems --all-positions ignores the arg).
 case "$TAG_MODE" in
-    lightweight) TAG_INDEX="$INDEX_DIR/${BASE}.ltags" ;;
-    full-tag)    TAG_INDEX="$INDEX_DIR/${BASE}_compressed.tags" ;;
+    lightweight)   TAG_INDEX="$INDEX_DIR/${BASE}.ltags" ;;
+    full-tag)      TAG_INDEX="$INDEX_DIR/${BASE}_compressed.tags" ;;
+    all-positions) TAG_INDEX="/dev/null" ;;
 esac
 
 echo "=== Query setup ==="
@@ -279,18 +298,29 @@ echo
 # offloaded to gafpack via --dedup-read-node in step 10).
 # Full-tag mode: omits --lightweight-tags; find_mems reads _compressed.tags
 # and dedups internally (per-haplotype duplicates still counted separately).
-if [ "$TAG_MODE" = "lightweight" ]; then
-    FIND_MEMS_FLAGS=(--lightweight-tags)
-    echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, --lightweight-tags) ==="
-else
-    FIND_MEMS_FLAGS=()
-    echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, full-tag mode) ==="
-fi
+# All-positions mode: passes --all-positions; tag array bypassed; emits one
+# entry per BWT position in each MEM. gafpack --dedup-read-node then collapses
+# down to (read_id, read_st, node, offset) ground truth for verification.
+case "$TAG_MODE" in
+    lightweight)
+        FIND_MEMS_FLAGS=(--lightweight-tags)
+        echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, --lightweight-tags) ===" ;;
+    full-tag)
+        FIND_MEMS_FLAGS=()
+        echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, full-tag mode) ===" ;;
+    all-positions)
+        FIND_MEMS_FLAGS=(--all-positions)
+        echo "=== 09 find_mems (L=$MEM_LEN, occ>=$MIN_OCC, --all-positions [verify/POC]) ===" ;;
+esac
 # find_mems writes <prefix>_path_pos_v2.bin and <prefix>_seq_id_starts.out.
 # Using "mems" as the prefix → mems_path_pos_v2.bin, mems_seq_id_starts.out.
+#
+# Optional env var FIND_MEMS_EXTRA_FLAGS lets callers append extra flags
+# (e.g., --use-flipped-mems) without editing this script.  Word-splits into
+# the argv unmodified; empty by default.  Mirrors the perf_harness.sh hook.
 [ -f "mems_path_pos_v2.bin" ] || profile 09_find_mems "$PI_BIN/find_mems" \
     "$RI" "$TAG_INDEX" "$READS" "$MEM_LEN" "$MIN_OCC" "mems" \
-    "${FIND_MEMS_FLAGS[@]}"
+    "${FIND_MEMS_FLAGS[@]}" ${FIND_MEMS_EXTRA_FLAGS:-}
 
 # === 10 gafpack =============================================================
 # Two orthogonal axes:
@@ -312,7 +342,10 @@ GAFPACK_FLAGS=(
     --seq-id-starts "mems_seq_id_starts.out"
     --path-names "$PATHS"
 )
-if [ "$TAG_MODE" = "lightweight" ]; then
+# Both lightweight and all-positions feed gafpack unfiltered records and rely
+# on it for graph-position dedup. full-tag's records are already deduped by
+# find_mems so we omit the flag there.
+if [ "$TAG_MODE" = "lightweight" ] || [ "$TAG_MODE" = "all-positions" ]; then
     GAFPACK_FLAGS+=(--dedup-read-node)
 fi
 
