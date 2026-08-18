@@ -83,6 +83,17 @@ for v in GBZ BASE KMER THREADS; do
 done
 [ -e "$GBZ" ] || { echo "Missing input: $GBZ"; exit 1; }
 
+# ---- Cap OpenMP parallelism -----------------------------------------------
+# Bind OMP_NUM_THREADS to $THREADS so OpenMP-using binaries (build_rindex,
+# build_tags, convert_tags, print_stats, build_lightweight_tags -- all link
+# the parallel headers in pangenome-index-latest/include/pangenome_index/)
+# respect the config rather than grabbing every core via omp_get_max_threads().
+# Without this, a 96-core host runs build_tags at 96 threads regardless of
+# what THREADS says, which (a) hides config-vs-actual mismatches in timing
+# logs and (b) is antisocial on shared hosts. Honor any pre-set value so
+# `OMP_NUM_THREADS=8 ./build_index.sh ...` still overrides at the CLI.
+export OMP_NUM_THREADS="${OMP_NUM_THREADS:-$THREADS}"
+
 RUN_DIR="$PIPE_DIR/runs/$TAG"
 LOGS="$RUN_DIR/logs"
 mkdir -p "$LOGS"

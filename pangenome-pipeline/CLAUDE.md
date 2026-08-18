@@ -15,6 +15,80 @@ BUILD_QUERY_LAYOUT.md        full directory + config contract documentation
 vesuvio-build-issues.md      field notes on porting to Guix-on-Debian — read before debugging build failures on a non-Mac host
 ```
 
+## Data sources and GFA preparation
+
+### HPRC pangenome graphs
+
+| Dataset | Source | Notes |
+|---------|--------|-------|
+| **HPRC v1 (freeze1)** | `s3://human-pangenomics/pangenomes/freeze/freeze1/pggb/chroms/chr{N}.hprc-v1.0-pggb.gfa.gz` | Final normalized pggb output; skip normalization steps |
+| **HPRC v2** | `s3://garrisonlab/hprcv2/gfas/by-chromosome/` | Smoothxg output (`.smooth.gfa.zst`); needs full normalization |
+| **Local smoothxg** | pggb intermediate `*.smooth.gfa` | Needs full normalization chain |
+
+### prepare_inputs.sh — GFA → GBZ conversion
+
+`hprcv1/prepare_inputs.sh` and `hprcv2/prepare_inputs.sh` convert source GFAs to pipeline-ready GBZ files. The flow depends on input type:
+
+**For smoothxg output (needs normalization):**
+1. **gfaffix** — collapse walk-preserving shared affixes
+2. **odgi build|unchop|sort** — merge segments, canonical sort order
+3. **odgi view** — export normalized GFA
+4. **PanSN rename** — fix 2-field reference paths (see below)
+5. **gfa2gbwt** — build GBZ with required flags
+
+**For freeze1 releases (already normalized):**
+1. **PanSN rename** — fix 2-field reference paths if needed
+2. **gfa2gbwt** — build GBZ with required flags
+
+### Common issues and fixes
+
+| Issue | Symptom | Fix |
+|-------|---------|-----|
+| **2-field PanSN paths** | `gfa2gbwt: Cannot parse path name chm13#chr1` | Reference paths like `chm13#chr1` need 3 fields. Fix: `sed 's/^P\tchm13#chr1\t/P\tchm13#1#chr1\t/'` |
+| **Nodes > 1024 bp** | `build_tags: Node offset 1024 is too large` | Must use `gfa2gbwt -m 1024` to split oversized segments. See `vesuvio-build-issues.md` hurdle #14 |
+| **GBZ v2 vs v1** | `vg: Expected v1, got v2` | Add `--gbz-v1` flag if vg was built against gbwtgraph < v1.4.0 |
+| **Cross-device rename** | `grlbwt-cli: Invalid cross-device link` | Use `-T $RUN_DIR/grl_tmp` to put tmpdir on same filesystem as output |
+
+### gfa2gbwt flags (mandatory for this pipeline)
+
+```bash
+gfa2gbwt -c -p --pan-sn -m 1024 --gbz-v1 -P $THREADS <base>
+```
+
+| Flag | Purpose |
+|------|---------|
+| `-c` | Compress-gfa mode (read .gfa, write .gbz) |
+| `-p` | Progress to stderr |
+| `--pan-sn` | Parse PanSN path names (sample#hap#contig) |
+| `-m 1024` | **REQUIRED** — cap segment length; build_tags uses 10-bit offset |
+| `--gbz-v1` | Write GBZ v1 format (required if vg < gbwtgraph v1.4.0) |
+| `-P N` | Parallel construction jobs |
+
+### PanSN path naming
+
+gfa2gbwt's `--pan-sn` requires 3-field path names: `sample#haplotype#contig`. Some HPRC releases have reference paths with only 2 fields (e.g., `chm13#chr1` instead of `chm13#1#chr1`).
+
+**Detection:**
+```bash
+awk -F'\t' '/^P/{n=split($2,a,"#"); if(n!=3){print $2}}' input.gfa | head
+```
+
+**Fix (in-place):**
+```bash
+sed -i -E \
+  -e 's/^(P	)chm13#chr([0-9XYM]+)(	)/\1chm13#1#chr\2\3/' \
+  -e 's/^(P	)grch38#chr([0-9XYM]+)(	)/\1grch38#1#chr\2\3/' \
+  input.gfa
+```
+
+### Timing reference (vesuvio, 64 threads)
+
+| Step | chr1 (11.8M nodes) | chr6 (~4M nodes) |
+|------|-------------------|------------------|
+| gfa2gbwt | ~21 min, 18.6 GB | ~5-8 min |
+| build_tags | TBD | ~87 min, 82 GB |
+| Full build_index.sh | TBD | ~2-3 hours |
+
 ## Correctness criterion
 **A query is correct iff its sorted `.gaf` line set matches a known-good reference, and `validate_gaf_v2.py` reports 100% valid on the sample.** `validate_gaf_v2.py` checks that every sampled GAF entry's `(read_id, read_st, match_len, node_id, offset)` actually corresponds to a real substring match between the read and the path the GAF claims — there is no biological reason for a correctly-built pipeline to ever produce an invalid entry. Any `Invalid > 0` indicates a real bug somewhere in the build_index/query chain (commonly: stale tag index, GBZ ↔ GFA node-ID mismatch, off-by-one in convert_tags), NOT noise.
 
@@ -58,7 +132,7 @@ cd mem-projection/pangenome-pipeline
 | Step | Tool | In | Out | Notes |
 |---|---|---|---|---|
 | 01 | `gbz_stats` | `.gbz` | log only | parsed for `NUM_SEQ` |
-| 02 | `gbz_extract -b -t -p` | `.gbz` | `.seq` | both orientations; size ≈ 2 × `gbz_stats -p` path length (fwd + rev complement of each path). NOT a multiple of `-i Total length`, which is in BWT node-visits, not bp. HPRCv2 chr6: `.seq` = 160.7 GB = 2 × 80.34 Gbp. |
+| 02 | `gbz_extract -b -t -p` | `.gbz` | `.seq` | both orientations; `.seq` bytes ≈ 2 × `gbz_stats -p Path length`. HPRCv2 chr6: 160.7 GB = 2 × 80.34 Gbp. See `gbz_stats` footgun below — never use `-i Total length` as a bp count. |
 | 03 | `grlbwt-cli` | `.seq` | `.rl_bwt` | |
 | 04 | `build_rindex` | `.rl_bwt` | `.ri` | new encoding (~60% smaller than pre-refactor) |
 | 05 | `build_tags -k K` | `.gbz` `.rl_bwt` | `.tags` | slow step (~1 h on yeast-235) |
@@ -92,6 +166,11 @@ Validation is gated behind `query.sh --gaf`; the default (coverage-only) mode sk
 Baseline numbers for comparison live in `$REF_DIR/PERFORMANCE_COMPARISON.md` (use the *normalized-graph* column).
 
 ## Known footguns
+- **`gbz_stats` has two "Total/Path length" outputs in different units — pick the right flag.**
+  - `gbz_stats -i` "**Total length**" = sum of GBWT **node-visits** across all paths (BWT length of the GBWT index, in alphabet symbols, NOT bp). Useful for GBWT compactness comparisons; useless as a sequence-content metric.
+  - `gbz_stats -p` "**Path length**" = sum of haplotype path lengths in **bp**, single orientation. THIS is the right number for "how much haplotype sequence does this graph carry."
+  - Bidirectional `.seq` bytes ≈ 2 × `-p Path length`. HPRCv2 chr6: PGGB `-p` = 80.34 Gbp, MC `-p` = 78.56 Gbp; the `-i` numbers (5.22 / 4.53) for the same graphs are ~15× smaller and are NOT bp. Sanity check: `-p` / `-i` ≈ avg node bp visited per BWT symbol (~100 for HPRC chr6 with `-m 1024` chopping).
+  - For cross-graph "sequence content" comparisons (e.g. PGGB vs MC), always quote `-p Path length`. `build_index.sh` parses `-i` only to derive `NUM_SEQ`; don't repurpose it.
 - **`convert_tags` without `--num-seq` silently produces a misaligned index.** It always strips endmarker runs (`Skipping pure endmarker run` in the log) and only re-prepends them if `--num-seq` is given. Without it, `bwt_intervals` is short by `NUM_SEQ`, every BWT-position→tag-run lookup is offset, and `find_mems` emits `(seq_id, node_id)` pairs where the node isn't on that seq's path. `build_index.sh` derives `NUM_SEQ` from `gbz_stats` output. Sanity check: `convert_tags` log should report `bwt_intervals size == n+1` where `n` = `.seq` byte length.
 - **`gafpack` v1 infinite-loops on bad input.** `process_path_matches` on the `path-walker` branch had a `loop {}` that only exits when every record's `node_id` is found on its path's step list. v2 replaces this with a monotonic step cursor — no implicit unbounded loop possible. Footgun is **gone** as of v2.
 - **`find_mems` reports two different n/r ratios; the per-MEM mean is outlier-skewed.** The log prints both `Mean per-MEM n/r ratio = (1/N)·Σ(mem.size/tag_runs)` and `Global n/r ratio = Σmem.size / Σtag_runs`. The per-MEM mean is dominated by a long tail of high-occurrence MEMs (e.g. HPRCv2 chr6 alt-noisy: mean=218 vs global=4.08, a 50× distortion). For cross-dataset comparison ALWAYS use the global ratio; the per-MEM mean is only useful as a distribution-shape proxy. Older find_mems builds only printed the per-MEM mean (labeled "Average n/r ratio").

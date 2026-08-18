@@ -27,7 +27,7 @@ goes sideways.
 The pipeline itself (`build_index.sh` + `query.sh`, the binaries, the configs) is identical across
 both hosts. The divergences are all in the toolchain *around* the pipeline.
 
-## The 12 hurdles, in order encountered
+## The 14 hurdles, in order encountered
 
 > **Note for future readers:** Hurdles 10-12 reference `run.sh`, which was the
 > monolithic pipeline driver in use when these issues were debugged. Since
@@ -436,6 +436,143 @@ fast, pin and bump deliberately.
 
 ---
 
+### 13. `curl` fails with `OPENSSL_3.{2,3}.0' not found` (hprcv2/prepare_inputs.sh step 0a)
+
+**Symptom** (running `hprcv2/prepare_inputs.sh` on vesuvio after sourcing
+`~/.pangenome_env.sh`):
+```
+[0a] downloading s3://garrisonlab/hprcv2/gfas/by-chromosome/...gfa.zst -> ...gfa.zst
+curl: /home/haril/.guix-profile/lib/libssl.so.3: version `OPENSSL_3.2.0' not found (required by /lib/x86_64-linux-gnu/libcurl.so.4)
+curl: /home/haril/.guix-profile/lib/libssl.so.3: version `OPENSSL_3.3.0' not found (required by /lib/x86_64-linux-gnu/libcurl.so.4)
+```
+curl exits non-zero, `set -euo pipefail` aborts the script before any normalize work runs.
+
+**Root cause:** ABI mismatch driven by `LD_LIBRARY_PATH`. The user runs the
+system `/usr/bin/curl`, which is dynamically linked against Debian's
+`/lib/x86_64-linux-gnu/libcurl.so.4`. That `libcurl.so.4` was built against a
+newer OpenSSL (≥ 3.2.0 / 3.3.0) and lists those versioned symbols as
+requirements. The Guix env's
+`LD_LIBRARY_PATH=$HOME/lib:$HOME/.guix-profile/lib:...` (set by
+`~/.pangenome_env.sh`, hurdle 7) prepends Guix's `~/.guix-profile/lib`, which
+ships an older `libssl.so.3` lacking those symbols. The dynamic linker resolves
+the Guix `libssl.so.3` first; the system `libcurl.so.4`'s symbol lookups fail.
+
+In short: a system binary inherited the Guix lib search path that was set up
+for the *pipeline* binaries (which were linked against the Guix libs and
+need them). The same env that fixes hurdle 7 breaks system curl.
+
+**Fix (in `hprcv2/prepare_inputs.sh`):** in step `[0a]`, retry curl with
+`LD_LIBRARY_PATH` unset before giving up. `env -u LD_LIBRARY_PATH` runs curl
+with the user's normal env minus that one variable, restoring the system
+dynamic-linker default (`/etc/ld.so.cache`) and resolving curl against
+Debian's matching libssl.
+
+```bash
+$TIME_PFX curl ... "$URL" \
+  || $TIME_PFX env -u LD_LIBRARY_PATH curl ... "$URL"
+```
+
+The fallback only fires if the first attempt fails (network errors, 4xx,
+etc. still surface normally), so it doesn't mask legitimate curl problems.
+
+**Why not fix `~/.pangenome_env.sh` instead?** Three reasons:
+1. The pipeline binaries (`find_mems`, `build_tags`, `gfa2gbwt`) genuinely
+   need `$HOME/.guix-profile/lib` on their lib path — that's hurdle 7.
+   Removing it from the global env regresses runtime linkage for everything
+   downstream.
+2. Appending the Guix dir instead of prepending would help here, but Guix's
+   own `etc/profile` prepends — fighting it is more work than per-callsite
+   handling.
+3. The mismatch only affects *system* binaries that happen to be called
+   from inside a Guix-flavored shell. There's exactly one such call
+   (`curl` in step 0a). Scope the fix there.
+
+**Workaround if the fallback is missing or also fails:** download manually
+in a fresh shell (`ssh vesuvio` → don't source `~/.pangenome_env.sh` →
+`curl -fL -o file https://...`) and drop the `.zst` at
+`~/mem-projection/hprcv2/`. The script's `[0a]` resume guard
+(`elif [ -f "$SMOOTH_ZST" ]; then echo "... already present -- skipping download"`)
+picks it up cleanly on re-run.
+
+**Lesson:** When mixing two userland stacks on one host (Guix + Debian
+system libs), `LD_LIBRARY_PATH` set globally for one stack's binaries can
+silently break the other stack's binaries. Prefer per-callsite scoping
+(`env -u`, or wrapper scripts) over a single shared env file when the
+pipeline calls out to system tools.
+
+---
+
+### 14. `build_tags` aborts on GBZ nodes > 1024 bp (build_index.sh step 05)
+
+**Symptom** (build_index.sh, ~7 minutes into step 05 on HPRC chr6):
+```
+=== 05 build_tags ===
+>>> [05_build_tags] .../bin/build_tags -k 31 chr6.gbz ...rl_bwt ...tags
+index_haplotypes(): Node offset 1024 is too large
+```
+Hard abort; no `.tags` produced. yeast-235 never tripped this because no
+segment in its (much smaller) graph exceeded 1024 bp anyway.
+
+**Root cause:** `build_tags` uses a **10-bit field (1024 values) to encode
+per-node offsets** in its internal minimizer index. Any node ≥ 1024 bp
+overflows that field. The originally-staged HPRC chr6 GBZ had nodes up to
+~193 kb (4364 segments > 1024 bp), so `build_tags` ran fine until it walked
+into the first oversized node and aborted.
+
+The oversized nodes came from `prepare_inputs.sh` passing `gfa2gbwt -m 0`,
+which **disables** the default 1024-bp segment-split. The intent was
+"keep GBZ node IDs equal to GFA segment IDs across rebuilds." For yeast-235
+this was harmless (no segment needed splitting); for HPRC it produced a GBZ
+that build_tags can't ingest.
+
+The `gfa2gbwt --help` parenthetical even spells out the constraint:
+
+```
+-m, --max-node N   break > N bp segments into multiple nodes (default 1024)
+                   (minimizer index requires nodes of length <= 1024 bp)
+```
+
+**Two design intents in conflict, and build_tags wins** because it is
+mandatory for the pipeline.
+
+**Fix:** Switch `gfa2gbwt -m 0` → `gfa2gbwt -m 1024` in both
+`hprcv1/prepare_inputs.sh` and `hprcv2/prepare_inputs.sh` (step `[2]`).
+For a one-off recovery of an already-built GBZ:
+
+```bash
+cd ~/mem-projection/hprcv1
+gfa2gbwt -c -p --pan-sn -m 1024 --gbz-v1 -P 8 \
+    chr6.pan.fa.a2fb268.4030258.6a1ecc2.smooth.final
+# ~5 min; then build_tags completes cleanly (~87 min, 82 GB peak RAM).
+```
+
+**Side effect:** with `-m 1024`, gfa2gbwt may split source segments and
+**GBZ node IDs no longer match GFA segment IDs.** This is fine — the pipeline
+contract "GBZ and GFA must share node IDs" is upheld by `build_index.sh`
+step `01b` re-deriving the pipeline-facing GFA from the (post-split) GBZ via
+```
+vg convert -fW --no-translation $GBZ > $BASE.gfa
+```
+**That is why step 01b is strictly mandatory at HPRC scale.** Using a
+user-supplied GFA with gafpack against a `-m 1024`-built GBZ would silently
+produce wrong projections, because gafpack would walk segment IDs that the
+GBZ no longer uses verbatim.
+
+For datasets where no segment exceeds 1024 bp (e.g. yeast-235), `-m 0` and
+`-m 1024` produce byte-identical GBZs — but defaulting to `-m 1024` keeps
+the recipe correct at all scales.
+
+**Lesson:** "Stable IDs across rebuilds" is an attractive property but is
+not actually load-bearing for this pipeline — the pipeline already
+re-derives the GFA from the GBZ at every build, so any node-ID stability
+benefit dissolves at step 01b anyway. Whenever a tool's hard constraint
+(build_tags' 10-bit offset) conflicts with a "nice-to-have" upstream
+property (`-m 0`'s ID stability), the constraint wins; trying to preserve
+the nice-to-have just produces a GBZ that the rest of the pipeline can't
+consume.
+
+---
+
 ## Layout on vesuvio after successful bootstrap
 
 ```
@@ -504,3 +641,55 @@ Most likely culprits, in order of probability on a Guix/Debian host:
 For everything else, check the commit log on `vesuvio-bootstrap` — every fix
 has a commit message explaining what the symptom was and what root cause it
 addressed. The git history *is* the documentation.
+
+---
+
+### 15. `git pull` reports "Already up to date" but is actually behind
+
+**Symptom:**
+```
+$ git pull
+Already up to date.
+$ git log -1 --oneline
+7e5ddf2 ...   # <-- should be b2c1608 per Mac
+```
+`git remote show origin` says "local out of date" but `git pull` does nothing.
+
+**Root cause:** The local branch tracks nothing. `git branch -vv` shows no
+upstream (no `[origin/...]`). This happens when the branch was created locally
+and pushed with `git push origin <branch>` instead of `git push -u origin <branch>`.
+Without an upstream, `git pull` does `git fetch` + `git merge FETCH_HEAD`,
+but FETCH_HEAD only updates when you explicitly `git fetch origin <branch>`.
+A plain `git pull` fetches the *default* branch (usually main), sees no new
+commits there, and reports "Already up to date" — even though the feature
+branch is stale.
+
+**Diagnosis:**
+```bash
+git branch -vv             # check for [origin/branch-name] tracking
+git remote show origin     # shows "local out of date" even when pull says ok
+git branch -r              # often missing origin/your-branch entirely
+```
+
+**Fix:** Three-step recovery:
+
+```bash
+# 1. Fetch the branch ref explicitly into remotes namespace
+git fetch origin tag-head-samples:refs/remotes/origin/tag-head-samples
+
+# 2. Set tracking for future pulls
+git branch --set-upstream-to=origin/tag-head-samples tag-head-samples
+
+# 3. Merge
+git merge origin/tag-head-samples
+```
+
+**Preventive:** When pushing a new branch, always use `-u`:
+```bash
+git push -u origin tag-head-samples
+```
+
+**Lesson:** On vesuvio (and any remote where you clone + checkout feature
+branches), `git pull` silently doing nothing is almost always a tracking
+configuration issue. Check `git branch -vv` before assuming the remote has
+no new commits.
