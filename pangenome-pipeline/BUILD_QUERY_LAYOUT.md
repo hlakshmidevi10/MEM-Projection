@@ -207,7 +207,7 @@ irrelevant) but not fatal. Common patterns:
 # Coverage-only queries (prod-fast — no .gaf, no validate)
 ./query.sh hprcv1-chr6-ref-reads.env       hprc-chr6-2026-06-02
 ./query.sh hprcv1-chr6-alt-reads.env       hprc-chr6-2026-06-02
-./query.sh hprcv1-chr6-alt-noisy-reads.env hprc-chr6-2026-06-02
+./query.sh hprcv1-chr6-alt-noisy.env       hprc-chr6-2026-06-02
 
 # Validate a query end-to-end (slower; includes step 11)
 ./query.sh hprcv1-chr6-ref-reads.env hprc-chr6-2026-06-02 --gaf

@@ -9,6 +9,7 @@ query.sh                     ./query.sh <config.env> <index-tag> [query-name] [-
                                  → runs/<index-tag>/queries/<query-name>/{lightweight,full-tag}/
 compare.sh                   ./compare.sh <config.env> <index-tag> <query-name> [ref-query-dir]
 bootstrap_vesuvio.sh         per-user install of all deps on a fresh Linux host
+configs/README.md            **config index — read before picking an .env**; defaults, coverage gates, known-broken configs
 configs/*.env                inputs + params (see yeast235-chrII-normalized.env for the contract)
 runs/<index-tag>/            one shared index per build; queries/<q>/ per query
 BUILD_QUERY_LAYOUT.md        full directory + config contract documentation
@@ -108,6 +109,13 @@ Verified clean runs:
 Index files (`.ri` / `_compressed.tags` / `.ltags` / `.gfa`) and query outputs (`mems_path_pos_v2.bin` / `alignment.gaf` / `alignment_coverage.csv`) will NOT md5-match `final_output2/` — encoding and row order have changed (and the binary record format itself differs from the v1 24-byte layout that `final_output2` was built against). Only `.seq` / `.rl_bwt` / `.tags` / `.paths` / `mems_seq_id_starts.out` are byte-stable. `compare.sh` does a sorted line-set diff for `alignment.gaf` / `alignment_coverage.csv`; SET-EQUAL there is the pass signal.
 
 ## Running
+
+**Pick your config from [`configs/README.md`](configs/README.md) first.** It lists
+the per-dataset defaults, the known-good coverage MD5 gates, and the configs
+that are currently broken (7 of 23 have a missing `READS` or `GBZ` and will
+fail on invocation). Default to the config named exactly after the dataset —
+`hprcv1-chr6.env`, `yeast235-chrII-normalized.env`.
+
 ```bash
 cd mem-projection/pangenome-pipeline
 
