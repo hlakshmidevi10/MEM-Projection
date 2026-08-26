@@ -69,7 +69,7 @@ PIPE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 MEM_PROJ="$(cd "$PIPE_DIR/.." && pwd)"
 
 # ---- Tool locations --------------------------------------------------------
-PI_BIN="${PI_BIN:-/Users/hlakshmidevi/personal/pangenome-index-latest/bin}"
+PI_BIN="${PI_BIN:-$HOME/dev/pangenome-index-pvt/bin}"
 GAFPACK="${GAFPACK:-gafpack}"
 VALIDATE_GAF="${VALIDATE_GAF:-$MEM_PROJ/scripts/validate_gaf_v2.py}"
 
@@ -376,8 +376,14 @@ echo "=== TIMING SUMMARY ($TIMING) ==="
 cat "$TIMING"
 echo
 echo "=== OUTPUTS ($QUERY_DIR/) ==="
+# `|| true` is load-bearing under `set -euo pipefail` (top of file). In
+# coverage-only mode alignment.gaf deliberately does not exist, so ls exits 2;
+# pipefail propagates that through the pipe and set -e then aborts the script
+# *at its own summary* — after all real work has completed. The symptom was a
+# successful run reporting exit 2, with the "Coverage-only mode" note below
+# never printed. Only --gaf runs were unaffected, since the file exists there.
 ls -lh mems_*.bin mems_*.out alignment.gaf alignment_coverage.csv 2>/dev/null \
-    | awk '{printf "  %-40s %8s\n", $NF, $5}'
+    | awk '{printf "  %-40s %8s\n", $NF, $5}' || true
 if [ "$EMIT_GAF" = "0" ]; then
     echo
     echo "Coverage-only mode (tag=$TAG_MODE) — no .gaf, no validation."

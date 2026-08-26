@@ -38,8 +38,21 @@ in `RESEARCH_JOURNAL.md` is measured on.
 | Config | Reads | `MEM_LEN` | Use for |
 |---|---|---:|---|
 | `hprcv1-chr1-hg00097-noisy-L25.env` | HG00097 noisy | 25 | **the working chr1 query config** |
-| `hprcv1-chr1-alt-noisy-L25.env` | alt-noisy | 25 | |
+| `hprcv1-chr1-alt-noisy-L25.env` | HG00438 alt-noisy | 25 | in-graph |
+| `hprcv1-chr1-hg002-noisy-L25.env` | HG002 noisy | 25 | out-of-graph (0 of 2262 paths) |
+| `hprcv1-chr1-hg002-clean-L25.env` | HG002 clean | 25 | out-of-graph, error-free — see note below |
 | `hprcv1-chr1.env` | — | — | ⚠️ build-only; `READS` unset (see Broken below) |
+
+The HG002 chr1 reads are simulated from the **HG002 v1.1 Q100 paternal assembly
+FASTA** (md5-verified against the published checksum), contig `HG002#1#chr1`,
+`wgsim -S 42` — not graph-extracted, so the contig is unclipped. See
+`hprcv1/READS_README.md` and `hprcv1/reads_work_chr1/generate_hg002_chr1_reads.sh`.
+
+⚠️ **The clean set is an extreme workload.** Being error-free, its reads match
+some haplotype almost end-to-end even though HG002 is absent from the graph
+(human haplotypes are ~99.9% identical): average MEM length **197.4 bp of 200**,
+740 tag runs per MEM, and **75.2 M entries written** — 4× the noisy set's 18.3 M,
+a 1.2 GB `.bin`, and 10.9 GB peak RSS in `find_mems`. Budget accordingly.
 
 ## Yeast-235 chrII — index tag `vesuvio-smoke`
 
@@ -53,6 +66,20 @@ in `RESEARCH_JOURNAL.md` is measured on.
 
 `hprcv2-chr6.env`, `hprcv2-chr6-alt-noisy-500k.env`, `hprcv2-mc-chr6.env`
 (L=25) and `hprcv1-mc-chr6.env` all resolve. See Broken below for the rest.
+
+### HPRC v2 MC chm13 chr6 — index tag `hprcv2-mc-chr6-2026-06-07`
+
+| Config | Reads | `MEM_LEN` | Graph relation |
+|---|---|---:|---|
+| `hprcv2-mc-chr6.env` | HG00438 alt-noisy | 25 | ⚠️ **same sample, different assembly** |
+| `hprcv2-mc-chr6-hg002-noisy-L25.env` | HG002 noisy | 25 | **in-graph** (`HG002#1#chr6#…`) |
+
+⚠️ **`alt-reads` is not in-graph for this index.** The reads were simulated from
+`HG00438#2#JAHBCA010000010.1`, an *HPRCv1* assembly; this HPRCv2 graph carries a
+different assembly of the same sample (`CM089172.1` / `CM089191.1`), and the
+source contig is absent (0 matches). Sample-level presence is not enough —
+check the **contig** before calling a readset in-graph. `hg002-noisy` is the
+genuinely in-graph workload here.
 
 ---
 
