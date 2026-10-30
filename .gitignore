@@ -4,6 +4,11 @@
 # But keep the README
 !Readme.md
 
+# Keep the install / build / query scripts
+!install.sh
+!build_index.sh
+!query.sh
+
 # Keep the scripts folder
 !scripts/
 !scripts/**

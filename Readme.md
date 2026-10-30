@@ -19,195 +19,116 @@ The pipeline extends and integrates several core components:
 - **r-index**: Full-text index based on the run-length encoded Burrows-Wheeler Transform (RLBWT) for efficient MEM finding
 - **Tag-index**: Auxiliary mapping structure that connects BWT positions to graph coordinates
 - **path-walker**: Parallel path walker that computes node coverage (and optionally GAF) from match positions
-- **PGGB pipeline**: For pangenome graph construction from multi-sample assemblies
 
 ### Workflow Summary
 
-1. **Graph Construction**: Build pangenome graphs from reference and sample sequences
-2. **Index Building**: Create RLBWT and r-index from lossless sequence space
-3. **Tag Mapping**: Construct auxiliary structure linking BWT coordinates to graph positions
-4. **MEM Finding**: Query reads against the r-index to identify maximal exact matches
-5. **Graph Projection**: Map MEMs to graph coordinates using the tag index
-6. **Coverage Computation**: Calculate path-specific and node-level coverage for genotyping
+1. **Index Building**: Create RLBWT and r-index from lossless sequence space
+2. **Tag Mapping**: Construct auxiliary structure linking BWT coordinates to graph positions
+3. **MEM Finding**: Query reads against the r-index to identify maximal exact matches
+4. **Graph Projection**: Map MEMs to graph coordinates using the tag index
+5. **Coverage Computation**: Calculate node-level coverage for genotyping
 
-This BWT-to-graph projection strategy enables fast, scalable read mapping while maintaining the full complexity of pangenome variation for accurate genotyping.
+Steps 1–2 are `build_index.sh`; steps 3–5 are `query.sh`. The input graph comes from a pangenome graph builder such as PGGB or Minigraph-Cactus.
+
+---
+
+## Installation
+
+### Requirements
+
+A C++17 compiler with OpenMP, CMake, Make, pkg-config, git, curl, Rust (cargo), and the OpenSSL, zstd and zlib development headers.
+
+**macOS**:
+```bash
+brew install llvm@17 libomp cmake zstd zlib openssl@3 pkg-config rust
+```
+
+**Linux (Debian/Ubuntu)**:
+```bash
+sudo apt install build-essential cmake pkg-config libssl-dev libzstd-dev zlib1g-dev cargo git curl
+```
+
+On a server without root, these are usually available as modules or from your admin.
+
+### Install
+
+```bash
+git clone https://github.com/hlakshmidevi10/MEM-Projection.git
+cd MEM-Projection
+./install.sh                         # installs into ~/.mem-projection
+source ~/.mem-projection/env.sh      # add this line to ~/.bashrc
+```
+
+`install.sh` builds every dependency at a pinned commit into one directory (`./install.sh /some/prefix` to choose another). If a requirement is missing it stops and says what to install. Re-running it resumes where it stopped.
+
+On macOS, vg has no release binary, so `build_index.sh` is not available; querying works.
+
+---
+
+## Building an Index
+
+```bash
+./build_index.sh -g graph.gbz -o my_index/ -t 16
+```
+
+| Option | |
+|---|---|
+| `-g` | Graph as `.gbz`, or `.gfa` with PanSN path names (`sample#hap#contig`) |
+| `-o` | Output directory |
+| `-t` | Threads (default 8) |
+| `--tmp DIR` | Temporary directory for the BWT construction (default inside `-o`, must be on the same filesystem) |
+| `--keep-intermediates` | Keep the sequence, BWT and full tag files |
+
+The index is `my_index/graph.{ri,ltags,paths,gfa}`, with `index.info` and per-step logs in `logs/`. Re-running the same command resumes from the last completed step.
+
+The build checks before it starts that there is enough free disk and that no node is longer than 1024 bp. A GFA input is converted with `gfa2gbwt -m 1024`, which splits longer nodes.
+
+---
+
+## Querying
+
+```bash
+./query.sh -i my_index/ -r reads.fq.gz -o sample_out/ -t 16
+```
+
+| Option | |
+|---|---|
+| `-i` | Index directory from `build_index.sh` |
+| `-r` | Reads as FASTQ, FASTA or one sequence per line; optionally gzipped |
+| `-o` | Output directory |
+| `-l` | Minimum MEM length (default 25) |
+| `-t` | Threads (default 8) |
+| `--gaf` | Also write `mem.gaf` |
+| `--validate` | Check `mem.gaf` against the reads and the graph (implies `--gaf`; needs `pip install gaftools==1.3.0`) |
+
+### Output
+
+| File | |
+|---|---|
+| `mem_coverage.csv` | `node_id,node_coverage`, one row per graph node: bases of the node covered by MEMs. Node IDs match `my_index/graph.gfa` |
+| `mem.gaf` | With `--gaf`: one row per MEM placement (`read_id read_st path_str path_len path_st path_end match_len path_name`) |
+| `run.info` | Index, reads, settings and tool versions |
+| `logs/` | `find_mems` and `path-walker` logs |
+
+---
+
+## Repository Layout
+
+```
+install.sh            build the dependencies
+build_index.sh        graph -> index
+query.sh              reads + index -> node coverage
+scripts/              GAF validation and coverage plotting helpers
+pangenome-pipeline/   research drivers, configs and benchmarks used to develop the pipeline
+```
 
 ---
 
 ## Dependencies
 
-1. **pggb** - Pangenome Graph Builder (includes wfmash, seqwish, smoothxg, odgi, gfaffix, samtools)
-2. **pangenome-index** - [Repository](https://github.com/hlakshmidevi10/pangenome-index-pvt) - Provides build_rindex, build_tags, compress_tags, find_mems
-3. **path-walker** - [Repository](https://github.com/hlakshmidevi10/path-walker) - Path walk and coverage computation
-4. **impg** - Pangenome query tool for extracting regions of interest
-5. **wgsim** - Read simulation tool
-6. **vg** - Variation graph toolkit
+Installed by `install.sh` at the commits listed in it:
 
----
-
-## Environment Setup
-
-### PATH Configuration
-
-```bash
-export PATH=$HOME/personal/wfmash/build/bin:$PATH
-export PATH=$HOME/personal/pafcheck/target/release:$PATH
-export PATH=$HOME/personal/seqwish/bin:$PATH
-export PATH=$HOME/personal/GFAffix/target/release:$PATH
-export PATH=$HOME/personal/odgi/bin:$PATH
-export PATH=$HOME/personal/smoothxg/bin:$PATH
-export PATH=$HOME/personal/gfainject/target/release:$PATH
-export PATH=$HOME/personal/path-walker/target/release:$PATH
-export PATH=$HOME/personal/pggb:$PATH
-export PATH=$HOME/personal/ropebwt3:$PATH
-export PATH=$HOME/personal/gbwtgraph/bin:$PATH
-export PATH=$HOME/personal/grlBWT/build:$PATH
-export PATH=$HOME/personal/minimap2/bin:$PATH
-export PATH=$HOME/personal/pangenome-index-latest/bin:$PATH
-export PATH=$HOME/personal/seqtk/bin:$PATH
-export PATH=$HOME/personal/wgsim:$PATH
-```
-
----
-
-## Whole-Genome Analysis
-
-### Build Pangenome Graph
-
-```bash
-samtools faidx reference/scerevisiae8.fa.gz
-pggb -i reference/scerevisiae8.fa.gz -t 16 -o pggb.scerevisiae8
-gfa2gbwt -c pggb.scerevisiae8/scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth -p --pan-sn
-mv pggb.scerevisiae8/scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gbz .
-```
-
-### Verify Graph Statistics
-
-View stats about the graph and the GBWT index (should show 8 samples / 8 haplotypes):
-
-```bash
-gbz_stats -i scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gbz
-gbz_stats -g scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gbz
-```
-
-### Extract Sequences and Create RLBWT
-
-```bash
-gbz_extract -b -p scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gbz > scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.seq
-grlbwt-cli scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.seq
-```
-
-### Build Tag Index
-
-```bash
-build_rindex scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.rl_bwt > scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.ri
-build_tags scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gbz scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.rl_bwt scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.tags 31 2> build-tags-scerevisiae8.fa.gz.a65af12.11fba48.056cb79-31-01.out.log
-compress_tags scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.ri scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.tags scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth 2> compress-tags-scerevisiae8.fa.gz.a65af12.11fba48.056cb79.out.log
-```
-
-### Simulate Reads
-
-Extract a region of interest and simulate reads (~10× single-end 200 bp reads with Q30-ish errors, no SNPs/indels beyond sequencing noise):
-
-```bash
-mkdir reads && cd reads
-samtools faidx ../reference/scerevisiae8.fa.gz S288C#1#chrII:274000-284000 > S288C#1#chrII:274000-284000.fa
-wgsim -N 500 -1 200 -2 200 -e 0.001 -r 0 -R 0 -X 0 -S 42 S288C\#1\#chrII:274000-284000.fa s288c_gla_chr2_274000_284000.fq /dev/null
-awk 'NR % 4 == 2' s288c_gla_chr2_274000_284000.fq > s288c_gla_chr2_274000_284000_N500_R1_200_reads.txt
-```
-
-### Find MEMs
-
-```bash
-find_mems scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.ri scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth_compressed.tags reads/s288c_gla_chr2_274000_284000_N500_R1_200_reads.txt 30 1 scerevisiae8_s288c_gla_chr2_274000_284000_N500_R1_200
-```
-
-### Prepare Graph Paths
-
-```bash
-vg convert -fW --no-translation scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gbz > scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gfa
-path_extract scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gbz scerevisiae8.paths
-```
-
-### Compute Coverage
-
-```bash
-path-walker --gfa $WDIR/scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gfa --path-pos "${OUT_PREFIX}_path_pos_v2.bin" --seq-id-starts "${OUT_PREFIX}_seq_id_starts.out" --path-names $WDIR/scerevisiae8.paths --gaf-file-prefix $OUT_PREFIX --len-scale
-```
-
-### Validate GAF Output
-
-```bash
-python3 scripts/validate_gaf_v2.py scerevisiae8_s288c_gla_chr2_274000_284000_N500_R1_200.gaf reads/s288c_gla_chr2_274000_284000_N500_R1_200_reads.txt scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gfa
-```
-
----
-
-## ROI (Region of Interest) Analysis
-
-### Extract Region-Specific Sequences
-
-```bash
-impg query -a ../pggb.scerevisiae8/scerevisiae8.fa.gz.a65af12.alignments.wfmash.paf -r S288C#1#chrI:186000-214000 --sequence-files ../reference/scerevisiae8.fa.gz -o fasta -O s28cc_flo1_chr1_186000_214000 -v 2
-samtools faidx s28cc_flo1_chr1_186000_214000.fa
-```
-
-### Build Region-Specific Graph
-
-```bash
-pggb -i s28cc_flo1_chr1_186000_214000.fa -o pggb.s28cc_flo1_chr1_186000_214000
-gfa2gbwt -c pggb.s28cc_flo1_chr1_186000_214000/s28cc_flo1_chr1_186000_214000.fa.a65af12.11fba48.056cb79.smooth.final -p --pan-sn
-mv pggb.s28cc_flo1_chr1_186000_214000/s28cc_flo1_chr1_186000_214000.fa.a65af12.11fba48.056cb79.smooth.final.gbz s28cc_flo1_chr1_186000_214000.gbz
-```
-
-### Extract Sequences and Create RLBWT
-
-```bash
-gbz_extract -b -p s28cc_flo1_chr1_186000_214000.gbz > s28cc_flo1_chr1_186000_214000.seq
-grlbwt-cli s28cc_flo1_chr1_186000_214000.seq
-```
-
-### Build Tag Index
-
-```bash
-build_rindex s28cc_flo1_chr1_186000_214000.rl_bwt > s28cc_flo1_chr1_186000_214000.ri
-build_tags s28cc_flo1_chr1_186000_214000.gbz s28cc_flo1_chr1_186000_214000.rl_bwt s28cc_flo1_chr1_186000_214000.tags 31 2> build-tags-s28cc_flo1_chr1_186000_214000.out.log
-compress_tags s28cc_flo1_chr1_186000_214000.ri s28cc_flo1_chr1_186000_214000.tags s28cc_flo1_chr1_186000_214000 2> compress-tags-s28cc_flo1_chr1_186000_214000.out.log
-```
-
-### Prepare Graph Paths
-
-```bash
-vg convert -fW --no-translation s28cc_flo1_chr1_186000_214000.gbz > s28cc_flo1_chr1_186000_214000.gfa
-path_extract s28cc_flo1_chr1_186000_214000.gbz s28cc_flo1_chr1_186000_214000.paths
-```
-
-### Simulate Reads
-
-```bash
-samtools faidx s28cc_flo1_chr1_186000_214000.fa S288C#1#chrI:186000-214000 > s28cc_chr1_186000_214000.fa
-wgsim -N 500 -1 200 -2 200 -e 0.001 -r 0 -R 0 -X 0 -S 42 s28cc_flo1_chr1_186000_214000.fa s28cc_flo1_chr1_186000_214000.fq  /dev/null
-awk 'NR % 4 == 2' s28cc_flo1_chr1_186000_214000.fq > s28cc_flo1_chr1_186000_214000_N500_R1_200_reads.txt
-```
-
-### Find MEMs and Compute Coverage
-
-```bash
-find_mems s28cc_flo1_chr1_186000_214000.ri s28cc_flo1_chr1_186000_214000_compressed.tags s28cc_flo1_chr1_186000_214000_N500_R1_200_reads.txt 30 1 s28cc_flo1_chr1_186000_214000_N500_R1_200
-path-walker --gfa s28cc_flo1_chr1_186000_214000.gfa --path-pos "${OUT_PREFIX}_path_pos_v2.bin" --seq-id-starts "${OUT_PREFIX}_seq_id_starts.out" --path-names s28cc_flo1_chr1_186000_214000.paths --gaf-file-prefix $OUT_PREFIX --len-scale
-python3 ../../scripts/bandage_coverage.py s28cc_flo1_chr1_186000_214000_N500_R1_200_coverage.csv
-```
-
----
-
-## Visualization
-
-### Coverage Plots
-
-Full graph view with read coverage:
-
-![Bandage Coverage - Full Graph](yeast-8/s28cc_flo1_chr1_186000_214000/bandage-coverage-flo1.png)
-
-Region-specific coverage detail:
-
-![Bandage Coverage - Region Detail](yeast-8/s28cc_flo1_chr1_186000_214000/bandage-coverage-flo1-region.png)
+- **[pangenome-index](https://github.com/hlakshmidevi10/pangenome-index-pvt)** - r-index, tag arrays and `find_mems`
+- **[path-walker](https://github.com/hlakshmidevi10/path-walker)** - MEM placements to node coverage and GAF
+- **[vg](https://github.com/vgteam/vg)** - writes the graph's GFA from the GBZ
+- **[GBWTGraph](https://github.com/jltsiren/gbwtgraph)**, **[GBWT](https://github.com/jltsiren/gbwt)**, **[HandleGraph](https://github.com/vgteam/libhandlegraph)**, **[SDSL](https://github.com/vgteam/sdsl-lite)**, **[grlBWT](https://github.com/ddiazdom/grlBWT)**
