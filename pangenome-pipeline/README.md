@@ -1,6 +1,6 @@
 # pangenome-pipeline
 
-Reproducible, profiled runs of the `pangenome-index` → `gafpack` → `validate_gaf` workflow.
+Reproducible, profiled runs of the `pangenome-index` → `path-walker` → `validate_gaf` workflow.
 
 ## Quick start
 
@@ -34,7 +34,7 @@ and the coverage-only/--gaf and lightweight/--full-tag mode semantics.
 ```
 configs/<name>.env                 inputs ($GBZ, $READS), params, reference dir
 build_index.sh                     steps 01–08b (gbz_stats → ... → build_lightweight_tags)
-query.sh                           steps 09–10 (find_mems → gafpack); --gaf adds step 11
+query.sh                           steps 09–10 (find_mems → path-walker); --gaf adds step 11
 compare.sh                         md5/size + set-equality diff vs a reference query
 bootstrap_vesuvio.sh               per-user install of all deps on a fresh Linux host
 BUILD_QUERY_LAYOUT.md              full directory + config contract documentation
@@ -53,10 +53,10 @@ runs/<index-tag>/                  one dir per index build
       logs/                        09, 10, [11 with --gaf]; timing_summary.txt
       mems_path_pos_v2.bin         find_mems output (step 09)
       mems_seq_id_starts.out
-      alignment_coverage.csv       gafpack output (step 10, always)
+      alignment_coverage.csv       path-walker output (step 10, always)
       alignment.gaf                only present with query.sh --gaf
     full-tag/                      created with --full-tag (A/B / regression)
-      ...same structure, different tag index + gafpack flags...
+      ...same structure, different tag index + path-walker flags...
   FINDINGS.md                      hand-written analysis (when there is one)
 perf/                              performance characterization
   perf_harness.sh                  N-trial timed harness; --compare-v1 for A/B

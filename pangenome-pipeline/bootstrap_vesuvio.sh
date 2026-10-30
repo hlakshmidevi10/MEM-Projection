@@ -7,7 +7,7 @@
 #   $HOME/.local/                       (libhandlegraph headers + libs, gaftools)
 #   $HOME/.cargo/                       (rustup)
 #   $HOME/{sdsl-lite,gbwt,libhandlegraph,gbwtgraph,grlBWT,
-#          pangenome-index-latest,gafpack,mem-projection}/
+#          pangenome-index-latest,path-walker,mem-projection}/
 #
 # What it does NOT install: vg (deferred per user request).
 # What it ASSUMES already present (preflight checks these): a C/C++ toolchain,
@@ -40,8 +40,8 @@ JOBS="${JOBS:-$(nproc 2>/dev/null || echo 4)}"
 
 # Git remotes (your private forks; SSH would be ssh://git@github.com/…)
 # Branches matter: pangenome-index-latest uses upstream-sync (v2 record format
-# lives there, NOT main); gafpack uses path-walker (only branch with the
-# v2 binary-IO reader). mem-projection uses default branch.
+# lives there, NOT main); path-walker uses main.
+# mem-projection uses default branch.
 PI_REPO="${PI_REPO:-https://github.com/hlakshmidevi10/pangenome-index-pvt.git}"
 PI_BRANCH="${PI_BRANCH:-upstream-sync}"
 PI_DIR_NAME="pangenome-index-latest"   # local clone name expected by run.sh
@@ -50,9 +50,9 @@ MEM_REPO="${MEM_REPO:-https://github.com/hlakshmidevi10/MEM-Projection.git}"
 MEM_BRANCH="${MEM_BRANCH:-}"           # empty = default branch
 MEM_DIR_NAME="mem-projection"
 
-GAFPACK_REPO="${GAFPACK_REPO:-https://github.com/hlakshmidevi10/gafpack-pvt.git}"
-GAFPACK_BRANCH="${GAFPACK_BRANCH:-path-walker}"
-GAFPACK_DIR_NAME="gafpack"
+PATH_WALKER_REPO="${PATH_WALKER_REPO:-https://github.com/hlakshmidevi10/path-walker.git}"
+PATH_WALKER_BRANCH="${PATH_WALKER_BRANCH:-main}"
+PATH_WALKER_DIR_NAME="path-walker"
 
 # vgteam's maintained fork. Matters because (a) simongog/sdsl-lite is
 # abandoned and its libdivsufsort submodule has cmake_minimum_required(2.8.7)
@@ -138,11 +138,11 @@ EOF
     rm -f /tmp/_pf_cxx /tmp/_pf_cxx.cpp
 
     # NB: CA certificate availability is only required for cargo's first-time
-    # crate fetch (gafpack step). It's checked inline in step 8 instead of
+    # crate fetch (path-walker step). It's checked inline in step 8 instead of
     # here, because (a) the system-curl probe is unreliable when SSL_CERT_FILE
     # is unset but openssl has a working compiled-in default, and (b) failing
     # preflight on missing CA certs would block users re-running the bootstrap
-    # after gafpack is already built (when no further HTTPS fetches happen).
+    # after path-walker is already built (when no further HTTPS fetches happen).
 
     if [ ${#missing_bins[@]}    -eq 0 ] \
     && [ ${#missing_libs[@]}    -eq 0 ] \
@@ -434,7 +434,7 @@ else
     ok "pangenome-index-latest already built"
 fi
 
-# ---- 7. Rust toolchain (for gafpack) ---------------------------------------
+# ---- 7. Rust toolchain (for path-walker) -----------------------------------
 if ! command -v cargo >/dev/null 2>&1; then
     log "install rustup + stable toolchain into \$HOME/.cargo (per-user)"
     curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs \
@@ -446,16 +446,11 @@ else
     ok "rust already present: $(rustc --version)"
 fi
 
-# ---- 8. gafpack ------------------------------------------------------------
-# CC/CXX explicitly set: gafpack's transitive deps (bzip2-sys, liblzma-sys,
-# zstd-sys) use the cc-rs Rust build-script library to compile C sources at
-# build time. cc-rs probes $CC first, falling back to `cc`/`c++`. Guix's
-# gcc-toolchain only provides `gcc`/`g++` (no `cc` alias, unlike Debian's
-# build-essential), so without $CC=gcc the build dies with
-# "ToolNotFound: failed to find tool 'cc'". Setting them here is a no-op on
-# hosts where /usr/bin/cc exists.
-if [ ! -x "$ROOT/$GAFPACK_DIR_NAME/target/release/gafpack" ]; then
-    clone_or_update "$GAFPACK_REPO" "$GAFPACK_DIR_NAME" "$GAFPACK_BRANCH"
+# ---- 8. path-walker --------------------------------------------------------
+# CC/CXX set because Guix gcc-toolchain has no `cc` alias, which cc-rs build
+# scripts probe for; a no-op on hosts where /usr/bin/cc exists.
+if [ ! -x "$ROOT/$PATH_WALKER_DIR_NAME/target/release/path-walker" ]; then
+    clone_or_update "$PATH_WALKER_REPO" "$PATH_WALKER_DIR_NAME" "$PATH_WALKER_BRANCH"
 
     # CA cert check — cargo fetches from crates.io over HTTPS for first-time
     # builds. Only checked here because subsequent re-runs (offline cache hit)
@@ -463,7 +458,7 @@ if [ ! -x "$ROOT/$GAFPACK_DIR_NAME/target/release/gafpack" ]; then
     # default cert location than curl, so the truest test is `cargo search`
     # (lightweight — hits crates.io index without downloading anything).
     log "verify TLS / CA bundle (cargo needs HTTPS to crates.io)"
-    if ! (cd "$ROOT/$GAFPACK_DIR_NAME" && cargo search --limit 1 anyhow >/dev/null 2>&1); then
+    if ! (cd "$ROOT/$PATH_WALKER_DIR_NAME" && cargo search --limit 1 anyhow >/dev/null 2>&1); then
         echo "  cargo HTTPS fetch failed. Most likely cause on Guix: no CA bundle."
         echo "  Fix: guix install nss-certs"
         echo "       GUIX_PROFILE=\"\$HOME/.guix-profile\"; . \"\$GUIX_PROFILE/etc/profile\""
@@ -471,12 +466,12 @@ if [ ! -x "$ROOT/$GAFPACK_DIR_NAME/target/release/gafpack" ]; then
         die "no working CA bundle for cargo HTTPS"
     fi
 
-    log "cargo build --release gafpack (CC=gcc CXX=g++)"
-    (cd "$ROOT/$GAFPACK_DIR_NAME" \
+    log "cargo build --release path-walker (CC=gcc CXX=g++)"
+    (cd "$ROOT/$PATH_WALKER_DIR_NAME" \
         && CC="${CC:-gcc}" CXX="${CXX:-g++}" cargo build --release)
-    ok "gafpack built at $ROOT/$GAFPACK_DIR_NAME/target/release/gafpack"
+    ok "path-walker built at $ROOT/$PATH_WALKER_DIR_NAME/target/release/path-walker"
 else
-    ok "gafpack already built"
+    ok "path-walker already built"
 fi
 
 # ---- 9. mem-projection (the pipeline repo itself) --------------------------
@@ -536,17 +531,17 @@ export LD_LIBRARY_PATH="\$PREFIX/lib:\$HOME/.guix-profile/lib:\${LD_LIBRARY_PATH
 export PKG_CONFIG_PATH="\$PREFIX/lib/pkgconfig:\${PKG_CONFIG_PATH:-}"
 
 # Tool dirs on PATH (mirrors the Mac dev setup's zshrc).
-# Lets you call find_mems, gafpack, gbz_stats, grlbwt-cli, vg directly
-# instead of via \$PI_BIN / \$GAFPACK etc.
+# Lets you call find_mems, path-walker, gbz_stats, grlbwt-cli, vg directly
+# instead of via \$PI_BIN / \$PATH_WALKER etc.
 export PATH="$ROOT/$PI_DIR_NAME/bin:\$PATH"
-export PATH="$ROOT/$GAFPACK_DIR_NAME/target/release:\$PATH"
+export PATH="$ROOT/$PATH_WALKER_DIR_NAME/target/release:\$PATH"
 export PATH="$ROOT/grlBWT/build:\$PATH"
 export PATH="$ROOT/gbwtgraph/bin:\$PATH"
 export PATH="\$PREFIX/bin:\$HOME/.local/bin:\$HOME/.cargo/bin:\$PATH"
 
 # Pipeline tool locations (consumed by mem-projection/pangenome-pipeline/run.sh)
 export PI_BIN="$ROOT/$PI_DIR_NAME/bin"
-export GAFPACK="$ROOT/$GAFPACK_DIR_NAME/target/release/gafpack"
+export PATH_WALKER="$ROOT/$PATH_WALKER_DIR_NAME/target/release/path-walker"
 export GRLBWT="$ROOT/grlBWT/build/grlbwt-cli"
 export GBZ_STATS="$ROOT/gbwtgraph/bin/gbz_stats"
 export GBZ_EXTRACT="$ROOT/gbwtgraph/bin/gbz_extract"
@@ -584,7 +579,7 @@ printf "  %-22s %s\n" \
     "gbwtgraph"          "$ROOT/gbwtgraph/bin/{gbz_stats,gbz_extract,gfa2gbwt}" \
     "grlBWT"             "$ROOT/grlBWT/build/grlbwt-cli" \
     "pangenome-index"    "$ROOT/$PI_DIR_NAME/bin/" \
-    "gafpack"            "$ROOT/$GAFPACK_DIR_NAME/target/release/gafpack" \
+    "path-walker"        "$ROOT/$PATH_WALKER_DIR_NAME/target/release/path-walker" \
     "mem-projection"     "$ROOT/$MEM_DIR_NAME" \
     "gaftools"           "$(command -v gaftools)" \
     "env file"           "$ENVFILE"

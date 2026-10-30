@@ -43,7 +43,7 @@
 #     OR <BASE>_compressed.tags (full-tag mode), depending on which modes
 #     are benchmarked.
 #   - $PI_BIN/find_mems built with --lightweight-tags support
-#   - $GAFPACK built with --dedup-read-node support
+#   - $PATH_WALKER built with --dedup-read-node support
 #   - $READS file (one read per line, no FASTA headers)
 #   - GNU time (gtime / /usr/bin/time -v / ~/.guix-profile/bin/time)
 # =============================================================================
@@ -54,7 +54,7 @@ MEM_PROJ="$(cd "$PIPE_DIR/.." && pwd)"
 
 # ---- Tool locations --------------------------------------------------------
 PI_BIN="${PI_BIN:-/Users/hlakshmidevi/personal/pangenome-index-latest/bin}"
-GAFPACK="${GAFPACK:-/Users/hlakshmidevi/personal/gafpack/target/release/gafpack}"
+PATH_WALKER="$(command -v "${PATH_WALKER:-path-walker}" || true)"
 
 # ---- time(1) detection (mirrors build_index.sh / query.sh) -----------------
 TIME=""
@@ -120,7 +120,7 @@ done
 
 # Sanity-check binaries
 [ -x "$PI_BIN/find_mems" ] || { echo "Missing or non-executable: $PI_BIN/find_mems"; exit 1; }
-[ -x "$GAFPACK" ]          || { echo "Missing or non-executable: $GAFPACK"; exit 1; }
+[ -x "$PATH_WALKER" ]          || { echo "Missing or non-executable: $PATH_WALKER"; exit 1; }
 
 # Locate index
 INDEX_DIR="${INDEX_DIR:-$PIPE_DIR/runs/v1-current}"
@@ -220,7 +220,7 @@ run_one_trial() {
     fi
     # Run, with no shell-quoting surprises around gafpack_flags (may be empty)
     "$TIME" -v -o "$tdir/gafpack.time" \
-        "$GAFPACK" \
+        "$PATH_WALKER" \
             --gfa "$INDEX_DIR/${BASE}.gfa" \
             --path-pos "mems_path_pos_v2.bin" \
             --seq-id-starts "mems_seq_id_starts.out" \
@@ -298,7 +298,7 @@ run_one_trial() {
     echo
     echo "Binaries:"
     printf "  %-12s %s  md5=%s\n" "find_mems" "$PI_BIN/find_mems" "$(fmd5 "$PI_BIN/find_mems")"
-    printf "  %-12s %s  md5=%s\n" "gafpack"   "$GAFPACK"          "$(fmd5 "$GAFPACK")"
+    printf "  %-12s %s  md5=%s\n" "path-walker" "$PATH_WALKER"      "$(fmd5 "$PATH_WALKER")"
     echo
     echo "Input files:"
     [ -f "${GBZ:-}" ] && printf "  %-32s %15s bytes  %s\n" "$(basename "$GBZ"):" "$(fsize "$GBZ")" "$GBZ"

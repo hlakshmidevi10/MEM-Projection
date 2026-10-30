@@ -18,11 +18,11 @@
 #                  `<dataset>-` prefix removed (e.g. `hprcv1-chr6-ref-reads.env`
 #                  → `ref-reads`).
 #   --gaf        — additionally produce alignment.gaf AND run validate_gaf.
-#                  Without --gaf: gafpack runs in coverage-only mode (default).
+#                  Without --gaf: path-walker runs in coverage-only mode (default).
 #                  Production deploys only need coverage; .gaf + validation
 #                  are test-only overhead.
 #   --full-tag   — use the full compressed-tags index (.tags via convert_tags) +
-#                  gafpack without --dedup-read-node, i.e. the pre-lightweight
+#                  path-walker without --dedup-read-node, i.e. the pre-lightweight
 #                  pipeline. Default is lightweight (.ltags + --dedup-read-node).
 #                  Outputs of the two modes are written to SEPARATE subdirs
 #                  (queries/<name>/lightweight/ vs queries/<name>/full-tag/) so
@@ -30,7 +30,7 @@
 #                  against the lightweight default.
 #   --all-positions — verification/POC mode. find_mems bypasses the tag array
 #                  and emits ONE entry per BWT position in each MEM (mem.size
-#                  entries per MEM); gafpack runs with --dedup-read-node. The
+#                  entries per MEM); path-walker runs with --dedup-read-node. The
 #                  deduped result is the ground truth against which the
 #                  lightweight pipeline's dedup logic can be checked. Output
 #                  volume is large; intended for small reads sets only.
@@ -42,23 +42,23 @@
 #   ├── lightweight/                     ← created without --full-tag (default)
 #   │   ├── mems_path_pos_v2.bin         (09: find_mems --lightweight-tags)
 #   │   ├── mems_seq_id_starts.out       (09)
-#   │   ├── alignment_coverage.csv       (10: gafpack --dedup-read-node)
+#   │   ├── alignment_coverage.csv       (10: path-walker --dedup-read-node)
 #   │   ├── alignment.gaf                (10: only with --gaf)
 #   │   ├── logs/09_find_mems.{log,time}
-#   │   ├── logs/10_gafpack.{log,time}
+#   │   ├── logs/10_path_walker.{log,time}
 #   │   ├── logs/11_validate_gaf.{log,time}  (only with --gaf)
 #   │   ├── logs/timing_summary.txt
 #   │   ├── RUN_INFO.txt
 #   │   ├── config.env -> $CONFIG
 #   │   └── reads      -> $READS
 #   ├── full-tag/                        ← created with --full-tag
-#   │   └── ...same structure, different tag index + gafpack flags...
+#   │   └── ...same structure, different tag index + path-walker flags...
 #   └── all-positions/                   ← created with --all-positions
-#       └── ...same structure, find_mems w/o tag index + gafpack --dedup-read-node...
+#       └── ...same structure, find_mems w/o tag index + path-walker --dedup-read-node...
 #
 # Each step is guarded by [ -f <output> ]; re-invocation skips completed steps.
 # Adding --gaf to a previously coverage-only run re-runs step 10 in the SAME
-# mode subdir (gafpack is fast) to produce alignment.gaf, then runs step 11.
+# mode subdir (path-walker is fast) to produce alignment.gaf, then runs step 11.
 #
 # Validation (step 11, only with --gaf) requires gaftools==1.3.0; pinned by
 # bootstrap_vesuvio.sh.
@@ -70,7 +70,7 @@ MEM_PROJ="$(cd "$PIPE_DIR/.." && pwd)"
 
 # ---- Tool locations --------------------------------------------------------
 PI_BIN="${PI_BIN:-$HOME/dev/pangenome-index-pvt/bin}"
-GAFPACK="${GAFPACK:-gafpack}"
+PATH_WALKER="${PATH_WALKER:-path-walker}"
 VALIDATE_GAF="${VALIDATE_GAF:-$MEM_PROJ/scripts/validate_gaf_v2.py}"
 
 # ---- time(1) detection -----------------------------------------------------
@@ -189,9 +189,9 @@ cd "$QUERY_DIR"
     echo "MEM_LEN:       $MEM_LEN"
     echo "MIN_OCC:       $MIN_OCC"
     case "$TAG_MODE" in
-        lightweight)   echo "Tag mode:      lightweight (find_mems --lightweight-tags, gafpack --dedup-read-node)" ;;
-        full-tag)      echo "Tag mode:      full-tag (find_mems w/o lightweight, gafpack w/o dedup-read-node)" ;;
-        all-positions) echo "Tag mode:      all-positions (find_mems --all-positions [tag array bypassed], gafpack --dedup-read-node)" ;;
+        lightweight)   echo "Tag mode:      lightweight (find_mems --lightweight-tags, path-walker --dedup-read-node)" ;;
+        full-tag)      echo "Tag mode:      full-tag (find_mems w/o lightweight, path-walker w/o dedup-read-node)" ;;
+        all-positions) echo "Tag mode:      all-positions (find_mems --all-positions [tag array bypassed], path-walker --dedup-read-node)" ;;
     esac
     if [ "$EMIT_GAF" = "1" ]; then
         echo "GAF mode:      --gaf (alignment.gaf produced; validate_gaf runs)"
@@ -202,9 +202,9 @@ cd "$QUERY_DIR"
     echo "Started:       $(date)"
     echo "Host:          $(hostname)"
     echo "PI_BIN:        $PI_BIN"
-    echo "GAFPACK:       $GAFPACK"
+    echo "PATH_WALKER:   $PATH_WALKER"
     git -C "$(dirname "$PI_BIN")" log -1 --format='PI commit:     %h %ci %s' 2>/dev/null || true
-    (cd "$(dirname "$GAFPACK")" 2>/dev/null && git log -1 --format='GP commit:     %h %ci %s') 2>/dev/null || true
+    (cd "$(dirname "$(command -v "$PATH_WALKER")")" 2>/dev/null && git log -1 --format='PW commit:     %h %ci %s') 2>/dev/null || true
     echo
     echo "Index file provenance (mtime, size):"
     for f in "${BASE}.ri" "${BASE}.ltags" "${BASE}.paths" "${BASE}.gfa" "${BASE}_compressed.tags"; do
@@ -286,7 +286,7 @@ echo "  Tag mode:  $TAG_MODE  ($(basename "$TAG_INDEX"))"
 echo "  Reads:     $READS ($(du -h "$READS" | cut -f1))"
 echo "  Output:    $QUERY_DIR"
 if [ "$EMIT_GAF" = "1" ]; then
-    echo "  GAF mode:  --gaf (gafpack writes alignment.gaf; validate_gaf runs)"
+    echo "  GAF mode:  --gaf (path-walker writes alignment.gaf; validate_gaf runs)"
 else
     echo "  GAF mode:  coverage-only (no .gaf, no validate; pass --gaf to enable)"
 fi
@@ -295,11 +295,11 @@ echo
 # === 09 find_mems ===========================================================
 # Lightweight mode: passes --lightweight-tags so find_mems reads .ltags and
 # emits one entry per tag run intersecting each MEM (no graph-pos dedup;
-# offloaded to gafpack via --dedup-read-node in step 10).
+# offloaded to path-walker via --dedup-read-node in step 10).
 # Full-tag mode: omits --lightweight-tags; find_mems reads _compressed.tags
 # and dedups internally (per-haplotype duplicates still counted separately).
 # All-positions mode: passes --all-positions; tag array bypassed; emits one
-# entry per BWT position in each MEM. gafpack --dedup-read-node then collapses
+# entry per BWT position in each MEM. path-walker --dedup-read-node then collapses
 # down to (read_id, read_st, node, offset) ground truth for verification.
 case "$TAG_MODE" in
     lightweight)
@@ -322,13 +322,13 @@ esac
     "$RI" "$TAG_INDEX" "$READS" "$MEM_LEN" "$MIN_OCC" "mems" \
     "${FIND_MEMS_FLAGS[@]}" ${FIND_MEMS_EXTRA_FLAGS:-}
 
-# === 10 gafpack =============================================================
+# === 10 path-walker =========================================================
 # Two orthogonal axes:
-#   tag mode:  lightweight → gafpack needs --dedup-read-node (find_mems' lite
-#              output contains per-MEM same-node duplicates that gafpack must
+#   tag mode:  lightweight → path-walker needs --dedup-read-node (find_mems' lite
+#              output contains per-MEM same-node duplicates that path-walker must
 #              dedup; without the flag, coverage counts get inflated)
 #              full-tag   → no --dedup-read-node (find_mems already dedups;
-#              gafpack treats every record as a distinct event)
+#              path-walker treats every record as a distinct event)
 #   gaf mode:  --gaf       → --gaf-file-prefix alignment (writes .gaf + cov.csv)
 #              default     → --coverage-prefix alignment (writes cov.csv only)
 #
@@ -336,35 +336,35 @@ esac
 #   coverage-only → alignment_coverage.csv
 #   --gaf         → alignment.gaf
 # Adding --gaf to a previously coverage-only run re-runs step 10 (cheap).
-GAFPACK_FLAGS=(
+PATH_WALKER_FLAGS=(
     --gfa "$GFA"
     --path-pos "mems_path_pos_v2.bin"
     --seq-id-starts "mems_seq_id_starts.out"
     --path-names "$PATHS"
 )
-# Both lightweight and all-positions feed gafpack unfiltered records and rely
+# Both lightweight and all-positions feed path-walker unfiltered records and rely
 # on it for graph-position dedup. full-tag's records are already deduped by
 # find_mems so we omit the flag there.
 if [ "$TAG_MODE" = "lightweight" ] || [ "$TAG_MODE" = "all-positions" ]; then
-    GAFPACK_FLAGS+=(--dedup-read-node)
+    PATH_WALKER_FLAGS+=(--dedup-read-node)
 fi
 
 if [ "$EMIT_GAF" = "1" ]; then
-    echo "=== 10 gafpack ($TAG_MODE mode, --gaf-file-prefix) ==="
-    [ -f "alignment.gaf" ] || profile 10_gafpack "$GAFPACK" \
-        "${GAFPACK_FLAGS[@]}" \
+    echo "=== 10 path-walker ($TAG_MODE mode, --gaf-file-prefix) ==="
+    [ -f "alignment.gaf" ] || profile 10_path_walker "$PATH_WALKER" \
+        "${PATH_WALKER_FLAGS[@]}" \
         --gaf-file-prefix "alignment"
 else
-    echo "=== 10 gafpack ($TAG_MODE mode, --coverage-prefix only) ==="
-    [ -f "alignment_coverage.csv" ] || profile 10_gafpack "$GAFPACK" \
-        "${GAFPACK_FLAGS[@]}" \
+    echo "=== 10 path-walker ($TAG_MODE mode, --coverage-prefix only) ==="
+    [ -f "alignment_coverage.csv" ] || profile 10_path_walker "$PATH_WALKER" \
+        "${PATH_WALKER_FLAGS[@]}" \
         --coverage-prefix "alignment"
 fi
 
 # === 11 validate_gaf (only with --gaf) ======================================
 if [ "$EMIT_GAF" = "1" ]; then
     echo "=== 11 validate_gaf (n=$VALIDATE_SAMPLE) ==="
-    # validate_gaf reconstructs path sequences against the same GFA gafpack walked.
+    # validate_gaf reconstructs path sequences against the same GFA path-walker walked.
     profile 11_validate_gaf python3 "$VALIDATE_GAF" "alignment.gaf" "$READS" "$GFA" --sample "$VALIDATE_SAMPLE"
 fi
 

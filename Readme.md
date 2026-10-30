@@ -18,7 +18,7 @@ The pipeline extends and integrates several core components:
 
 - **r-index**: Full-text index based on the run-length encoded Burrows-Wheeler Transform (RLBWT) for efficient MEM finding
 - **Tag-index**: Auxiliary mapping structure that connects BWT positions to graph coordinates
-- **gafpack**: Custom parallel path-walker that computes paths and node coverage from match positions
+- **path-walker**: Parallel path walker that computes node coverage (and optionally GAF) from match positions
 - **PGGB pipeline**: For pangenome graph construction from multi-sample assemblies
 
 ### Workflow Summary
@@ -38,7 +38,7 @@ This BWT-to-graph projection strategy enables fast, scalable read mapping while 
 
 1. **pggb** - Pangenome Graph Builder (includes wfmash, seqwish, smoothxg, odgi, gfaffix, samtools)
 2. **pangenome-index** - [Repository](https://github.com/hlakshmidevi10/pangenome-index-pvt) - Provides build_rindex, build_tags, compress_tags, find_mems
-3. **gafpack** - [Repository](https://github.com/hlakshmidevi10/gafpack-pvt/tree/path-walker) - Path-walker and coverage computation
+3. **path-walker** - [Repository](https://github.com/hlakshmidevi10/path-walker) - Path walk and coverage computation
 4. **impg** - Pangenome query tool for extracting regions of interest
 5. **wgsim** - Read simulation tool
 6. **vg** - Variation graph toolkit
@@ -57,7 +57,7 @@ export PATH=$HOME/personal/GFAffix/target/release:$PATH
 export PATH=$HOME/personal/odgi/bin:$PATH
 export PATH=$HOME/personal/smoothxg/bin:$PATH
 export PATH=$HOME/personal/gfainject/target/release:$PATH
-export PATH=$HOME/personal/gafpack/target/release:$PATH
+export PATH=$HOME/personal/path-walker/target/release:$PATH
 export PATH=$HOME/personal/pggb:$PATH
 export PATH=$HOME/personal/ropebwt3:$PATH
 export PATH=$HOME/personal/gbwtgraph/bin:$PATH
@@ -132,13 +132,13 @@ path_extract scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gbz scerevisiae8.
 ### Compute Coverage
 
 ```bash
-./target/debug/gafpack --gfa $WDIR/scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gfa --path-pos "${OUT_PREFIX}_path_pos.tsv" --seq-id-starts "${OUT_PREFIX}_seq_id_starts.out" --path-names $WDIR/scerevisiae8.paths --gaf-file-prefix $OUT_PREFIX --len-scale
+path-walker --gfa $WDIR/scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gfa --path-pos "${OUT_PREFIX}_path_pos_v2.bin" --seq-id-starts "${OUT_PREFIX}_seq_id_starts.out" --path-names $WDIR/scerevisiae8.paths --gaf-file-prefix $OUT_PREFIX --len-scale
 ```
 
 ### Validate GAF Output
 
 ```bash
-~/personal/gafpack/validate_gaf.py scerevisiae8_s288c_gla_chr2_274000_284000_N500_R1_200.gaf reads/s288c_gla_chr2_274000_284000_N500_R1_200_reads.txt scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gfa
+python3 scripts/validate_gaf_v2.py scerevisiae8_s288c_gla_chr2_274000_284000_N500_R1_200.gaf reads/s288c_gla_chr2_274000_284000_N500_R1_200_reads.txt scerevisiae8.fa.gz.a65af12.11fba48.056cb79.smooth.gfa
 ```
 
 ---
@@ -194,7 +194,7 @@ awk 'NR % 4 == 2' s28cc_flo1_chr1_186000_214000.fq > s28cc_flo1_chr1_186000_2140
 
 ```bash
 find_mems s28cc_flo1_chr1_186000_214000.ri s28cc_flo1_chr1_186000_214000_compressed.tags s28cc_flo1_chr1_186000_214000_N500_R1_200_reads.txt 30 1 s28cc_flo1_chr1_186000_214000_N500_R1_200
-~/personal/gafpack/target/debug/gafpack --gfa s28cc_flo1_chr1_186000_214000.gfa --path-pos "${OUT_PREFIX}_path_pos.tsv" --seq-id-starts "${OUT_PREFIX}_seq_id_starts.out" --path-names s28cc_flo1_chr1_186000_214000.paths --gaf-file-prefix $OUT_PREFIX --len-scale
+path-walker --gfa s28cc_flo1_chr1_186000_214000.gfa --path-pos "${OUT_PREFIX}_path_pos_v2.bin" --seq-id-starts "${OUT_PREFIX}_seq_id_starts.out" --path-names s28cc_flo1_chr1_186000_214000.paths --gaf-file-prefix $OUT_PREFIX --len-scale
 python3 ../../scripts/bandage_coverage.py s28cc_flo1_chr1_186000_214000_N500_R1_200_coverage.csv
 ```
 
